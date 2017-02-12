@@ -1,0 +1,1152 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  ﻿<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="oracle,sql tuning," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="IT 职业生涯规划" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="运营商异常缓慢SQL优化今天到一个运营商进行深度巡检时，发现一条SQL运行次数频繁，并且占用资源非常高，这条SQL是对两个千万级的大表进行关联，根据电话号码进行查询，原来的语句运行非常缓慢，常常半个小时都执行不完，真不知道业务是怎么忍受运行这么缓慢的SQL。
+因为需要对客户信息进行保密，只能在自己电脑上模拟相应的数据与优化结果
+先创建两个表，然后模拟表的数据，分别插入3千万与2千5百万">
+<meta property="og:type" content="article">
+<meta property="og:title" content="运营商异常缓慢SQL优化">
+<meta property="og:url" content="http://username.github.io/2016/08/30/运营商异常缓慢的SQL优化/index.html">
+<meta property="og:site_name" content="IT 职业生涯规划">
+<meta property="og:description" content="运营商异常缓慢SQL优化今天到一个运营商进行深度巡检时，发现一条SQL运行次数频繁，并且占用资源非常高，这条SQL是对两个千万级的大表进行关联，根据电话号码进行查询，原来的语句运行非常缓慢，常常半个小时都执行不完，真不知道业务是怎么忍受运行这么缓慢的SQL。
+因为需要对客户信息进行保密，只能在自己电脑上模拟相应的数据与优化结果
+先创建两个表，然后模拟表的数据，分别插入3千万与2千5百万">
+<meta property="og:updated_time" content="2017-02-03T09:15:46.155Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="运营商异常缓慢SQL优化">
+<meta name="twitter:description" content="运营商异常缓慢SQL优化今天到一个运营商进行深度巡检时，发现一条SQL运行次数频繁，并且占用资源非常高，这条SQL是对两个千万级的大表进行关联，根据电话号码进行查询，原来的语句运行非常缓慢，常常半个小时都执行不完，真不知道业务是怎么忍受运行这么缓慢的SQL。
+因为需要对客户信息进行保密，只能在自己电脑上模拟相应的数据与优化结果
+先创建两个表，然后模拟表的数据，分别插入3千万与2千5百万">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"always"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://username.github.io/2016/08/30/运营商异常缓慢的SQL优化/"/>
+
+
+
+
+
+  <title> 运营商异常缓慢SQL优化 | IT 职业生涯规划 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner">﻿<div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">IT 职业生涯规划</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle">时间的朋友</p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://username.github.io/2016/08/30/运营商异常缓慢的SQL优化/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="TY">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/avatar.gif">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="IT 职业生涯规划">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="IT 职业生涯规划" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                运营商异常缓慢SQL优化
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-08-30T00:00:00+08:00">
+                2016-08-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/oracle/" itemprop="url" rel="index">
+                    <span itemprop="name">oracle</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/08/30/运营商异常缓慢的SQL优化/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/08/30/运营商异常缓慢的SQL优化/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+<span>&nbsp; | &nbsp;
+<span id="busuanzi_value_page_pv" ></span>次阅读
+</span>    
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="运营商异常缓慢SQL优化"><a href="#运营商异常缓慢SQL优化" class="headerlink" title="运营商异常缓慢SQL优化"></a>运营商异常缓慢SQL优化</h1><p>今天到一个运营商进行深度巡检时，发现一条SQL运行次数频繁，并且占用资源非常高，这条SQL是对两个千万级的大表进行关联，根据电话号码进行查询，原来的语句运行非常缓慢，常常半个小时都执行不完，真不知道业务是怎么忍受运行这么缓慢的SQL。</p>
+<p>因为需要对客户信息进行保密，只能在自己电脑上模拟相应的数据与优化结果</p>
+<p>先创建两个表，然后模拟表的数据，分别插入3千万与2千5百万<br><a id="more"></a></p>
+<pre><code> 
+DROP TABLE t1;
+create table t1 as
+select
+to_char(trunc(dbms_random.value(10000000000, 20000000000 ))) phone_no,
+trunc(dbms_random.value(0, 30 )) ext,
+lpad(rownum,10) v1,
+rpad('x',100) padding
+from
+all_objects
+where rownum <= 30="" 30000000;="" drop="" table="" t2;="" create="" t2="" as="" select="" to_char(trunc(dbms_random.value(10000000,="" 20000000000="" )))="" phone_no,="" trunc(dbms_random.value(0,="" ))="" ext,="" lpad(rownum,10)="" v1,="" rpad('x',100)="" padding="" from="" all_objects="" where="" rownum="" <="25000000;" code=""></=></code></pre>
+
+<p>其原来的运行的SQL类似如下，运行半小时都不会出来结果的</p>
+<pre><code> 
+SELECT phone_no,ext,v1,padding
+FROM t1
+WHERE SUBSTR(t1.phone_no,1,8) IN
+(SELECT t2.phone_no FROM t2 WHERE LENGTH(t2.phone_no)=8)
+OR 
+SUBSTR(t1.phone_no,1,9) IN
+(SELECT t2.phone_no FROM t2 WHERE LENGTH(t2.phone_no)=9)
+OR
+SUBSTR(t1.phone_no,1,10) IN
+(SELECT t2.phone_no FROM t2 WHERE LENGTH(t2.phone_no)=10)
+OR
+SUBSTR(t1.phone_no,1,11) IN
+(SELECT t2.phone_no FROM t2 WHERE LENGTH(t2.phone_no)=11);
+
+执行计划如下：
+Execution Plan
+/----------------------------------------------------------
+Plan hash value: 2055931425
+
+/---------------------------------------------------------------------------
+| Id  | Operation          | Name | Rows  | Bytes | Cost (%CPU)| Time     |
+/---------------------------------------------------------------------------
+|   0 | SELECT STATEMENT   |      |    32 |  3168 |   159K  (1)| 00:31:54 |
+|*  1 |  FILTER            |      |       |       |            |          |
+|   2 |   TABLE ACCESS FULL| T1   | 66720 |  6450K|   379   (1)| 00:00:05 |
+|*  3 |   TABLE ACCESS FULL| T2   |     5 |   110 |    76   (0)| 00:00:01 |
+|*  4 |   TABLE ACCESS FULL| T2   |    31 |   682 |    25   (0)| 00:00:01 |
+|*  5 |   TABLE ACCESS FULL| T2   |   389 |  8558 |     4   (0)| 00:00:01 |
+|*  6 |   TABLE ACCESS FULL| T2   |   422 |  9284 |     3   (0)| 00:00:01 |
+/---------------------------------------------------------------------------
+
+Predicate Information (identified by operation id):
+/---------------------------------------------------
+
+   1 - filter( EXISTS (SELECT 0 FROM "T2" "T2" WHERE
+              LENGTH("T2"."PHONE_NO")=8 AND "T2"."PHONE_NO"=SUBSTR(:B1,1,8)) OR
+              EXISTS (SELECT 0 FROM "T2" "T2" WHERE LENGTH("T2"."PHONE_NO")=9 AND
+              "T2"."PHONE_NO"=SUBSTR(:B2,1,9)) OR  EXISTS (SELECT 0 FROM "T2" "T2"
+              WHERE LENGTH("T2"."PHONE_NO")=10 AND "T2"."PHONE_NO"=SUBSTR(:B3,1,10))
+              OR  EXISTS (SELECT 0 FROM "T2" "T2" WHERE LENGTH("T2"."PHONE_NO")=11
+              AND "T2"."PHONE_NO"=SUBSTR(:B4,1,11)))
+   3 - filter(LENGTH("T2"."PHONE_NO")=8 AND
+              "T2"."PHONE_NO"=SUBSTR(:B1,1,8))
+   4 - filter(LENGTH("T2"."PHONE_NO")=9 AND
+              "T2"."PHONE_NO"=SUBSTR(:B1,1,9))
+   5 - filter(LENGTH("T2"."PHONE_NO")=10 AND
+              "T2"."PHONE_NO"=SUBSTR(:B1,1,10))
+   6 - filter(LENGTH("T2"."PHONE_NO")=11 AND
+              "T2"."PHONE_NO"=SUBSTR(:B1,1,11))
+
+Note
+/-----
+  - dynamic sampling used for this statement (level=2)
+</code></pre>
+
+
+<p>从上面的执行计划里比较容易看到两个问题：<br>1、两个大表，全表扫描，特别是T2全表扫了4次，并且使用filter,这个filter可以看成是NL连接的变种，你想想，几千万的表，做NL的连接，还要做几次，想想不慢也难啊<br>2、当前的执行计划使用了level 2的dynamic sampling，即代表当前表上没有统计信息或统计信息过旧，但是这个不是这条SQL运行缓慢的关键，因为重新收集了统计信息后，执行计划一样，运行时间一样。最重要的还是执行计划不好导致的。</p>
+<p>既然知道了执行计划有问题，那我们就想办法优化吧，最简单的就是给T2的phone_no加上索引，效果立马显现。</p>
+<pre><code> 
+17:48:32 SQL> create index idx_t2_phoneno on t2(phone_no) ;
+
+Index created.
+
+18:18:48 SQL> exec DBMS_STATS.GATHER_TABLE_STATS (ownname => 'SYS' , tabname => 'T1',cascade => true, estimate_percent => DBMS_STATS.AUTO_SAMPLE_SIZE,method_opt=>'for all indexed columns size 1', granularity => 'ALL', degree => 1);
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.79
+18:20:50 SQL> exec DBMS_STATS.GATHER_TABLE_STATS (ownname => 'SYS' , tabname => 'T2',cascade => true, estimate_percent => DBMS_STATS.AUTO_SAMPLE_SIZE,method_opt=>'for all indexed columns size 1', granularity => 'ALL', degree => 1);
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.56
+</code></pre>
+
+<p>重新运行SQL，加了索引后只需要2S左右就可以出来了结果了</p>
+<pre><code> 
+**Elapsed: 00:00:02.08**
+
+Execution Plan
+/----------------------------------------------------------
+Plan hash value: 1293345318
+
+/-------------------------------------------------------------------------------------
+| Id  | Operation          | Name           | Rows  | Bytes | Cost (%CPU)| Time     |
+/-------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT   |                |    32 |  3168 |  2035   (1)| 00:00:25 |
+|*  1 |  FILTER            |                |       |       |            |          |
+|   2 |   TABLE ACCESS FULL| T1             | 55915 |  5405K|   286   (2)| 00:00:04 |
+|*  3 |   INDEX RANGE SCAN | IDX_T2_PHONENO |     1 |    12 |     1   (0)| 00:00:01 |
+|*  4 |   INDEX RANGE SCAN | IDX_T2_PHONENO |     1 |    12 |     1   (0)| 00:00:01 |
+|*  5 |   INDEX RANGE SCAN | IDX_T2_PHONENO |     1 |    12 |     1   (0)| 00:00:01 |
+|*  6 |   INDEX RANGE SCAN | IDX_T2_PHONENO |     1 |    12 |     1   (0)| 00:00:01 |
+/-------------------------------------------------------------------------------------
+
+Predicate Information (identified by operation id):
+/---------------------------------------------------
+
+   1 - filter( EXISTS (SELECT 0 FROM "T2" "T2" WHERE
+              "T2"."PHONE_NO"=SUBSTR(:B1,1,8) AND LENGTH("T2"."PHONE_NO")=8) OR  EXISTS
+              (SELECT 0 FROM "T2" "T2" WHERE "T2"."PHONE_NO"=SUBSTR(:B2,1,9) AND
+              LENGTH("T2"."PHONE_NO")=9) OR  EXISTS (SELECT 0 FROM "T2" "T2" WHERE
+              "T2"."PHONE_NO"=SUBSTR(:B3,1,10) AND LENGTH("T2"."PHONE_NO")=10) OR  EXISTS
+              (SELECT 0 FROM "T2" "T2" WHERE "T2"."PHONE_NO"=SUBSTR(:B4,1,11) AND
+              LENGTH("T2"."PHONE_NO")=11))
+   3 - access("T2"."PHONE_NO"=SUBSTR(:B1,1,8))
+       filter(LENGTH("T2"."PHONE_NO")=8)
+   4 - access("T2"."PHONE_NO"=SUBSTR(:B1,1,9))
+       filter(LENGTH("T2"."PHONE_NO")=9)
+   5 - access("T2"."PHONE_NO"=SUBSTR(:B1,1,10))
+       filter(LENGTH("T2"."PHONE_NO")=10)
+   6 - access("T2"."PHONE_NO"=SUBSTR(:B1,1,11))
+       filter(LENGTH("T2"."PHONE_NO")=11)
+
+
+Statistics
+/----------------------------------------------------------
+          0  recursive calls
+          0  db block gets
+     448827  consistent gets  <<---但是消耗的逻辑读还是非常大 0="" 1="" 508="" 534="" physical="" reads="" redo="" size="" bytes="" sent="" via="" sql*net="" to="" client="" received="" from="" roundtrips="" sorts="" (memory)="" (disk)="" rows="" processed="" <="" code=""></---但是消耗的逻辑读还是非常大></code></pre>
+
+<p>优化到这里，是不是就可以实现优化的目标了呢？对于大部分人来说，从跑半小时都出不来结果，到现在2S左右就能出结果，这是一个非常大的优化，但是对于TY来说，这样的SQL还有优化的空间，因为消耗的逻辑读还是非常大。做事要不不做，要做就要做极致，这是我一直信奉的原则。既然这样，那我们继续看看还有没有优化的空间吧。</p>
+<p>从上面看，虽然加了索引，但是filter这个条件还是在，我们要想办法将这个filter去掉才能实现最佳的优化效果。<br>1）通过分析，发现当前语句存在多个or，导致了无法走hash join只能走filter表连接方式的问题，复杂的or条件无法做or expansion.那我们试试人工将OR拆开，将语句改写如下：</p>
+<pre><code> 
+SELECT  phone_no,ext,v1,padding
+FROM t1
+WHERE SUBSTR(t1.phone_no,1,8) IN
+(SELECT t2.phone_no FROM t2 WHERE LENGTH(t2.phone_no)=8)
+union all 
+SELECT  phone_no,ext,v1,padding
+FROM t1 where
+SUBSTR(t1.phone_no,1,9) IN 
+(SELECT t2.phone_no FROM t2 WHERE LENGTH(t2.phone_no)=9)
+union all 
+SELECT  phone_no,ext,v1,padding
+FROM t1 where
+SUBSTR(t1.phone_no,1,10) IN
+(SELECT t2.phone_no FROM t2 WHERE LENGTH(t2.phone_no)=10)
+union all 
+SELECT phone_no,ext,v1,padding
+FROM t1 where
+SUBSTR(t1.phone_no,1,11) IN
+(SELECT t2.phone_no FROM t2 WHERE LENGTH(t2.phone_no)=11);
+
+
+**Elapsed: 00:00:00.79**
+
+Execution Plan
+/----------------------------------------------------------
+Plan hash value: 3844306404
+
+/----------------------------------------------------------------------------------
+| Id  | Operation             | Name     | Rows  | Bytes | Cost (%CPU)| Time     |
+/----------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT      |          |     4 |   484 |  2267  (76)| 00:00:28 |
+|   1 |  UNION-ALL            |          |       |       |            |          |
+|*  2 |   HASH JOIN RIGHT SEMI|          |     1 |   121 |   567   (2)| 00:00:07 |
+|   3 |    VIEW               | VW_NSO_1 |   559 | 12298 |   280   (2)| 00:00:04 |
+|*  4 |     TABLE ACCESS FULL | T2       |   559 |  6708 |   280   (2)| 00:00:04 |
+|   5 |    TABLE ACCESS FULL  | T1       | 55915 |  5405K|   285   (2)| 00:00:04 |
+|*  6 |   HASH JOIN RIGHT SEMI|          |     1 |   121 |   567   (2)| 00:00:07 |
+|   7 |    VIEW               | VW_NSO_2 |   559 | 12298 |   280   (2)| 00:00:04 |
+|*  8 |     TABLE ACCESS FULL | T2       |   559 |  6708 |   280   (2)| 00:00:04 |
+|   9 |    TABLE ACCESS FULL  | T1       | 55915 |  5405K|   285   (2)| 00:00:04 |
+|* 10 |   HASH JOIN RIGHT SEMI|          |     1 |   121 |   567   (2)| 00:00:07 |
+|  11 |    VIEW               | VW_NSO_3 |   559 | 12298 |   280   (2)| 00:00:04 |
+|* 12 |     TABLE ACCESS FULL | T2       |   559 |  6708 |   280   (2)| 00:00:04 |
+|  13 |    TABLE ACCESS FULL  | T1       | 55915 |  5405K|   285   (2)| 00:00:04 |
+|* 14 |   HASH JOIN RIGHT SEMI|          |     1 |   121 |   567   (2)| 00:00:07 |
+|  15 |    VIEW               | VW_NSO_4 |   559 | 12298 |   280   (2)| 00:00:04 |
+|* 16 |     TABLE ACCESS FULL | T2       |   559 |  6708 |   280   (2)| 00:00:04 |
+|  17 |    TABLE ACCESS FULL  | T1       | 55915 |  5405K|   285   (2)| 00:00:04 |
+/----------------------------------------------------------------------------------
+
+Predicate Information (identified by operation id):
+/---------------------------------------------------
+
+   2 - access("PHONE_NO"=SUBSTR("T1"."PHONE_NO",1,8))
+   4 - filter(LENGTH("T2"."PHONE_NO")=8)
+   6 - access("PHONE_NO"=SUBSTR("T1"."PHONE_NO",1,9))
+   8 - filter(LENGTH("T2"."PHONE_NO")=9)
+  10 - access("PHONE_NO"=SUBSTR("T1"."PHONE_NO",1,10))
+  12 - filter(LENGTH("T2"."PHONE_NO")=10)
+  14 - access("PHONE_NO"=SUBSTR("T1"."PHONE_NO",1,11))
+  16 - filter(LENGTH("T2"."PHONE_NO")=11)
+
+
+Statistics
+/----------------------------------------------------------
+          0  recursive calls
+          0  db block gets
+       8244  consistent gets       <<--逻辑读已经降到一万以下 0="" 1="" 508="" 534="" physical="" reads="" redo="" size="" bytes="" sent="" via="" sql*net="" to="" client="" received="" from="" roundtrips="" sorts="" (memory)="" (disk)="" rows="" processed="" <="" code=""></--逻辑读已经降到一万以下></code></pre>
+
+<p>通过采用改写为union 的方式来解决即可。可以看到，当前执行计划已经变成hash join，不再存在filter连接了。但现在对于这条SQL来说，是不是最优的呢？我们继续考虑一下，创建函数索引，是不是能更优化？</p>
+<pre><code> 
+create index IDX_T1_PHONE_NO8 on t1(SUBSTR(phone_no,1,8));
+create index IDX_T1_PHONE_NO9 on t1(SUBSTR(phone_no,1,9));
+
+**Elapsed: 00:00:00.52**
+
+Execution Plan
+----------------------------------------------------------
+Plan hash value: 2507792230
+
+----------------------------------------------------------------------------------------------------
+| Id  | Operation                       | Name             | Rows  | Bytes | Cost (%CPU)| Time     |
+----------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT                |                  |  2236 |   216K|  1971  (68)| 00:00:24 |
+|   1 |  UNION-ALL                      |                  |       |       |            |          |
+|   2 |   VIEW                          | VM_NWVW_5        |   559 | 55341 |   647   (1)| 00:00:08 |
+|   3 |    HASH UNIQUE                  |                  |   559 | 74347 |   647   (1)| 00:00:08 |
+|   4 |     NESTED LOOPS                |                  |   565 | 75145 |   646   (1)| 00:00:08 |
+|*  5 |      INDEX FAST FULL SCAN       | IDX_T2_PHONENO   |   559 |  6708 |    51   (4)| 00:00:01 |
+|   6 |      TABLE ACCESS BY INDEX ROWID| T1               |     1 |   121 |     3   (0)| 00:00:01 |
+|*  7 |       INDEX RANGE SCAN          | IDX_T1_PHONE_NO8 |     1 |       |     1   (0)| 00:00:01 |
+|   8 |   VIEW                          | VM_NWVW_6        |   559 | 55341 |   647   (1)| 00:00:08 |
+|   9 |    HASH UNIQUE                  |                  |   559 | 74906 |   647   (1)| 00:00:08 |
+|  10 |     NESTED LOOPS                |                  |   565 | 75710 |   646   (1)| 00:00:08 |
+|* 11 |      INDEX FAST FULL SCAN       | IDX_T2_PHONENO   |   559 |  6708 |    51   (4)| 00:00:01 |
+|  12 |      TABLE ACCESS BY INDEX ROWID| T1               |     1 |   122 |     3   (0)| 00:00:01 |
+|* 13 |       INDEX RANGE SCAN          | IDX_T1_PHONE_NO9 |     1 |       |     1   (0)| 00:00:01 |
+|  14 |   VIEW                          | VM_NWVW_7        |   559 | 55341 |   339   (3)| 00:00:05 |
+|  15 |    HASH UNIQUE                  |                  |   559 | 77701 |   339   (3)| 00:00:05 |
+|* 16 |     HASH JOIN                   |                  |   565 | 78535 |   337   (2)| 00:00:05 |
+|* 17 |      INDEX FAST FULL SCAN       | IDX_T2_PHONENO   |   559 |  6708 |    51   (4)| 00:00:01 |
+|  18 |      TABLE ACCESS FULL          | T1               | 55915 |  6934K|   285   (2)| 00:00:04 |
+|  19 |   VIEW                          | VM_NWVW_8        |   559 | 55341 |   339   (3)| 00:00:05 |
+|  20 |    HASH UNIQUE                  |                  |   559 | 77701 |   339   (3)| 00:00:05 |
+|* 21 |     HASH JOIN                   |                  |   565 | 78535 |   337   (2)| 00:00:05 |
+|* 22 |      INDEX FAST FULL SCAN       | IDX_T2_PHONENO   |   559 |  6708 |    51   (4)| 00:00:01 |
+|  23 |      TABLE ACCESS FULL          | T1               | 55915 |  6934K|   285   (2)| 00:00:04 |
+----------------------------------------------------------------------------------------------------
+
+Predicate Information (identified by operation id):
+---------------------------------------------------
+
+   5 - filter(LENGTH("T2"."PHONE_NO")=8)
+   7 - access(SUBSTR("PHONE_NO",1,8)="T2"."PHONE_NO")
+  11 - filter(LENGTH("T2"."PHONE_NO")=9)
+  13 - access(SUBSTR("PHONE_NO",1,9)="T2"."PHONE_NO")
+  16 - access(SUBSTR("PHONE_NO",1,9)=SUBSTR("T2"."PHONE_NO",1,9) AND
+              "T2"."PHONE_NO"=SUBSTR("T1"."PHONE_NO",1,10) AND
+              SUBSTR("PHONE_NO",1,8)=SUBSTR("T2"."PHONE_NO",1,8))
+  17 - filter(LENGTH("T2"."PHONE_NO")=10)
+  21 - access(SUBSTR("PHONE_NO",1,9)=SUBSTR("T2"."PHONE_NO",1,9) AND
+              "T2"."PHONE_NO"=SUBSTR("T1"."PHONE_NO",1,11) AND
+              SUBSTR("PHONE_NO",1,8)=SUBSTR("T2"."PHONE_NO",1,8))
+  22 - filter(LENGTH("T2"."PHONE_NO")=11)
+
+
+Statistics
+----------------------------------------------------------
+          0  recursive calls
+          0  db block gets
+       3138  consistent gets           <<--逻辑读降到最低了 0="" 1="" 508="" 534="" physical="" reads="" redo="" size="" bytes="" sent="" via="" sql*net="" to="" client="" received="" from="" roundtrips="" sorts="" (memory)="" (disk)="" rows="" processed="" <="" code=""></--逻辑读降到最低了></code></pre>
+上述的优化，对于这条SQL，应该是最优了，消耗的逻辑读最少，执行时间也只需要52ms，但因为多了两个函数索引的维护开销，如果这两张表是频繁的更新插入的话，索引的维护会有一定的影响。那我们看看不建立索引，有没有一个平衡的优化方案？
+
+2）    其实存在多种改写方法，这里给出另一种.t2只设置到phone_no和虚拟的length(phone_no)两个字段,即行长为14个字节，千万级的表的大小为14*10，000，000字节即只有100M左右，采用with as写法，避免去创建复合索引（phone_no，length(phone_no)）走index fast full scan来避免全表扫描，避免了索引维护成本。
+
+<pre><code> 
+with a as
+ (select /*+MATERIALIZE*/
+   length(phone_no) as len, phone_no
+    from t2)
+select /*+use_hash(a,t1) leading(a t1)*/
+ t1.phone_no, t1.ext, t1.v1, t1.padding
+  from t1, a
+ where (a.len = 8 and a.phone_no = substr(t1.phone_no, 1, 8))
+    or (a.len = 9 and a.phone_no = substr(t1.phone_no, 1, 9))
+    or (a.len = 10 and a.phone_no = substr(t1.phone_no, 1, 10))
+    or (a.len = 11 and a.phone_no = substr(t1.phone_no, 1, 11));
+</code></pre>
+改写后数据库CBO优化器会自动展开or（不需要改写为union了，当然改写也可以）,展开后的执行计划如下
+<pre><code> 
+**Elapsed: 00:00:00.95**
+
+Execution Plan
+/----------------------------------------------------------
+Plan hash value: 3776602953
+
+/----------------------------------------------------------------------------------------------------------------
+| Id  | Operation                  | Name                      | Rows  | Bytes |TempSpc| Cost (%CPU)| Time     |
+/----------------------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT           |                           |   225K|    26M|       |  3957   (2)| 00:00:48 |
+|   1 |  TEMP TABLE TRANSFORMATION |                           |       |       |       |            |          |
+|   2 |   LOAD AS SELECT           | SYS_TEMP_0FD9D6613_2E5CA5 |       |       |       |            |          |
+|   3 |    TABLE ACCESS FULL       | T2                        | 55914 |   655K|       |   279   (1)| 00:00:04 |
+|   4 |   CONCATENATION            |                           |       |       |       |            |          |
+|*  5 |    HASH JOIN               |                           | 56458 |  6836K|  2024K|   710   (2)| 00:00:09 |
+|*  6 |     VIEW                   |                           | 55914 |  1365K|       |    29   (7)| 00:00:01 |
+|   7 |      TABLE ACCESS FULL     | SYS_TEMP_0FD9D6613_2E5CA5 | 55914 |   655K|       |    29   (7)| 00:00:01 |
+|   8 |     TABLE ACCESS FULL      | T1                        | 55915 |  5405K|       |   285   (2)| 00:00:04 |
+|*  9 |    HASH JOIN               |                           | 56458 |  6836K|  2024K|   710   (2)| 00:00:09 |
+|* 10 |     VIEW                   |                           | 55914 |  1365K|       |    29   (7)| 00:00:01 |
+|  11 |      TABLE ACCESS FULL     | SYS_TEMP_0FD9D6613_2E5CA5 | 55914 |   655K|       |    29   (7)| 00:00:01 |
+|  12 |     TABLE ACCESS FULL      | T1                        | 55915 |  5405K|       |   285   (2)| 00:00:04 |
+|* 13 |    HASH JOIN               |                           | 56458 |  6836K|  2024K|   710   (2)| 00:00:09 |
+|* 14 |     VIEW                   |                           | 55914 |  1365K|       |    29   (7)| 00:00:01 |
+|  15 |      TABLE ACCESS FULL     | SYS_TEMP_0FD9D6613_2E5CA5 | 55914 |   655K|       |    29   (7)| 00:00:01 |
+|  16 |     TABLE ACCESS FULL      | T1                        | 55915 |  5405K|       |   285   (2)| 00:00:04 |
+|* 17 |    HASH JOIN               |                           | 56458 |  6836K|  2024K|   710   (2)| 00:00:09 |
+|* 18 |     VIEW                   |                           | 55914 |  1365K|       |    29   (7)| 00:00:01 |
+|  19 |      TABLE ACCESS FULL     | SYS_TEMP_0FD9D6613_2E5CA5 | 55914 |   655K|       |    29   (7)| 00:00:01 |
+|  20 |     TABLE ACCESS FULL      | T1                        | 55915 |  5405K|       |   285   (2)| 00:00:04 |
+/----------------------------------------------------------------------------------------------------------------
+
+Predicate Information (identified by operation id):
+/---------------------------------------------------
+
+   5 - access("A"."PHONE_NO"=SUBSTR("T1"."PHONE_NO",1,11))
+   6 - filter("A"."LEN"=11)
+   9 - access("A"."PHONE_NO"=SUBSTR("T1"."PHONE_NO",1,10))
+       filter(LNNVL("A"."LEN"=11) OR LNNVL("A"."PHONE_NO"=SUBSTR("T1"."PHONE_NO",1,11)))
+  10 - filter("A"."LEN"=10)
+  13 - access("A"."PHONE_NO"=SUBSTR("T1"."PHONE_NO",1,9))
+       filter((LNNVL("A"."LEN"=10) OR LNNVL("A"."PHONE_NO"=SUBSTR("T1"."PHONE_NO",1,10))) AND
+              (LNNVL("A"."LEN"=11) OR LNNVL("A"."PHONE_NO"=SUBSTR("T1"."PHONE_NO",1,11))))
+  14 - filter("A"."LEN"=9)
+  17 - access("A"."PHONE_NO"=SUBSTR("T1"."PHONE_NO",1,8))
+       filter((LNNVL("A"."LEN"=9) OR LNNVL("A"."PHONE_NO"=SUBSTR("T1"."PHONE_NO",1,9))) AND
+              (LNNVL("A"."LEN"=10) OR LNNVL("A"."PHONE_NO"=SUBSTR("T1"."PHONE_NO",1,10))) AND (LNNVL("A"."LEN"=11) OR
+              LNNVL("A"."PHONE_NO"=SUBSTR("T1"."PHONE_NO",1,11))))
+  18 - filter("A"."LEN"=8)
+
+
+Statistics
+/----------------------------------------------------------
+          3  recursive calls
+        160  db block gets
+       5795  consistent gets  <<---逻辑读大幅降低 0="" 1="" 151="" 508="" 534="" 576="" physical="" reads="" redo="" size="" bytes="" sent="" via="" sql*net="" to="" client="" received="" from="" roundtrips="" sorts="" (memory)="" (disk)="" rows="" processed="" <="" code=""></---逻辑读大幅降低></code></pre>
+
+<p>这样改写以后，逻辑读大幅降低，执行时间降到95ms左右。并且这个优化方案不需要在两张表上创建任何的索引。</p>
+<p>综上所述，优化的思路都是找出产生低效执行计划filter这个关键，然后判断到出现问题的根源是因为or存在导致无法走hash join只能走filter表连接方式的问题，复杂的or条件无法做or expansion。</p>
+<p>知道了原因，就是根据相应的情况去进行优化，虽然创建索引可以达到这条SQL的最佳优化效果，但是运营商的环境，业务表往往需要不断的更新插入，所以经过考虑，最后向客户推荐了第二种优化方案。</p>
+<p>所以，有时不是执行时间最快，消耗资源最少的优化方案就是最适合客户环境的，还需要权衡，有时可能是次优的方案才是最适合客户的，我们要学会取舍:-)</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/oracle-sql-tuning/" rel="tag"># oracle,sql tuning</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/08/10/系统表空间异常增长二/" rel="next" title="SYSTEM表空间异常增长问题分析（二）">
+                <i class="fa fa-chevron-left"></i> SYSTEM表空间异常增长问题分析（二）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/09/28/mysql的CVE-2016-6662安全漏洞/" rel="prev" title="mysql的CVE-2016-6662安全漏洞修复">
+                mysql的CVE-2016-6662安全漏洞修复 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2016/08/30/运营商异常缓慢的SQL优化/"
+     data-title="运营商异常缓慢SQL优化"
+     data-content=""
+     data-url="http://username.github.io/2016/08/30/运营商异常缓慢的SQL优化/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/08/30/运营商异常缓慢的SQL优化/"
+           data-title="运营商异常缓慢SQL优化" data-url="http://username.github.io/2016/08/30/运营商异常缓慢的SQL优化/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="TY" />
+          <p class="site-author-name" itemprop="name">TY</p>
+          <p class="site-description motion-element" itemprop="description">IT职业生涯规划与技术分享</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/wuxubj" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/wuxubj" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-link"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.ce-service.com.cn/blog/" title="中亦安图技术博客" target="_blank">中亦安图技术博客</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://oracleblog.org/" title="天堂向左 DBA向右" target="_blank">天堂向左 DBA向右</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#运营商异常缓慢SQL优化"><span class="nav-number">1.</span> <span class="nav-text">运营商异常缓慢SQL优化</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        ﻿<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">TY</span>
+</div>
+
+
+<div class="powered-by">
+  由Tony Yang强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="tyoracle.com">
+    IT 职业生涯规划  
+  </a>
+</div>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+本站总访问量 <span id="busuanzi_value_site_pv"></span> &nbsp&nbsp&nbsp
+您是第 <span id="busuanzi_value_site_uv"></span> 个来到的小伙伴
+
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"tyoracle"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

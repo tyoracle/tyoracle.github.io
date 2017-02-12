@@ -1,0 +1,920 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  ﻿<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Python, Pelican, GitHub, Markdown," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="IT 职业生涯规划" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="个人介绍本人TY，从事ORACLE DBA十五年，从ORACLE 8I开始，一直奋战在一线，本着对技术的狂热，一直走到今天，积累了大量的经验与案例，期待静下心来，将这些案例与经验化成文字，与大家分享，共同进步。
+前言作为从事DBA多年的TY来说，与奋战在一线的同行们一样，每天都会遇到各种各样的奇怪问题，这些问题有些莫名奇妙的自动出现，然后莫名奇妙的自动消失，但这世上不会有无缘无故的爱，也不会有无缘">
+<meta property="og:type" content="article">
+<meta property="og:title" content="系统参数设置不当导致ORACLE坏块的故事">
+<meta property="og:url" content="http://username.github.io/2016/08/02/系统参数设置不当导致ORACLE坏块的故事/index.html">
+<meta property="og:site_name" content="IT 职业生涯规划">
+<meta property="og:description" content="个人介绍本人TY，从事ORACLE DBA十五年，从ORACLE 8I开始，一直奋战在一线，本着对技术的狂热，一直走到今天，积累了大量的经验与案例，期待静下心来，将这些案例与经验化成文字，与大家分享，共同进步。
+前言作为从事DBA多年的TY来说，与奋战在一线的同行们一样，每天都会遇到各种各样的奇怪问题，这些问题有些莫名奇妙的自动出现，然后莫名奇妙的自动消失，但这世上不会有无缘无故的爱，也不会有无缘">
+<meta property="og:image" content="http://username.github.io/file:///C:\Users\Tony\Pictures\1.jpg">
+<meta property="og:updated_time" content="2017-02-03T08:44:49.324Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="系统参数设置不当导致ORACLE坏块的故事">
+<meta name="twitter:description" content="个人介绍本人TY，从事ORACLE DBA十五年，从ORACLE 8I开始，一直奋战在一线，本着对技术的狂热，一直走到今天，积累了大量的经验与案例，期待静下心来，将这些案例与经验化成文字，与大家分享，共同进步。
+前言作为从事DBA多年的TY来说，与奋战在一线的同行们一样，每天都会遇到各种各样的奇怪问题，这些问题有些莫名奇妙的自动出现，然后莫名奇妙的自动消失，但这世上不会有无缘无故的爱，也不会有无缘">
+<meta name="twitter:image" content="http://username.github.io/file:///C:\Users\Tony\Pictures\1.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"always"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://username.github.io/2016/08/02/系统参数设置不当导致ORACLE坏块的故事/"/>
+
+
+
+
+
+  <title> 系统参数设置不当导致ORACLE坏块的故事 | IT 职业生涯规划 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner">﻿<div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">IT 职业生涯规划</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle">时间的朋友</p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://username.github.io/2016/08/02/系统参数设置不当导致ORACLE坏块的故事/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="TY">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/avatar.gif">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="IT 职业生涯规划">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="IT 职业生涯规划" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                系统参数设置不当导致ORACLE坏块的故事
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-08-02T00:00:00+08:00">
+                2016-08-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Pelican/" itemprop="url" rel="index">
+                    <span itemprop="name">Pelican</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/08/02/系统参数设置不当导致ORACLE坏块的故事/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/08/02/系统参数设置不当导致ORACLE坏块的故事/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+<span>&nbsp; | &nbsp;
+<span id="busuanzi_value_page_pv" ></span>次阅读
+</span>    
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="个人介绍"><a href="#个人介绍" class="headerlink" title="个人介绍"></a>个人介绍</h2><p>本人TY，从事ORACLE DBA十五年，从ORACLE 8I开始，一直奋战在一线，本着对技术的狂热，一直走到今天，积累了大量的经验与案例，期待静下心来，将这些案例与经验化成文字，与大家分享，共同进步。</p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>作为从事DBA多年的TY来说，与奋战在一线的同行们一样，每天都会遇到各种各样的奇怪问题，这些问题有些莫名奇妙的自动出现，然后莫名奇妙的自动消失，但这世上不会有无缘无故的爱，也不会有无缘无故的恨：-），TY是一个喜欢创根问根的人，非常喜欢接受数据库奇怪问题的挑战。也可以简称“自虐”。</p>
+<p>最近两天，有个客户打电话给TY，说他的数据库刚从AIX迁移到PC 服务器上，使用的是OLE 6的操作系统，最近备份时，出现报错，系统中居然报归档文件存在坏块。</p>
+<p>这个就非常奇怪了，数据库出现坏块就常见，归档文件出现坏块这个极为罕见，这挑起了TY的好奇心，决定到客户现场一探究竟。</p>
+<p><code>这里讲述的是一个，对于未知问题，无从下手的情况下，如何分析解决问题的过程。</code></p>
+<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a><strong>背景</strong></h2><p><strong>客户的数据库是11.2.0.1，刚从AIX上迁移到PC服务器上，迁移时，归档文件是放到FRADG上的，备份一直没有问题，但最近将归档目录修改到文件系统后，备份时alter.log就出现如下的报错：</strong></p>
+   <pre><code>RMAN>backup archivelog all;
+
+  Starting backup at 06-Jan-16
+  current log archived
+  allocated channel: ORA_DISK_1
+  channel ORA_DISK_1: SID=148 device type=DISK
+  channel ORA_DISK_1: starting archived log backup set
+  channel ORA_DISK_1: specifying archived log(s) in backup set
+  input archived log thread=1 sequence=4 RECID=1 STAMP=793260539
+  input archived log thread=1 sequence=5 RECID=2 STAMP=793260573
+  input archived log thread=1 sequence=6 RECID=3 STAMP=793260647
+  input archived log thread=1 sequence=7 RECID=4 STAMP=793260764
+  input archived log thread=1 sequence=8 RECID=5 STAMP=793260835
+  input archived log thread=1 sequence=9 RECID=6 STAMP=793260868A6
+  channel ORA_DISK_1: starting piece 1 at 06-Jan-16
+  RMAN-571: ===========================================================
+  RMAN-569: =============== ERROR MESSAGE STACK FOLLOWS ===============
+  RMAN-571: ===========================================================
+  RMAN-3009: failure of backup command on ORA_DISK_1 channel at 01/06/2016
+  06:21:59
+  ORA-19599: block number 2048 is corrupt in archived log
+  /u01/app/oracle/flash_recovery_area/ORCL/archivelog/2016_01_06/o1_mf_1_10_84j
+  xxb4d_.arc</code></pre>
+
+
+
+
+
+  <pre><code>[oracle@localhost trace]$ tail -f alert_orcl.log
+
+Bad header found during backing up archived log
+  Data in bad block - seq:0. bno:0. time:0
+  beg:0 cks:0
+  calculated check value: 0
+  Reread of seq=10, blocknum=2048,
+  file=/u01/app/oracle/flash_recovery_area/ORCL/archivelog/2016_01_06/o1_mf_1_1
+  0_84jxxb4d_.arc, found same corrupt data
+  Reread of seq=10, blocknum=2048,
+  file=/u01/app/oracle/flash_recovery_area/ORCL/archivelog/2016_01_06/o1_mf_1_1
+  0_84jxxb4d_.arc, found same corrupt data
+  Reread of seq=10, blocknum=2048,
+  file=/u01/app/oracle/flash_recovery_area/ORCL/archivelog/2016_01_06/o1_mf_1_1
+  0_84jxxb4d_.arc, found same corrupt data
+  Reread of seq=10, blocknum=2048,
+  file=/u01/app/oracle/flash_recovery_area/ORCL/archivelog/2016_01_06/o1_mf_1_1
+  0_84jxxb4d_.arc, found same corrupt data
+  Reread of seq=10, blocknum=2048,
+  file=/u01/app/oracle/flash_recovery_area/ORCL/archivelog/2016_01_06/o1_mf_1_1
+  0_84jxxb4d_.arc, found same corrupt data
+  Deleted Oracle managed file
+  /u01/app/oracle/flash_recovery_area/ORCL/backupset/2016_01_06/o1-mf_annnn_TAG20160106T062152_84jyb44j_.bkp</code></pre>
+
+
+<h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><p>对于corrupt data，一般都是发生在数据库文件中，有两种情况，一种是物理损坏，是指数据库不能读取到该块内部的数据结构，一般是因为硬件出现问题，内存问题、OS问题、IO子系统问题等引起。而逻辑损坏，则大多是指数据库能读取到该块的数据结构，但是因为数据结构的值不一致，从而被数据库标识为坏块，大部分的逻辑损坏，很多都是因为ORACLE 的BUG 造成的。</p>
+<p>但对于客户现在这种情况，是归档文件损坏。而用户的环境是新的机器，存储也是新的。硬件出现问题的概率较低，对于内存，OS，IO等问题，如果存在，肯定数据库本身的数据文件也会报坏块，而现在只是归档文件有问题，所以基本上可以排除物理坏块的的可能。</p>
+<p>对于归档文件出现坏块这种情况，在TY十多年的DBA生涯中也极少遇到，正在苦思冥想，不知如何下手的时候，突然灵光一闪，客户曾提到过，当刚迁移完的时候，归档是存放在ASM中的，那个时候没有出现这种情况。只有迁移到文件系统后，才出现这种情况，这是一条多么重要的线索啊。</p>
+<p>认真思考了一下归档文件涉及到的进程，无非就是arch写，然后备份时RMAN读的时候报错。那是不是写的时候出现了问题呢？</p>
+<p>为了证实自己的想法，决定对归档进程进行trace，看看归档进程在进行归档时，ASM与文件系统之间有没有什么特别的地方。</p>
+<pre><code>
+会话一：
+# ps -ef|grep arc
+oracle    2768     1  0 22:11 ?        00:00:01 ora_arc0_orcl
+root      3000  2395  0 23:09 pts/1    00:00:00 grep arc
+
+strace –o /tmp/strace.log –p 2768
+
+会话二：
+sqlplus / as sysdba
+alter syste switch logfile;
+</code></pre>
+
+<p>这个时候，会产生归档进程的整个归档trace，仔细检查这个trace，发现写文件时，只有以下的相关信息：</p>
+<pre><code>
+open("...../1_21_900928246.dbf", O_RDWR|O_SYNC|O_DIRECT) = 21
+open("...../1_21_900928246.dbf", O_RDWR|O_SYNC|O_DIRECT) = 21
+open("...../1_21_900928246.dbf", O_RDWR|O_SYNC|O_DIRECT) = 21
+open("...../1_21_900928246.dbf", O_RDWR|O_SYNC|O_DIRECT) = 21
+</code></pre>
+
+<p>然后，将归档路径重新设置回ASM里面，重做上述的过程，对比一下strace的输出</p>
+<pre><code>
+open("/dev/raw/raw7", O_RDWR|O_NONBLOCK|O_SYNC|O_DIRECT) = 20
+open("/dev/raw/raw6", O_RDWR|O_NONBLOCK|O_SYNC|O_DIRECT) = 20
+open("/proc/6236/stat", O_RDONLY)       = 20
+</code></pre>
+
+<p>发现其多了一个O_NONBLOCK的关键字，对于一个IO操作的句柄会遇到阻塞IO 和非阻塞IO 的概念, 这里对于这两种socket 先做一下说明：<br>基本概念：<br>  阻塞IO::<br>   socket 的阻塞模式意味着必须要做完IO 操作（包括错误）才会返回。非阻塞IO::<br>   非阻塞模式下无论操作是否完成都会立刻返回，需要通过其他方式来判断具体操作是否成功。</p>
+<p>存在O_NONBLOCK的关键字，即其是非阻塞的IO操作，这从ASM的原理上可以推测到，因为ASM是直接操作底层磁盘的，其没有文件缓存，那问题会不会出在O_SYNC|O_DIRECT这两个参数上，难道是写归档日志的方式不对，导致了归档出现坏块？</p>
+<p>马上到metelink上输入O_SYNC O_DIRECT进行搜索，发现排在BUG的第一位就有一个相类似的BUG，其描述是在linux上使用EXT4的文件系统存放archived log ,redo log ,datafile 文件时，数据库的参数filesystemio_options=setall时，就会出现数据库坏块。</p>
+<p><img src="file:///C:\Users\Tony\Pictures\1.jpg" alt="image"></p>
+<p>柳暗花明又一村，看到这个BUG，心中一阵狂喜，客户是不是命中这个BUG呢？是不是离解决问题不远了。马上登录到系统中一看归档目录，发现果然是以ext4来加载的。</p>
+<p>再到数据库里查看</p>
+<pre><code>
+SQL> show parameter filesystem
+
+NAME                    TYPE        VALUE
+----------------------  ----------- --------
+filesystemio_options    string      SETALL
+</code></pre>
+
+<p>果然与这个BUG相匹配，那么这个filesystemio_options是什么参数呢？ORACLE数据库里面有两个参数控制IO的行为，也就是说，我们可以通过filesystemio_options与disk_asynch_io这两个参数来优化ORACLE数据库的IO性能。</p>
+<p>filesystemio_options 这个参数是允许数据库对IO进行间接或直接，同步或异步读写，这个参数默认是none，这意味着，数据库对文件系统IO操作模式是同步读写，对文件系统的cache是间接读写。Oracle推荐这个参数是使用setall，这个参数值是执行IO操作时绕过了文件系统的cache，直接读写到磁盘上。</p>
+<p>而disk_asynch_io这个参数是默认为true的，即启用异步IO。</p>
+<p>基于上述的原理，所以当filesystemio_options设置为setall时，我们看到O_SYNC|O_DIRECT的关键字，其绕过了EXT4上的文件系统缓存，直接对IO进行操作，导致触发了14594193这个BUG。</p>
+<h2 id="原因总结及建议"><a href="#原因总结及建议" class="headerlink" title="原因总结及建议"></a>原因总结及建议</h2><p>通过对上述的分析，可以知道是因为客户将归档文件存放到了EXT4上的文件系统，而数据库的参数filesystemio_options设置为setall时，数据库在做IO操作时，绕过了EXT4文件系统的缓存，从而触发了BUG而引起了坏块，所以这种坏块属于逻辑坏块。</p>
+<p>这个问题在metalink的文档ORA-1578 ORA-353 ORA-19599 Corrupt blocks with zeros when filesystemio_options=SETALL on ext4 file system using Linux (文档 ID 1487957.1)里有详细的描述，在这里我就不帖出来了，各位自已去查阅吧。</p>
+<p>这个文档提及，从10.1.0.2 to 12.1.0.1都存在这个BUG，也就是说，从10.2.0.2引入filesystemio_options这个参数，只要设为SETALL，结合EXT4，就会有可能遇到这个BUG。</p>
+<h2 id="建议："><a href="#建议：" class="headerlink" title="建议："></a><strong>建议：</strong></h2><p>万事知道原理后，解决就非常容易了，要不修改filesystemio_options这个参数为非SETALL值。</p>
+<pre><code>
+Workaround:
+The workaround to avoid corruptions in the Oracle database files is to set filesystemio_options=NONE or filesystemio_options=DIRECTIO or filesystemio_options=ASYNCH in the database parameter file (spfile / init<sid>.ora).
+</sid></code></pre>
+
+<p>要不就不要使用EXT4来存放数据库的相关文件，改为其他文件系统格式或直接存放到ASM上。</p>
+<p>终于解决问题，可以回家了：-）</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Python-Pelican-GitHub-Markdown/" rel="tag"># Python, Pelican, GitHub, Markdown</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/08/02/系统表空间异常增长一/" rel="next" title="SYSTEM表空间异常增长问题分析（一）">
+                <i class="fa fa-chevron-left"></i> SYSTEM表空间异常增长问题分析（一）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/08/10/系统表空间异常增长二/" rel="prev" title="SYSTEM表空间异常增长问题分析（二）">
+                SYSTEM表空间异常增长问题分析（二） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2016/08/02/系统参数设置不当导致ORACLE坏块的故事/"
+     data-title="系统参数设置不当导致ORACLE坏块的故事"
+     data-content=""
+     data-url="http://username.github.io/2016/08/02/系统参数设置不当导致ORACLE坏块的故事/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/08/02/系统参数设置不当导致ORACLE坏块的故事/"
+           data-title="系统参数设置不当导致ORACLE坏块的故事" data-url="http://username.github.io/2016/08/02/系统参数设置不当导致ORACLE坏块的故事/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="TY" />
+          <p class="site-author-name" itemprop="name">TY</p>
+          <p class="site-description motion-element" itemprop="description">IT职业生涯规划与技术分享</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/wuxubj" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/wuxubj" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-link"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.ce-service.com.cn/blog/" title="中亦安图技术博客" target="_blank">中亦安图技术博客</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://oracleblog.org/" title="天堂向左 DBA向右" target="_blank">天堂向左 DBA向右</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#个人介绍"><span class="nav-number">1.</span> <span class="nav-text">个人介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">2.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#背景"><span class="nav-number">3.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分析"><span class="nav-number">4.</span> <span class="nav-text">分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#原因总结及建议"><span class="nav-number">5.</span> <span class="nav-text">原因总结及建议</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#建议："><span class="nav-number">6.</span> <span class="nav-text">建议：</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        ﻿<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">TY</span>
+</div>
+
+
+<div class="powered-by">
+  由Tony Yang强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="tyoracle.com">
+    IT 职业生涯规划  
+  </a>
+</div>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+本站总访问量 <span id="busuanzi_value_site_pv"></span> &nbsp&nbsp&nbsp
+您是第 <span id="busuanzi_value_site_uv"></span> 个来到的小伙伴
+
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"tyoracle"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
