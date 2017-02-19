@@ -86,15 +86,19 @@
 
 
 
-<meta name="description" content="IT职业生涯规划与技术分享">
+<meta name="description" content="当一个对象被删，改名，或者通过imp等方式替换了。还是被删后重新创建，连object_id都改变了。但是其信息还是保留在sys.optstat_user_prefs$这个基表里。按道理，如果对象这样操作，其相关的信息会自动被清除，但是这种现象，只能手工执行exec dbms_stats.delete_table_prefs 才能被删除
+How to Delete Unwanted Incremen">
 <meta property="og:type" content="website">
 <meta property="og:title" content="IT 职业生涯规划">
-<meta property="og:url" content="http://tyoracle.com/tags/Python-Pelican-GitHub-Markdown/index.html">
+<meta property="og:url" content="http://tyoracle.com/sysaux表空间遇到了BUG.html">
 <meta property="og:site_name" content="IT 职业生涯规划">
-<meta property="og:description" content="IT职业生涯规划与技术分享">
+<meta property="og:description" content="当一个对象被删，改名，或者通过imp等方式替换了。还是被删后重新创建，连object_id都改变了。但是其信息还是保留在sys.optstat_user_prefs$这个基表里。按道理，如果对象这样操作，其相关的信息会自动被清除，但是这种现象，只能手工执行exec dbms_stats.delete_table_prefs 才能被删除
+How to Delete Unwanted Incremen">
+<meta property="og:updated_time" content="2017-02-14T14:43:01.616Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="IT 职业生涯规划">
-<meta name="twitter:description" content="IT职业生涯规划与技术分享">
+<meta name="twitter:description" content="当一个对象被删，改名，或者通过imp等方式替换了。还是被删后重新创建，连object_id都改变了。但是其信息还是保留在sys.optstat_user_prefs$这个基表里。按道理，如果对象这样操作，其相关的信息会自动被清除，但是这种现象，只能手工执行exec dbms_stats.delete_table_prefs 才能被删除
+How to Delete Unwanted Incremen">
 
 
 
@@ -122,13 +126,19 @@
 
 
 
-  <link rel="canonical" href="http://tyoracle.com/tags/Python-Pelican-GitHub-Markdown/"/>
+  <link rel="canonical" href="http://tyoracle.com/sysaux表空间遇到了BUG.html"/>
 
 
 
 
 
-  <title> 标签: Python, Pelican, GitHub, Markdown | IT 职业生涯规划 </title>
+  <title>
+  
+
+  
+     | IT 职业生涯规划
+  
+</title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -280,46 +290,57 @@
           <div id="content" class="content">
             
 
-  <div id="posts" class="posts-collapse">
-    <div class="collection-title">
-      <h2 >
-        Python, Pelican, GitHub, Markdown
-        <small>标签</small>
-      </h2>
-    </div>
+  <div id="posts" class="posts-expand">
+  ﻿<header class="post-header">
+
+	<h2 class="post-title" itemprop="name headline"></h2>
+
+
+
+</header>
 
     
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h1 class="post-title">
-        
-            <a class="post-title-link" href="/2016/08/02/系统参数设置不当导致ORACLE坏块的故事/" itemprop="url">
-              
-                <span itemprop="name">系统参数设置不当导致ORACLE坏块的故事</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2016-08-02T00:00:00+08:00"
-              content="2016-08-02" >
-          08-02
-        </time>
-      </div>
-
-    </header>
-  </article>
-
+    
+      <p>当一个对象被删，改名，或者通过imp等方式替换了。还是被删后重新创建，连object_id都改变了。<br>但是其信息还是保留在sys.optstat_user_prefs$这个基表里。按道理，如果对象这样操作，其相关的<br>信息会自动被清除，但是这种现象，只能手工执行<br>exec dbms_stats.delete_table_prefs 才能被删除</p>
+<p>How to Delete Unwanted Incremental Partition Statistics Synopsis Information From WRI$_OPTSTAT_SYNOPSIS$ in the SYSAUX Tablespace (Doc ID 1953961.1)</p>
+<p>APPLIES TO:</p>
+<p>Oracle Database - Enterprise Edition - Version 11.2.0.1 and later<br>Information in this document applies to any platform.<br>GOAL</p>
+<p>When incremental partition statistics are enabled, the synopsis information that is stored in WRI$_OPTSTAT_SYNOPSIS$ in the SYSAUX tablespace can get quite large.  This is absolutely normal.  If you no longer wish to use incremental statistics, then the following steps will remove the synopsis information from the SYSAUX tablespace.</p>
+<p>SOLUTION</p>
+<p>For 12.1 or later:</p>
+<p>Starting with 12c the following procedure can be used in order to avoid deleting stats and regathering:</p>
+<p>exec dbms_stats.delete_table_stats(‘SCHEMA_NAME’, ‘TABLE_NAME’, stat_category=&gt;’synopses’);</p>
+<p>For Earlier versions:</p>
+<p>1) Identify the partition table for which you no longer wish to use incremental statistics</p>
+<p>To identify objects that have incremental statistics either use dbms_stats.get_prefs or use the following select:</p>
+<p>SELECT owner,  object_name<br>FROM dba_objects<br>WHERE object_id IN<br>  (SELECT DISTINCT(obj#)<br>  FROM optstat_user_prefs$<br>  WHERE PNAME=’INCREMENTAL’<br>  AND VALCHAR=’TRUE’<br>  );<br>To list objects that have synopses:</p>
+<p>col owner format a20;<br>col object_name format a20;<br>with tabpart as (SELECT OBJ#,DATAOBJ#, synop.bo#<br>  FROM sys.tabpart$ tap, (SELECT DISTINCT(bo#) FROM SYS.WRI$_OPTSTAT_SYNOPSIS$) synop<br>  WHERE tap.bo#(+) = synop.bo# ) select DISTINCT(owner),  nvl(object_name,’<em>*ORPHANED’) as object_name,  bo#,COUNT(</em>)<br>FROM dba_objects do, tabpart tp<br>WHERE do.object_id(+) = tp.OBJ#<br>and   do.data_object_id(+) = dataobj#<br>group by owner, object_name, bo#<br>;</p>
+<p>If there are orphaned synopsis from dropping a table you may be hitting the following bug<br>Bug 14754390 - Orphan object entries on object statistics management tables after DROP OBJECT (Doc ID 14754390.8)</p>
+<p>2) Disable Incremental statistics for the table or tables you no longer wish to use incremental statistics for</p>
+<p>Use dbms_stats.set_table_prefs, or set_schema_prefs depending on the level of granularity you wish to disable incremental statistics at:</p>
+<p>exec DBMS_STATS.SET_SCHEMA_PREFS (‘&amp;SCHEMA_NAME’, ‘INCREMENTAL’,’FALSE’);<br>or</p>
+<p>exec DBMS_STATS.SET_TABLE_PREFS (‘&amp;SCHEMA_NAME’, ‘&amp;TABLE_NAME’,’INCREMENTAL’, ‘FALSE’);<br>3) Delete statistics from the table/s that you wish to remove synopsis from</p>
+<p>This removes the statistics and synopsis information from sysaux. </p>
+<p>SQL&gt; EXEC DBMS_STATS.DELETE_TABLE_STATS (‘&amp;SCHEMA_NAME’, ‘&amp;TABLE_NAME’);  </p>
+<p>4) Re-gather statistics </p>
+<p>SQL&gt; EXEC DBMS_STATS.GATHER_TABLE_STATS (‘&amp;SCHEMA_NAME’, ‘&amp;TABLE_NAME’);</p>
+<p>SYS.WRI$_OPTSTAT_SYNOPSIS$ is partitioned by range (BO#)  and then hash (group#).<br>Each BO# relates to a single partitioned table, so when we delete stats from a table with incremental statistics disabled, we can drop the related partitions.</p>
+<p>We can see this with the following query if there are numerous partition table with incremental stats.</p>
+<p>set lines 132 pages 999<br>column object_name format a30</p>
+<p>SELECT tp.bo#,  do.object_id,  do.data_object_id,  object_type, object_name<br>FROM sys.tabpart$ tp,  dba_objects do<br>WHERE tp.bo# IN (SELECT DISTINCT(bo#) FROM sys.WRI$_OPTSTAT_SYNOPSIS$  )<br>AND tp.obj#     = do.object_id<br>AND tp.DATAOBJ# = do.data_object_id;</p>
+<p>[This section is not visible to customers.]</p>
+<p>SM/OPTSTAT是用于存储老的统计信息，10G之前，当对表/字段/索引做了相应的统计信息之后，新的统计信息就会覆盖老的统计信息，也就是说的无法直接找回统计信息，要找回，只能事先通过dbms_stats导出来。10G就不必了，它会自动的存到相应的表里，而这些表是存在sysaux的，但这也引出了一个问题：如果这些表的数据不断的增长，而不把老的数据删除的话，sysaux迟早会暴了的。默认的情况下,系统会为SM/OPTSTAT保留31天的记录，可以通过dbms_stats.get_stats_history_retention来确定。这里的统计信息跟AWR是有区别的, AWR默认保留7天. SM/OPTSTAT保留的时间可以通过dbms_stats.alter_stats_history_retention来控制。如果SM/OPTSTAT确实占用了比较多的空间，要删除某个时间前的记录可以用：dbms_stats.purge_stats. 这个SP其实只从存储历史统计信息的表里删除记录，这样的话，就会出现一种情况，删除了大量的数据，但这些表占用的空间并没有释放,也就是HWM不会降下来的。这时要手工处理，顺便说一下用于存储SM/OPTSTAT相关信息的表是由脚$ORACLE_HOME/rdbms/admin/catost.sql来创建的.</p>
+<p>@ To confirm the same, Please enable the dbms_stat tracing and upload the trace<br>@ files<br>@ .<br>@ .<br>@ exec DBMS_STATS.SET_GLOBAL_PREFS(‘trace’, 2588);<br>@ –confirms level has been set<br>@ select DBMS_STATS.GET_PARAM(‘trace’) from dual;<br>@ .<br>@ Let run auto stats job  and upload trace file from user_dump_dest<br>@ .<br>@ –disable trace<br>@ exec DBMS_STATS.SET_GLOBAL_PREFS(‘trace’, 0);<br>@ –confirms level has been disabled<br>@ select DBMS_STATS.GET_PARAM(‘trace’) from dual;<br>@ .<br>@ .<br>@ How to Trace the DBMS_STATS Package (Doc ID 742519.1)</p>
+<p>@ – To identify objects that have incremental statistics<br>@ .<br>@ SELECT owner,  object_name<br>@ FROM dba_objects<br>@ WHERE object_id IN<br>@   (SELECT DISTINCT(obj#)<br>@   FROM optstat_user_prefs$<br>@   WHERE PNAME=’INCREMENTAL’<br>@   AND VALCHAR=’TRUE’<br>@   );<br>@ .<br>@ – To list objects that have synopses:<br>@ .<br>@ SELECT DISTINCT(owner),  object_name ,  COUNT(*)<br>@ FROM dba_objects<br>@ WHERE (object_id, data_object_id) IN<br>@   (SELECT OBJ#,    DATAOBJ#<br>@   FROM sys.tabpart$<br>@   WHERE bo# IN<br>@     (SELECT DISTINCT(bo#) FROM WRI$_OPTSTAT_SYNOPSIS$)<br>@   )<br>@ GROUP BY owner,  object_name;<br>@ .<br>@ .<br>@ &gt;&gt; Run the uploaded synopsis_info.sql on both 11.2.0.4 and 12.1.0.2 and<br>@ upload the spool output</p>
+<p>@ INTERNAL PROBLEM DESCRIPTION:<br>@ The performance of reclaim_synopsis_space introduced by bug fix 16851194 is<br>@ not<br>@ good because one of the query plan has a full table scan on hist_head$.<br>@  </p>
+<p>@ INTERNAL FIX DESCRIPTION:<br>@ I have now optimized the query in est_synopsis_size. It reuses previous<br>@ results to<br>@ avoid repeatitive evaluation to get the partitions whose synopses fall into<br>@ a<br>@ given partition in wri$_optstat_synopsis$. It also avoids full table scan<br>@ on<br>@ hist_head$.<br>@  </p>
+<p>@ BACKPORT FEASIBLE:<br>@ Yes</p>
+<p>@ FORWARD MERGE REQUIRED:<br>@ No (merged to main branch)</p>
+<p>REDISCOVERY INFORMATION:<br>long running time of</p>
+<p>WORKAROUND:<br>alter system set “_fix_control”=’16851194:off’ ;</p>
 
     
   </div>
-
-  
 
           
           </div>
@@ -327,6 +348,14 @@
 
 
           
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="sysaux表空间遇到了BUG.html"
+           data-title="" data-url="http://tyoracle.com/sysaux表空间遇到了BUG.html">
+      </div>
+    
+  </div>
+
 
         </div>
         
