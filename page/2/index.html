@@ -573,6 +573,246 @@ Elapsed: 00:00:00.00
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://tyoracle.com/2016/08/02/系统表空间异常增长一/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="TY">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/weixin.png">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="IT 职业生涯规划">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="IT 职业生涯规划" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2016/08/02/系统表空间异常增长一/" itemprop="url">
+                  SYSTEM表空间异常增长问题分析（一）
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-08-02T00:00:00+08:00">
+                2016-08-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/oracle/" itemprop="url" rel="index">
+                    <span itemprop="name">oracle</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/08/02/系统表空间异常增长一/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/08/02/系统表空间异常增长一/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="个人介绍"><a href="#个人介绍" class="headerlink" title="个人介绍"></a>个人介绍</h2><p>本人TY，从事ORACLE DBA十五年，从ORACLE 8I开始，一直奋战在一线，本着对技术的狂热，一直走到今天，积累了大量的经验与案例，期待静下心来，将这些案例与经验化成文字，与大家分享，共同进步。</p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在7月30日，某客户的exadata出现aud$无法扩充system表空间的错误，检查发现，当前system表空间只有4G大小，经现场维护人员将system表空间resize到20G后，问题暂时得到解决。</p>
+<p>但是在8月3日现场支持检查发现，当前的SYSTEM表空间已经增长到16G，对于三四天增长这么快，需要找出原因。</p>
+<h2 id="分析过程"><a href="#分析过程" class="headerlink" title="分析过程"></a>分析过程</h2><p>在7月30日时，一直以为是aud$占的空间较大，导致了空间爆满，但现场检查时，却发现与我们想像的不致。</p>
+<p>检查当前system表空间占用最多的对象</p>
+<pre><code> SQL> select * from (select owner,segment_name,bytes/1024/1024 "size M" from dba_segments where tablespace_name='SYSTEM' order by 3 desc) where rownum <10; 50="" 52="" 53="" 54="" 240="" 312="" 672="" 14301="" owner="" segment_name="" size="" m="" ------------------------------="" ---------------------------------------------------------------------------------="" ----------="" sys="" c_obj#_intcol#="" hist_head$="" i_h_obj#_col#="" i_hh_obj#_col#="" i_hh_obj#_intcol#="" tabpart$="" sys_lob0000001100c00003$$="" c_file#_block#="" i_obj5="">
+</10;></code></pre>
+
+
+<p>发现占用最大的对象是C_OBJ#_INTCOL#，这个对象已经占了近14G，而aud$却排不上前十，看来经验误人，这个C_OBJ#_INTCOL#是什么对象呢？这个是一个 cluster对象。</p>
+<p>簇表(cluster) 是一种可以选的存储数据方式。簇表由1组拥有相同的列而且经常被一起使用的数据表构成，这组表在存储时会共享一部分Data Blocks, 例如，employees 和 departments表都包含department_id 这个列。 当用户将这两个表组合成1个簇表时，Oracle在物理上将employees 和 departments 两张表各行的department_id 字段存储在1个Data block里。</p>
+<p>cluster table在ORACLE的系统表上使用得较多，我们查一下这个cluster涉及的是那一个对象，可以通过dba_tables查到</p>
+<pre><code>  
+SQL> select owner,table_name,cluster_name from dba_tables where table_name='HISTGRM$';
+
+OWNER                          TABLE_NAME                     CLUSTER_NAME
+------------------------------ ------------------------------ ------------------------------
+SYS                            HISTGRM$                       C_OBJ#_INTCOL#
+
+
+SQL>  select owner,table_name,BLOCKS*32/1024,tablespace_name  from dba_tables where table_name='HISTGRM$';
+
+OWNER                          TABLE_NAME                     BLOCKS*32/1024 TABLESPACE_NAME
+------------------------------ ------------------------------ -------------- ------------------------------
+SYS                            HISTGRM$                             13817.75 SYSTEM
+</code></pre>
+
+
+<p>可以看到这个cluster是HISTGRM$所用，并且这个cluster的大小就是这个HISTGRM$表的大小。为什么是这个表占据了system最多的空间呢？我们进一步研究，</p>
+<p>histgrm$这个表存储的是column statistics (histograms)，即列的柱状图信息，并且从11.2.0.4开始，这个列的统计表有了一些细微的变化，增加了default value这个列，即以前不会收集柱状图的列，增加了这个列后，也会强制收集这个列的信息。</p>
+<p>根据Mos的Cluster C_OBJ#_INTCOL# Growing Too Fast (Doc ID 403824.1)描述，这个基表的记录，会随着你的子分区数量的增长而呈几何级的增长。如你有55000个子分区，每个子分区有100列，每个列有200个柱状图的bucket，那么histgrm$在每次统计信息收集时， 就会增长<br>55000<em>100</em>200 = approx 1 billion rows</p>
+<p>这是一个非常大的数据，当然，你的子分区不会有100列那么多，也可能不会有55000个分区，但上述的公式展示了，随着子分区的增长，每收集一次统计信息，HISTGRM$基表的的数据量会急剧增加。</p>
+<p>我们检查一下当前系统中存有的子分区数量</p>
+<pre><code> 
+SQL> select count(*) from histgrm$;
+
+  COUNT(*)
+----------
+   8417868
+
+当前这个基表已经有8百多万行了
+SQL>  select count(*) from dba_tab_subpartitions;
+
+  COUNT(*)
+----------
+    113565
+
+</code></pre>
+
+
+<p>那就奇怪了，为什么一个周未过去，这个基表就急剧增长呢？以前没有这样的事呢？经查，原来系统的自动统计信息收集并没有开启，即系统不会在每天凌晨进行统计信息收集，所以system表空间一直在4G以内而没有任何的问题。</p>
+<p>但为什么周未会出现system表空间不足呢？那是因为开发人员在进行完表迁移后，为了确保跑批能顺利完成，所以手工执行了统计信息的收集，所以导致了HISTGRM$基表数据的急剧增长，从而快速占据了system表空间，而aud$也是一个只要有新的连接或操作时，就会插入新的数据的，当system空间被HISTGRM$基表占据时，aud$也没有空间插入数据，所以报错。</p>
+<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>从上述的分析可以看到，当前系统存在两个问题，统计信息的收集没有开启，所以系统中表的统计信息不准确，将会导致执行计划不准，对跑批有较大影响。但是一旦开启统计信息的自动收集，那么，系统中存在着11万个子分区，将会导致HISTGRM$急剧增长。而且这个表增长后，无法通过删除数据进行收缩。</p>
+<p>通过综合考虑，建议对关键的业务表进行手工的统计信息收集，并且扩充system表空间到较大的空间，并且加强对此表空间的监控，避免空间不足。这样可以保证主要的业务表涉及的SQL执行计划是准确的，另外，减少了自动收集统计信息自动收集的分区数量，使HISTGRM$能可控增长。</p>
+<blockquote>
+<p>Cluster C_OBJ#_INTCOL# Growing Too Fast (Doc ID 403824.1)    To BottomTo Bottom    </p>
+<p>In this Document<br>Symptoms<br>Cause<br>Solution<br>APPLIES TO:</p>
+<p>Oracle Database - Enterprise Edition - Version 10.2.0.2 to 11.2.0.4 [Release 10.2 to 11.2]<br>Information in this document applies to any platform.<br><strong><em> Checked for relevance on 6-Oct-2014 </em></strong><br><strong><em> Checked for relevance on 8-Mar-2016 </em></strong></p>
+<p>SYMPTOMS</p>
+<p>Cluster C_OBJ#_INTCOL# is growing too fast.<br>CAUSE</p>
+<p>The default stats job (GATHER_STATS_JOB) or any other job based on the DBMS_STATS used to collect Database statistics is being run frequently, while having a large number of subpartitions within the database.<br>To explain how the large number of subpartitions plays a role in the problem, consider the following example:</p>
+<p>If 55000 subpartitions are being used, all of which have data and if each subpartition has 100 columns and further if the histogram has 200 buckets, then the worst case scenario for number of rows in the histgrm$ table for these objects is:</p>
+<p>55000<em>100</em>200 = approx 1 billion rows</p>
+<p>That’s the worst case scenario since there may not be 100 columns and all subpartitions may not have data and all columns may not have 200 buckets. But it illustrates the point that histograms can take up a lot of space as new objects are created and new data is loaded.</p>
+<p>To make sure of the previous information, perform the following SQL queries:</p>
+<ol>
+<li><p>SQL&gt; SELECT STATE FROM DBA_SCHEDULER_JOBS WHERE JOB_NAME = ‘GATHER_STATS_JOB’;</p>
+<p>If the result is “scheduled”, then the default stats job is automatically running.</p>
+</li>
+<li><p>SQL&gt; select job_name, schedule_name, last_start_date,repeat_interval,next_run_date from dba_scheduler_jobs;</p>
+<p>SQL&gt; select * from dba_scheduler_wingroup_members;</p>
+<p>SQL&gt; select * from dba_scheduler_window_details;</p>
+<p>This is to check for any other job that gathers statistics and determine its scheduled run time and that of the default stats job.</p>
+</li>
+<li><p>SQL&gt; select count(*) from histgrm$;</p>
+<p>Before and after running the job, if the histgrm$ number of rows increases obviously, then the assumptions are correct.</p>
+</li>
+<li><p>Check the number of subpartitions in the database if it has been increased or not.</p>
+</li>
+</ol>
+<p>SOLUTION</p>
+<p>To workaround this issue:</p>
+<ol>
+<li><p>Adjust the scheduler of the jobs so as not to run so often or run them manually.</p>
+</li>
+<li><p>Avoid adding so many subpartitions to the database.</p>
+</li>
+</ol>
+<p>Other than recreating the database, there is no other supported way to reduce the size of the cluster.</p>
+</blockquote>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
   <link itemprop="mainEntityOfPage" href="http://tyoracle.com/2016/08/02/系统参数设置不当导致ORACLE坏块的故事/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -806,246 +1046,6 @@ The workaround to avoid corruptions in the Oracle database files is to set files
 
 <p>要不就不要使用EXT4来存放数据库的相关文件，改为其他文件系统格式或直接存放到ASM上。</p>
 <p>终于解决问题，可以回家了：-）</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://tyoracle.com/2016/08/02/系统表空间异常增长一/">
-
-  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <meta itemprop="name" content="TY">
-    <meta itemprop="description" content="">
-    <meta itemprop="image" content="/images/weixin.png">
-  </span>
-
-  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-    <meta itemprop="name" content="IT 职业生涯规划">
-    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
-      <img style="display:none;" itemprop="url image" alt="IT 职业生涯规划" src="">
-    </span>
-  </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2016/08/02/系统表空间异常增长一/" itemprop="url">
-                  SYSTEM表空间异常增长问题分析（一）
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-08-02T00:00:00+08:00">
-                2016-08-02
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/oracle/" itemprop="url" rel="index">
-                    <span itemprop="name">oracle</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2016/08/02/系统表空间异常增长一/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/08/02/系统表空间异常增长一/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="个人介绍"><a href="#个人介绍" class="headerlink" title="个人介绍"></a>个人介绍</h2><p>本人TY，从事ORACLE DBA十五年，从ORACLE 8I开始，一直奋战在一线，本着对技术的狂热，一直走到今天，积累了大量的经验与案例，期待静下心来，将这些案例与经验化成文字，与大家分享，共同进步。</p>
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在7月30日，某客户的exadata出现aud$无法扩充system表空间的错误，检查发现，当前system表空间只有4G大小，经现场维护人员将system表空间resize到20G后，问题暂时得到解决。</p>
-<p>但是在8月3日现场支持检查发现，当前的SYSTEM表空间已经增长到16G，对于三四天增长这么快，需要找出原因。</p>
-<h2 id="分析过程"><a href="#分析过程" class="headerlink" title="分析过程"></a>分析过程</h2><p>在7月30日时，一直以为是aud$占的空间较大，导致了空间爆满，但现场检查时，却发现与我们想像的不致。</p>
-<p>检查当前system表空间占用最多的对象</p>
-<pre><code> SQL> select * from (select owner,segment_name,bytes/1024/1024 "size M" from dba_segments where tablespace_name='SYSTEM' order by 3 desc) where rownum <10; 50="" 52="" 53="" 54="" 240="" 312="" 672="" 14301="" owner="" segment_name="" size="" m="" ------------------------------="" ---------------------------------------------------------------------------------="" ----------="" sys="" c_obj#_intcol#="" hist_head$="" i_h_obj#_col#="" i_hh_obj#_col#="" i_hh_obj#_intcol#="" tabpart$="" sys_lob0000001100c00003$$="" c_file#_block#="" i_obj5="">
-</10;></code></pre>
-
-
-<p>发现占用最大的对象是C_OBJ#_INTCOL#，这个对象已经占了近14G，而aud$却排不上前十，看来经验误人，这个C_OBJ#_INTCOL#是什么对象呢？这个是一个 cluster对象。</p>
-<p>簇表(cluster) 是一种可以选的存储数据方式。簇表由1组拥有相同的列而且经常被一起使用的数据表构成，这组表在存储时会共享一部分Data Blocks, 例如，employees 和 departments表都包含department_id 这个列。 当用户将这两个表组合成1个簇表时，Oracle在物理上将employees 和 departments 两张表各行的department_id 字段存储在1个Data block里。</p>
-<p>cluster table在ORACLE的系统表上使用得较多，我们查一下这个cluster涉及的是那一个对象，可以通过dba_tables查到</p>
-<pre><code>  
-SQL> select owner,table_name,cluster_name from dba_tables where table_name='HISTGRM$';
-
-OWNER                          TABLE_NAME                     CLUSTER_NAME
------------------------------- ------------------------------ ------------------------------
-SYS                            HISTGRM$                       C_OBJ#_INTCOL#
-
-
-SQL>  select owner,table_name,BLOCKS*32/1024,tablespace_name  from dba_tables where table_name='HISTGRM$';
-
-OWNER                          TABLE_NAME                     BLOCKS*32/1024 TABLESPACE_NAME
------------------------------- ------------------------------ -------------- ------------------------------
-SYS                            HISTGRM$                             13817.75 SYSTEM
-</code></pre>
-
-
-<p>可以看到这个cluster是HISTGRM$所用，并且这个cluster的大小就是这个HISTGRM$表的大小。为什么是这个表占据了system最多的空间呢？我们进一步研究，</p>
-<p>histgrm$这个表存储的是column statistics (histograms)，即列的柱状图信息，并且从11.2.0.4开始，这个列的统计表有了一些细微的变化，增加了default value这个列，即以前不会收集柱状图的列，增加了这个列后，也会强制收集这个列的信息。</p>
-<p>根据Mos的Cluster C_OBJ#_INTCOL# Growing Too Fast (Doc ID 403824.1)描述，这个基表的记录，会随着你的子分区数量的增长而呈几何级的增长。如你有55000个子分区，每个子分区有100列，每个列有200个柱状图的bucket，那么histgrm$在每次统计信息收集时， 就会增长<br>55000<em>100</em>200 = approx 1 billion rows</p>
-<p>这是一个非常大的数据，当然，你的子分区不会有100列那么多，也可能不会有55000个分区，但上述的公式展示了，随着子分区的增长，每收集一次统计信息，HISTGRM$基表的的数据量会急剧增加。</p>
-<p>我们检查一下当前系统中存有的子分区数量</p>
-<pre><code> 
-SQL> select count(*) from histgrm$;
-
-  COUNT(*)
-----------
-   8417868
-
-当前这个基表已经有8百多万行了
-SQL>  select count(*) from dba_tab_subpartitions;
-
-  COUNT(*)
-----------
-    113565
-
-</code></pre>
-
-
-<p>那就奇怪了，为什么一个周未过去，这个基表就急剧增长呢？以前没有这样的事呢？经查，原来系统的自动统计信息收集并没有开启，即系统不会在每天凌晨进行统计信息收集，所以system表空间一直在4G以内而没有任何的问题。</p>
-<p>但为什么周未会出现system表空间不足呢？那是因为开发人员在进行完表迁移后，为了确保跑批能顺利完成，所以手工执行了统计信息的收集，所以导致了HISTGRM$基表数据的急剧增长，从而快速占据了system表空间，而aud$也是一个只要有新的连接或操作时，就会插入新的数据的，当system空间被HISTGRM$基表占据时，aud$也没有空间插入数据，所以报错。</p>
-<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>从上述的分析可以看到，当前系统存在两个问题，统计信息的收集没有开启，所以系统中表的统计信息不准确，将会导致执行计划不准，对跑批有较大影响。但是一旦开启统计信息的自动收集，那么，系统中存在着11万个子分区，将会导致HISTGRM$急剧增长。而且这个表增长后，无法通过删除数据进行收缩。</p>
-<p>通过综合考虑，建议对关键的业务表进行手工的统计信息收集，并且扩充system表空间到较大的空间，并且加强对此表空间的监控，避免空间不足。这样可以保证主要的业务表涉及的SQL执行计划是准确的，另外，减少了自动收集统计信息自动收集的分区数量，使HISTGRM$能可控增长。</p>
-<blockquote>
-<p>Cluster C_OBJ#_INTCOL# Growing Too Fast (Doc ID 403824.1)    To BottomTo Bottom    </p>
-<p>In this Document<br>Symptoms<br>Cause<br>Solution<br>APPLIES TO:</p>
-<p>Oracle Database - Enterprise Edition - Version 10.2.0.2 to 11.2.0.4 [Release 10.2 to 11.2]<br>Information in this document applies to any platform.<br><strong><em> Checked for relevance on 6-Oct-2014 </em></strong><br><strong><em> Checked for relevance on 8-Mar-2016 </em></strong></p>
-<p>SYMPTOMS</p>
-<p>Cluster C_OBJ#_INTCOL# is growing too fast.<br>CAUSE</p>
-<p>The default stats job (GATHER_STATS_JOB) or any other job based on the DBMS_STATS used to collect Database statistics is being run frequently, while having a large number of subpartitions within the database.<br>To explain how the large number of subpartitions plays a role in the problem, consider the following example:</p>
-<p>If 55000 subpartitions are being used, all of which have data and if each subpartition has 100 columns and further if the histogram has 200 buckets, then the worst case scenario for number of rows in the histgrm$ table for these objects is:</p>
-<p>55000<em>100</em>200 = approx 1 billion rows</p>
-<p>That’s the worst case scenario since there may not be 100 columns and all subpartitions may not have data and all columns may not have 200 buckets. But it illustrates the point that histograms can take up a lot of space as new objects are created and new data is loaded.</p>
-<p>To make sure of the previous information, perform the following SQL queries:</p>
-<ol>
-<li><p>SQL&gt; SELECT STATE FROM DBA_SCHEDULER_JOBS WHERE JOB_NAME = ‘GATHER_STATS_JOB’;</p>
-<p>If the result is “scheduled”, then the default stats job is automatically running.</p>
-</li>
-<li><p>SQL&gt; select job_name, schedule_name, last_start_date,repeat_interval,next_run_date from dba_scheduler_jobs;</p>
-<p>SQL&gt; select * from dba_scheduler_wingroup_members;</p>
-<p>SQL&gt; select * from dba_scheduler_window_details;</p>
-<p>This is to check for any other job that gathers statistics and determine its scheduled run time and that of the default stats job.</p>
-</li>
-<li><p>SQL&gt; select count(*) from histgrm$;</p>
-<p>Before and after running the job, if the histgrm$ number of rows increases obviously, then the assumptions are correct.</p>
-</li>
-<li><p>Check the number of subpartitions in the database if it has been increased or not.</p>
-</li>
-</ol>
-<p>SOLUTION</p>
-<p>To workaround this issue:</p>
-<ol>
-<li><p>Adjust the scheduler of the jobs so as not to run so often or run them manually.</p>
-</li>
-<li><p>Avoid adding so many subpartitions to the database.</p>
-</li>
-</ol>
-<p>Other than recreating the database, there is no other supported way to reduce the size of the cluster.</p>
-</blockquote>
 
           
         
