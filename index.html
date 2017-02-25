@@ -291,6 +291,166 @@
   
   
 
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://tyoracle.com/2017/02/23/ORACLE环境下的秒杀场景分析/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="TY">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/avatar.gif">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="IT 职业生涯规划">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="IT 职业生涯规划" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2017/02/23/ORACLE环境下的秒杀场景分析/" itemprop="url">
+                  ORACLE环境下的秒杀场景分析
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-23T00:00:00+08:00">
+                2017-02-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/oracle/" itemprop="url" rel="index">
+                    <span itemprop="name">oracle</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/02/23/ORACLE环境下的秒杀场景分析/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/02/23/ORACLE环境下的秒杀场景分析/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <blockquote>
+<p>版本声明：本文为tyoracle.com原创，如需转发，无需经我同意，但必须要注明来自于tyoracle.com</p>
+</blockquote>
+<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>某大型公司在二月份对某业务系统进行压力测试，效果并不太理想，在硬件为EXADATA八分一配置上运行的测试环境中，并没有达到预期效果。并且在2月17日在做压力测试时，将数据库节点压到宕机。后经ORACLE SR分析，原因是没有启用Hugepage属性，导致了节点内存被耗尽，从而使ORACLE数据库节点宕机。</p>
+<p>在对EXADATA上的测试数据库进行了 use_large _pages=true的设置，启用了Hugepage属性后，宕机现象并没有再出现，但是测试效果仍不理想。</p>
+<p>另外，客户在压测过程中，发现数据库后台报大量的Global Enqueue Services Deadlock detected 全局死锁，并且数据库里，存在大量的并发等待事件：enq: TX - row lock contention，所以需要分析其原因，并提供解决方案。</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/02/23/ORACLE环境下的秒杀场景分析/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
   <article class="post post-type-Oracle " itemscope itemtype="http://schema.org/Article">
   <link itemprop="mainEntityOfPage" href="http://tyoracle.com/2017/02/20/sysaux异常增长后空间清理/">
 
@@ -1549,287 +1709,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://tyoracle.com/2016/08/10/系统表空间异常增长二/">
-
-  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <meta itemprop="name" content="TY">
-    <meta itemprop="description" content="">
-    <meta itemprop="image" content="/images/avatar.gif">
-  </span>
-
-  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-    <meta itemprop="name" content="IT 职业生涯规划">
-    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
-      <img style="display:none;" itemprop="url image" alt="IT 职业生涯规划" src="">
-    </span>
-  </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2016/08/10/系统表空间异常增长二/" itemprop="url">
-                  SYSTEM表空间异常增长问题分析（二）
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-08-10T00:00:00+08:00">
-                2016-08-10
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/oracle/" itemprop="url" rel="index">
-                    <span itemprop="name">oracle</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2016/08/10/系统表空间异常增长二/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/08/10/系统表空间异常增长二/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="继续分析"><a href="#继续分析" class="headerlink" title="继续分析"></a>继续分析</h1><p>又一个周未过去了，但是在周未的时候，系统再次报错，在system表空间已扩展到32G的情况下，逼不得已再把system表空间再扩充了64G。这样下去不是办法啊，必须要想出一个彻底解决的方案。</p>
-<p>检查hisgram$这个表，发现已增长了一千多万</p>
-<pre><code> 
-SQL> select count(*) from histgrm$;            
-
-  COUNT(*)            
-----------            
-17679019
-
-</code></pre>
-
-<p>检查这个表占用最多的是那些表的柱状图统计信息</p>
-<pre><code> 
-
-Table    count(*)        partitions 
-F_XXXXX_DDDDDDDDDD_H    187883        1500  <<<------ 33="" 62="" 1907="" 10176="" 12073="" 12821="" 12877="" 12878="" 13190="" 14825="" 16040="" 16555="" 17268="" 17673="" 17804="" 23433="" 65124="" 77148="" f_xx_ddddd_ggggg_vvvv_h="" <<<------="" a_d_xxx_xxxx_ddu="" f_ag_loan_cont_s="" f_ag_loan_apl_msg_s="" f_ag_elec_acpt_dra_s="" f_as_guar_msg_s="" f_pt_cred_org_pt_msg_s="" f_ev_in_lend_buss_s="" f_ev_exp_bar_trad_s="" f_ev_loan_out_acc_msg_s="" f_ev_remit_fund_trad_s="" f_ev_imp_arr_ord_trad_s="" f_ev_abch_rem_fud_trad_s="" f_ev_cbill_coll_trad_s="" f_ev_online_aut_orig_s="" <="" code=""></------></code></pre>        
-
-<p>前面三个表的记录数最多，特别是前面两个，每个表的分区数一千多个，所以每收集一次统计信息，就会增加非常多的记录，所以system 表空间消耗得特别快。</p>
-<p>既然知道是因为柱状图的收集而引起的，那柱状图的作用是什么呢？当系统中的某些表存在高度不均匀的数据分布时，使用柱状图能够产生更好的选择性评估，从而产生更加优化的执行计划，如判定是选择走索引好还是走全表好。其实这对于普通的ORACLE数据库是非常好的特性，因为使用索引，能提高普通ORACLE数据库的性能，但我们现在的环境则相反，我们现在是EXADATA，在EXADATA里，通常建议是尽量减少索引，利用EXADATA的storage index特性能提高SQL的性能，使用普通的btree索引，反而性能会下降得厉害。正因为此，这些业务表上，除了主键外，都没有索引，因此，柱状图对于exadata的环境是没有什么用处的。</p>
-<p>既然知道了原理，那我们就明白，histgrm$的异常增长，柱状图的收集，不会给我们的系统带来任何的好处，那我们为什么还要收集它呢？</p>
-<p>检查系统当前的统计信息收集策略</p>
-<pre><code> 
-SQL> select client_name,status from dba_autotask_client;                 
-
-CLIENT_NAME                                                      STATUS  
-/-------------------------------------------------------------- /--------
-auto optimizer stats collection                                  ENABLED 
-auto space advisor                                               ENABLED 
-sql tuning advisor                                               ENABLED 
-</code></pre>    
-
-<p>当前是系统默认的自动收集，即表的数据量变化达到了表的大小10%时，即会自动收集统计信息。而这个自动收集统计信息的功能，其同时也会自动收集柱状图的相关信息，正因为这样，才会导致每个周未，system表空间都异常增长，原因就是周未的时候，作了自动的统计信息收集。</p>
-<pre><code> 
-select dbms_stats.get_prefs('method_opt') from dual;
-DBMS_STATS.GET_PREFS('METHOD_OPT')
-/-------------------------------------------------------------------------------
-FOR ALL COLUMNS SIZE AUTO
-
-</code></pre>    
-
-<p>从上面的查询中就可以看到当前自动收集是打开了柱状图的自动收集功能的。我们也可以单独查询上述最大的那三张表是不是也是打开了柱状图的自动收集功能的。</p>
-<pre><code> 
-SQL> select dbms_stats.get_prefs('method_opt','DWUSR','F_XXXXX_DDDDDDDDDD_H') from dual;
-
-DBMS_STATS.GET_PREFS('METHOD_OPT','DWUSR','F_XXXXX_DDDDDDDDDD_H')
-/--------------------------------------------------------------------------------
-FOR ALL COLUMNS SIZE AUTO
-
-
-SQL> select dbms_stats.get_prefs('method_opt','DWUSR','F_XX_DDDDD_GGGGG_VVVV_H') from dual;
-
-DBMS_STATS.GET_PREFS('METHOD_OPT','DWUSR','F_XX_DDDDD_GGGGG_VVVV_H')
-/--------------------------------------------------------------------------------
-FOR ALL COLUMNS SIZE AUTO
-
-
-
-SQL> select dbms_stats.get_prefs('method_opt','DWUSR','A_D_XXX_XXXX_DDU') from dual;
-
-DBMS_STATS.GET_PREFS('METHOD_OPT','DWUSR','A_D_XXX_XXXX_DDU')
-/--------------------------------------------------------------------------------
-FOR ALL COLUMNS SIZE AUTO
-
-</code></pre>    
-
-<p>从上述的结果更加确信了上述的推测，现在我们要验证的是，不收集这个柱状图统计信息，这个histgrm$基表是不是就不会停止增长了。我们取三个表中最小的那个表A_D_XXX_XXXX_DDU进行试验。</p>
-<pre><code> 
-SQL>   exec dbms_stats.DELETE_TABLE_STATS(OWNNAME=> 'DWUSR',TABNAME=>'A_D_XXX_XXXX_DDU');   
-
-PL/SQL procedure successfully completed.
-
-我们先删除了这个表的统计信息
-
-SQL> select count(*) from histgrm$ a where a.obj# in (select b.object_id from dba_objects b where b.object_name='A_D_XXX_XXXX_DDU');
-
-  COUNT(*)
-/----------
-         0
-删除后，在histgrm$里就没有这个表的相关信息了，histgrm$的空间就可以被重用了。但因为是数据字典表，这个空出来的空间不能被回收，只能被另外的记录重用。
-
-</code></pre>
-
-
-<p>我们重新以不收集柱状图的方式重新收集这个表的信息，指定</p>
-<p>METHOD_OPT=&gt;’for all columns size 1’</p>
-<pre><code> 
-15:20:53 SQL> exec dbms_stats.GATHER_TABLE_STATS(OWNNAME=> 'DWUSR',TABNAME=>'A_D_XXX_XXXX_DDU',ESTIMATE_PERCENT=>dbms_stats.auto_sample_size,METHOD_OPT=>'for all columns size 1') ;
-
-PL/SQL procedure successfully completed.
-
-Elapsed: 00:34:35.72
-
-15:55:31 SQL>                   select count(*) from histgrm$ a where a.obj# in (select b.object_id from dba_objects b where b.object_name='A_D_XXX_XXXX_DDU');
-
-  COUNT(*)
-----------
-         0
-
-Elapsed: 00:00:00.03    
-
-</code></pre>
-
-<p>收集完成后，我们检查histgrm$，果然如我们所期望的一样，没有任何的记录，即在不收集柱状图的情况下，这个histgrm$基表是不会增长的。</p>
-<p>OK，那我们验证成功了，既然这个柱状图对exadata 环境没什么用，那我们就把全库的柱状图都禁止好了，进行以下的设置</p>
-<pre><code> 
-16:14:22 SQL>      exec dbms_stats.set_param(pname=>'METHOD_OPT',pval=>'FOR ALL COLUMNS SIZE 1');
-
-PL/SQL procedure successfully completed.
-
-Elapsed: 00:00:00.04
-16:19:57 SQL> select dbms_stats.get_prefs('method_opt') from dual;
-
-DBMS_STATS.GET_PREFS('METHOD_OPT')
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-FOR ALL COLUMNS SIZE 1
-
-全库的统计信息收集属性改变了，不收集柱状图的信息
-
-Elapsed: 00:00:00.00
-16:20:11 SQL> select dbms_stats.get_prefs('method_opt','DWUSR','F_XXXXX_DDDDDDDDDD_H') from dual;
-
-DBMS_STATS.GET_PREFS('METHOD_OPT','DWUSR','F_XXXXX_DDDDDDDDDD_H')
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-FOR ALL COLUMNS SIZE 1
-
-Elapsed: 00:00:00.00
-16:20:25 SQL> 
-对应的表的收集属性也跟着变化了
-</code></pre>
-
-<p>至此问题得到完美的解决，SYSTEM表空间再不会因为histgrm$这个表的异常增长而撑爆。但是，如果在非EXADATA的环境，并且表字段的数据分布不均的情况下，柱状图还是非常有用的，这样 histgrm$增长就在所难免了。解决问题，只要知道了其原理，具体问题具体分析，一般都能找到解决方案。</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1877,7 +1756,7 @@ Elapsed: 00:00:00.00
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">12</span>
+                <span class="site-state-item-count">13</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1895,7 +1774,7 @@ Elapsed: 00:00:00.00
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-count">6</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

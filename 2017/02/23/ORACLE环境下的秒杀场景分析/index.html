@@ -1,0 +1,990 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  ﻿<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="oracle ，troubleshooting," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="IT 职业生涯规划" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="版本声明：本文为tyoracle.com原创，如需转发，无需经我同意，但必须要注明来自于tyoracle.com
+
+背景某大型公司在二月份对某业务系统进行压力测试，效果并不太理想，在硬件为EXADATA八分一配置上运行的测试环境中，并没有达到预期效果。并且在2月17日在做压力测试时，将数据库节点压到宕机。后经ORACLE SR分析，原因是没有启用Hugepage属性，导致了节点内存被耗尽，从而使">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ORACLE环境下的秒杀场景分析">
+<meta property="og:url" content="http://tyoracle.com/2017/02/23/ORACLE环境下的秒杀场景分析/index.html">
+<meta property="og:site_name" content="IT 职业生涯规划">
+<meta property="og:description" content="版本声明：本文为tyoracle.com原创，如需转发，无需经我同意，但必须要注明来自于tyoracle.com
+
+背景某大型公司在二月份对某业务系统进行压力测试，效果并不太理想，在硬件为EXADATA八分一配置上运行的测试环境中，并没有达到预期效果。并且在2月17日在做压力测试时，将数据库节点压到宕机。后经ORACLE SR分析，原因是没有启用Hugepage属性，导致了节点内存被耗尽，从而使">
+<meta property="og:image" content="http://odh3pyi7v.bkt.clouddn.com/tx_awr2.png">
+<meta property="og:updated_time" content="2017-02-25T14:02:46.672Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ORACLE环境下的秒杀场景分析">
+<meta name="twitter:description" content="版本声明：本文为tyoracle.com原创，如需转发，无需经我同意，但必须要注明来自于tyoracle.com
+
+背景某大型公司在二月份对某业务系统进行压力测试，效果并不太理想，在硬件为EXADATA八分一配置上运行的测试环境中，并没有达到预期效果。并且在2月17日在做压力测试时，将数据库节点压到宕机。后经ORACLE SR分析，原因是没有启用Hugepage属性，导致了节点内存被耗尽，从而使">
+<meta name="twitter:image" content="http://odh3pyi7v.bkt.clouddn.com/tx_awr2.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"always"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://tyoracle.com/2017/02/23/ORACLE环境下的秒杀场景分析/"/>
+
+
+
+
+
+  <title> ORACLE环境下的秒杀场景分析 | IT 职业生涯规划 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', '83296706-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?7a57fee69b03840c9f7dd4d904a40d7b";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner">﻿<div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">IT 职业生涯规划</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle">时间的朋友</p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://tyoracle.com/2017/02/23/ORACLE环境下的秒杀场景分析/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="TY">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/avatar.gif">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="IT 职业生涯规划">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="IT 职业生涯规划" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                ORACLE环境下的秒杀场景分析
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-23T00:00:00+08:00">
+                2017-02-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/oracle/" itemprop="url" rel="index">
+                    <span itemprop="name">oracle</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/02/23/ORACLE环境下的秒杀场景分析/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/02/23/ORACLE环境下的秒杀场景分析/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+<span>&nbsp; | &nbsp;
+<span id="busuanzi_value_page_pv" ></span>次阅读
+</span>    
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>版本声明：本文为tyoracle.com原创，如需转发，无需经我同意，但必须要注明来自于tyoracle.com</p>
+</blockquote>
+<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>某大型公司在二月份对某业务系统进行压力测试，效果并不太理想，在硬件为EXADATA八分一配置上运行的测试环境中，并没有达到预期效果。并且在2月17日在做压力测试时，将数据库节点压到宕机。后经ORACLE SR分析，原因是没有启用Hugepage属性，导致了节点内存被耗尽，从而使ORACLE数据库节点宕机。</p>
+<p>在对EXADATA上的测试数据库进行了 use_large _pages=true的设置，启用了Hugepage属性后，宕机现象并没有再出现，但是测试效果仍不理想。</p>
+<p>另外，客户在压测过程中，发现数据库后台报大量的Global Enqueue Services Deadlock detected 全局死锁，并且数据库里，存在大量的并发等待事件：enq: TX - row lock contention，所以需要分析其原因，并提供解决方案。</p>
+<a id="more"></a>
+<h2 id="1、-全局死锁的分析"><a href="#1、-全局死锁的分析" class="headerlink" title="1、 全局死锁的分析"></a>1、 全局死锁的分析</h2><p>首先我们先来看看Global Enqueue Services Deadlock detected 全局死锁，在单实例的环境，当出现应用的死锁，其表现为ORA-60，但是在RAC环境里，其表现就会类似如下的报错</p>
+<pre><code>
+Global Enqueue Services Deadlock detected. More info in file
+/u01/diag/rdbms/rac/RAC1/trace/RAC1_ora_3457040.trc.
+
+OR
+
+Global Enqueue Services Deadlock detected. More info in file 
+/u01/diag/rdbms/rac/RAC1/trace/RAC1_lmd0_30429.trc.
+</code></pre>
+
+<p>这是因为在RAC的环境里，出现死锁，有可能是出现在两个不同的实例，所以死锁并不使用ORA-60来表现了。至于死锁的原因，一般是两个或多个会话（这些会话在RAC环境里就可能分布在不同的节点）同时更新相同的表或相同的行数据。其分为TM锁与TX锁，TM锁一般是父表，子表间的关联字段没有索引，导致了TM锁，而TX锁，一般是多个会话更新同一行数据。</p>
+<p>通过以下的方法，对当前系统的全局死锁进行分析：</p>
+<pre><code>
+节点一：
+[oracle@CNXXXXM01vm02(XXXXT11) trace]$ grep BLOCKED XXXXT11_lmd0_310750.trc|grep TX|wc -l
+5530
+
+[oracle@CNXXXXM01vm02(XXXXT11) trace]$ grep BLOCKED XXXXT11_lmd0_310750.trc|grep TM|wc -l
+0
+
+看到的全部是事务锁，没有表锁，继续分析这些事务锁是什么锁类型
+[oracle@CNXXXXM01vm02(XXXXT11) trace]$ grep BLOCKED XXXXT11_lmd0_310750.trc|grep TX |awk '{print $3}'|uniq -c
+    822 5
+      1 3
+      1 5
+      1 3
+      1 5
+      1 3
+   4703 5
+
+3代表的是行级排他锁，在提交前不允许对行进行操作，5是共享行级排他锁。锁的类型如下：
+0 - none
+1 - null (NULL)
+2 - row-S (SS)
+3 - row-X (SX)
+4 - share (S)
+5 - S/Row-X (SSX)
+6 - exclusive (X)
+</code></pre>
+
+<p>我们再进一步细分，是什么语句导致了TX锁</p>
+<pre><code>
+  16449 --
+  16450   current SQL:
+     42   DELETE FROM XXX8entries WHERE PK = :1 
+      5   delete from XXX8s
+    311   DELETE FROM XXX8s WHERE PK = :1 
+     88   UPDATE XXX8entries SET hjmpTS = :1  ,modifiedTS=:2 ,p_calculated=:3 ,p_quantity=:4  WHERE PK = :5  
+     63   UPDATE XXX8entries SET hjmpTS = :1  ,modifiedTS=:2 ,p_calculated=:3  WHERE PK = :4  
+    357   UPDATE XXX8entries SET hjmpTS = :1  ,modifiedTS=:2 ,p_reserved=:3  WHERE PK = :4  
+    331   UPDATE XXX8s SET hjmpTS = :1  ,modifiedTS=:2 ,p_businessvolume=:3 ,p_deliverycost=:4 ,p_deliveryfeethresh=:5 ,p_insurancecost=:6 ,p_pointvalue=:7 ,p_subtotal=:8 ,p_totalprice=:9 ,p_weightforgrouporder=:10  WHERE PK = :11  
+    659   UPDATE XXX8s SET hjmpTS = :1  ,modifiedTS=:2 ,p_businessvolume=:3 ,p_pointvalue=:4 ,p_subtotal=:5 ,p_totalprice=:6  WHERE PK = :7  
+    221   UPDATE XXX8s SET hjmpTS = :1  ,modifiedTS=:2 ,p_calculated=:3  WHERE PK = :4  
+   1160   UPDATE XXX8s SET hjmpTS = :1  ,modifiedTS=:2 ,p_deliverycost=:3 ,p_deliveryfeethresh=:4 ,p_insurancecost=:5 ,p_totalprice=:6 ,p_weightforgrouporder=:7  WHERE PK = :8  
+      2   UPDATE XXX8s SET hjmpTS = :1  ,modifiedTS=:2 ,p_deliverycost=:3 ,p_deliveryfeethresh=:4 ,p_insurancecost=:5 ,p_weightforgrouporder=:6  WHERE PK = :7  
+     61   UPDATE XXX8s SET hjmpTS = :1  ,modifiedTS=:2 ,p_orderid=:3  WHERE PK = :4  
+   1387   UPDATE XXX8s SET hjmpTS = :1  ,modifiedTS=:2 ,p_status=:3  WHERE PK = :4  
+  10251   UPDATE XXX_STOCK SET p_available = p_available - :1   WHERE PK=:2 <<--- 1512="" update="" xxx_stock="" set="" p_available="p_available" +="" :1="" where="" pk=":2" <="" code=""></---></code></pre>
+
+<p>这个是节点一的情况，几乎全是UPDATE的语句，并且基本上就是更新两张表XXX8s 和 XXX_STOCK，我们再来看看另外一个节点的情况，基本上相同</p>
+<pre><code>
+节点二：
+
+[oracle@CNXXXXM02vm02 trace]$ grep BLOCKED XXXXT12_lmd0_371030.trc|grep TX|wc -l
+6413
+[oracle@CNXXXXM02vm02 trace]$ grep BLOCKED XXXXT12_lmd0_371030.trc|grep TM|wc -l
+0
+
+[oracle@CNXXXXM02vm02 trace]$ grep BLOCKED XXXXT12_lmd0_371030.trc|grep TX |awk '{print $3}'|uniq -c
+    846 5
+      1 3
+   5566 5
+
+按语句进行分解：
+  18929 --
+  18930   current SQL:
+     15   DELETE FROM XXX8entries WHERE PK = :1 
+    276   DELETE FROM XXX8s WHERE PK = :1 
+    100   UPDATE XXX8entries SET hjmpTS = :1  ,modifiedTS=:2 ,p_calculated=:3 ,p_quantity=:4  WHERE PK = :5  
+    146   UPDATE XXX8entries SET hjmpTS = :1  ,modifiedTS=:2 ,p_calculated=:3  WHERE PK = :4  
+    430   UPDATE XXX8entries SET hjmpTS = :1  ,modifiedTS=:2 ,p_reserved=:3  WHERE PK = :4  
+    204   UPDATE XXX8s SET hjmpTS = :1  ,modifiedTS=:2 ,p_businessvolume=:3 ,p_deliverycost=:4 ,p_deliveryfeethresh=:5 ,p_insurancecost=:6 ,p_pointvalue=:7 ,p_subtotal=:8 ,p_totalprice=:9 ,p_weightforgrouporder=:10  WHERE PK = :11  
+    552   UPDATE XXX8s SET hjmpTS = :1  ,modifiedTS=:2 ,p_businessvolume=:3 ,p_pointvalue=:4 ,p_subtotal=:5 ,p_totalprice=:6  WHERE PK = :7  
+      4   UPDATE XXX8s SET hjmpTS = :1  ,modifiedTS=:2 ,p_businessvolume=:3 ,p_pointvalue=:4  WHERE PK = :5  
+    185   UPDATE XXX8s SET hjmpTS = :1  ,modifiedTS=:2 ,p_calculated=:3  WHERE PK = :4  
+    907   UPDATE XXX8s SET hjmpTS = :1  ,modifiedTS=:2 ,p_deliverycost=:3 ,p_deliveryfeethresh=:4 ,p_insurancecost=:5 ,p_totalprice=:6 ,p_weightforgrouporder=:7  WHERE PK = :8  
+     31   UPDATE XXX8s SET hjmpTS = :1  ,modifiedTS=:2 ,p_deliverycost=:3 ,p_deliveryfeethresh=:4 ,p_insurancecost=:5 ,p_weightforgrouporder=:6  WHERE PK = :7  
+     61   UPDATE XXX8s SET hjmpTS = :1  ,modifiedTS=:2 ,p_orderid=:3  WHERE PK = :4  
+   1632   UPDATE XXX8s SET hjmpTS = :1  ,modifiedTS=:2 ,p_status=:3  WHERE PK = :4  
+  12935   UPDATE XXX_STOCK SET p_available = p_available - :1   WHERE PK=:2 《《---同样的SQL，次数也是超多
+   1452   UPDATE XXX_STOCK SET p_available = p_available + :1   WHERE PK=:2 
+</code></pre>
+
+<p>同样是对XXX8s 和 XXX_STOCK进行大量的更新。根据与用户的沟通，原来这个系统是类似于互联网秒杀的系统，大量的并发进入数据库后，不断去抢一个商品，每抢一个商品，其库存就会减1，直到秒杀完成。正因为此，导致了两个节点，同时有多个会话去更新同一行数据，从而导致了全局死锁。</p>
+<h3 id="建议"><a href="#建议" class="headerlink" title="建议"></a>建议</h3><p>  这个全局死锁的问题，对于客户这种业务场景并不能解决的，你说让他们减少并发？客户还想增加数据库并发去秒杀呢。所以只能提高引起死锁的SQL的运行效率，减少其锁定资源的时间，从而降低对数据库的影响。</p>
+<h2 id="2、ENQ-TX锁的分析"><a href="#2、ENQ-TX锁的分析" class="headerlink" title="2、ENQ:TX锁的分析"></a>2、ENQ:TX锁的分析</h2><p>既然知道了上述的应用场景后，需要分析的第二个原因<br>Event    Waits    Total Wait Time (sec)    Wait Avg(ms)    % DB time    Wait Class<br>enq: TX - row lock contention    1,864,049    5137.9K    2756    97.9    Application</p>
+<p>就非常好理解了，正因为多个会话去更新同一行数据，从而导致了大量的enq: TX - row lock contention等待，而这个业务系统的业务逻辑相对单一，大量的数据库资源都被这个事件所占用，导致了相关的SQL执行时间超长</p>
+<p><img src="http://odh3pyi7v.bkt.clouddn.com/tx_awr2.png" alt=""></p>
+<p>每条SQL的执行时间最长的达到了106秒，短的也有18秒，不用查ASH，都可以知道其大量的时间消耗在ENQ:TX的等待上。</p>
+<p>查看运行时间排在第一条的SQL,此SQL也是产生死锁最多的一条SQL<br>UPDATE XXX_STOCK SET p_available = p_available - :1 WHERE PK=:2</p>
+<p>其逻辑是基于主键 去更新库存，每秒一件商品，即减1。这个表的记录都非常小</p>
+<pre><code>
+OBJECT_NAME              ANALYZED                ROWCNT    BLKCNT    
+------------------------ ------------------ ----------- ---------    
+XXX_STOCK              20170202 22:00:52          292        35    
+XXX_STOCK              20170203 22:00:13          292        35    
+XXX_STOCK              20170206 22:00:07          292        35    
+XXX_STOCK              20170207 22:00:24          292        35    
+XXX_STOCK              20170208 22:00:10          294        35    
+XXX_STOCK              20170209 22:00:25          294        35    
+XXX_STOCK              20170210 22:00:10          294        35    
+XXX_STOCK              20170211 06:00:05          294        35    
+XXX_STOCK              20170211 14:04:55          294        35    
+XXX_STOCK              20170211 18:04:56          294        35    
+XXX_STOCK              20170211 22:05:36          294        35    
+XXX_STOCK              20170212 06:00:12          294        35    
+XXX_STOCK              20170212 10:01:07          294        35    
+XXX_STOCK              20170212 14:01:29          294        35    
+XXX_STOCK              20170212 18:01:58          294        35                            
+XXX_STOCK              20170212 22:02:17          294        35                                
+XXX_STOCK              20170213 22:00:14          294        35                                                          
+XXX_STOCK              20170214 22:00:34          294        35                                                        
+XXX_STOCK              20170215 22:00:07          383        35                                                           
+XXX_STOCK              20170216 22:00:48          383        35                                                                 
+XXX_STOCK              20170217 22:00:22          383        35                                                                       
+XXX_STOCK              20170218 06:00:08          383        35                                                                        
+XXX_STOCK              20170220 22:00:06          383        35                                                                                                                                       
+XXX_STOCK              20170221 22:00:14          383        35    
+</code></pre>
+只有几百行数据，35个块，但是这个表上却有11个索引
+<pre><code>
+INDEX_NAME                           COLUMN_NAME              COLUMN_POSITION 
+------------------------------------ ------------------------ --------------- 
+xxxx123XXX_STOCKKUIDIDX_2007         P_SKUID                                1 
+xxxx123XXX_STOCKKUVERSIONIDX_2       P_VERSION                              1 
+BININDEX_2007                        P_BIN                                  1 
+PRDXXXHSKUINDEX_2007                 P_PRODUCTCODE                          1 
+PRDXXXHSKUINDEX_2007                 P_XXXE                            2 
+PRDXXXHSKUINDEX_2007                 P_SKUID                                3 
+PRDXXXHSKUVRINDEX_2007               P_PRODUCTCODE                          1 
+PRDXXXHSKUVRINDEX_2007               P_XXXE                            2 
+PRDXXXHSKUVRINDEX_2007               P_SKUID                                3 
+PRDXXXHSKUVRINDEX_2007               P_VERSION                              4 
+PRODUCTCODEBINXXXEINDEX_2       P_PRODUCTCODE                          1 
+PRODUCTCODEBINXXXEINDEX_2       P_BIN                                  2 
+PRODUCTCODEBINXXXEINDEX_2       P_XXXE                            3 
+PRODUCTCODEIDX_2007                  P_PRODUCTCODE                          1 
+PRODUCTCODEXXXEAVAILABLEI       P_PRODUCTCODE                          1 
+PRODUCTCODEXXXEAVAILABLEI       P_XXXE                            2 
+PRODUCTCODEXXXEAVAILABLEI       P_AVAILABLE                            3 
+PRODUCTCODEXXXEINDEX_2007       P_PRODUCTCODE                          1 
+PRODUCTCODEXXXEINDEX_2007       P_XXXE                            2 
+SYS_C0010028                         PK                                     1 
+XXXEINDEX_2007                  P_XXXE                            1 
+</code></pre>
+
+<p>update的时候，大部分的时间都消耗在维护索引了，另一个表XXX8S也是存在同样的情况，对于这样的小表，是不需要创建索引的，只需要将表keep在buffer cache里，几十个块的小表更新效率是很高的。对于主键索引，业务逻辑或者是不能删除的，所以建议如下：</p>
+<h3 id="建议-1"><a href="#建议-1" class="headerlink" title="建议"></a>建议</h3><ul>
+<li>删除所有除主键索引外的所有索引</li>
+<li>把表keep 在buffer cache里<br> alter table t storage ( buffer_pool keep );</li>
+</ul>
+<h2 id="3、-内存的使用问题"><a href="#3、-内存的使用问题" class="headerlink" title="3、 内存的使用问题"></a>3、 内存的使用问题</h2><p>对于在前面几次都因为内存不足而导致数据库节点宕机的问题，在这里就不深入分析（SR已经给出了明确的说法）。但是要注意的是，这里有一个坑，就是在EXADATA新创建库，use_ large_pages这个参数默认为false，而不是普通数据库那样默认为true，所以出现客户在操作系统配置了hugepage，在数据库层面却使用不了的情况。</p>
+<p>对于hugepage，系统没有设这个的时候，是以4K的大小来管理内存的，而在设置了hugepage后，系统是使用2M的块大小来管理内存的，后者是前者的50倍。但是操作系统上是设置了，但不通知数据库来使用，也是没用的。所以需要使用use_large_pages来告诉数据库，你的数据库内存也要使用大页来进行管理。</p>
+<p>配置Hugepage需要先仔细阅读MOS上如下文档：</p>
+<blockquote>
+<p>ALERT: Disable Transparent HugePages on SLES11, RHEL6, OL6 and UEK2 Kernels (Doc ID 1557478.1)<br>HugePages and Oracle Database 11g Automatic Memory Management (AMM) on Linux (Doc ID 749851.1)<br>Hugepages Not Used when ASM is used (Doc ID 1457842.1)<br>ASM &amp; Shared Pool (ORA-4031) (Doc ID 437924.1)<br>Shell Script to Calculate Values Recommended Linux HugePages / HugeTLB Configuration (Doc ID 401749.1)<br>HugePages on Oracle Linux 64-bit (Doc ID 361468.1)</p>
+</blockquote>
+<h3 id="建议-2"><a href="#建议-2" class="headerlink" title="建议"></a>建议</h3><p>当前测试系统里配置了三个测试库，一个ASM库，这三个库分配的SGA分别是8G 8G 4G,ASM分配的是2G，当前系统的HugePages设置如下：<br>[root ~]# cat /etc/sysctl.conf|grep nr_hugepages<br>vm.nr_hugepages=18819</p>
+<p>这个设置在原来没有在新增库的情况下是正确的，但新增了数据库后，这个值必须跟着修改，否则也有可能在大压力下，导致内存不足，根据</p>
+<blockquote>
+<p>Shell Script to Calculate Values Recommended Linux HugePages / HugeTLB Configuration (Doc ID 401749.1)       </p>
+</blockquote>
+<p>里的Shell脚本hugepages_settings.sh，得出当前系统的最佳值应该为<br>Recommended setting: vm.nr_hugepages = 11272</p>
+<h2 id="4、-总结"><a href="#4、-总结" class="headerlink" title="4、 总结"></a>4、 总结</h2><p>客户系统类似于秒杀系统，表不大，存在多个索引，导致更新时需要频繁维护索引。同时，大量的并发也导致了行级事务锁，因并发更新的速度慢，反过来又加大了资源的争用。而全局死锁，只是大量并发对相同的数据行进行更新的一个表现，是不可避免的。</p>
+<p>删除索引，把表加载到内存中，想办法提高更新速度，这样才能提高并发量。</p>
+<h2 id="5、彩蛋"><a href="#5、彩蛋" class="headerlink" title="5、彩蛋"></a>5、彩蛋</h2><p>其实对于这个系统，从业务逻辑上来看，可能redis+mysql的架构会更好，但是客户有钱任性，要跑在EXADATA上。对于秒杀系统，很多都是通过对前端限流，然后尽量将小的流量放到数据库端。但客户希望在最短的时间内，将商品销售出去，这个逻辑就要求数据库处理得越快越好了。</p>
+<p>对于数据库，最严重的问题就是并发更新的问题，并发更新会阻塞其他会话。如上面的例子，一条更新需要跑一百多秒，那客户的体验是非常差的。如果通过redis做前端缓存，会存在一个问题，就是多个redis缓存的数据不一致，因为多个redis不可能同一时间点进行分发。如果只采用一个redis，那就可能存在持久化的问题，因为只有一个redis，同时把持久化打开，效率是非常低的。这个时间，我们可以考虑使用redis群集的方式，在备redis上进行持久化。</p>
+<p>另外可以考虑另一种方案，这个方案就是采用一张流水表，这个表非常简单，只有两个字段，一个是产品号，一个是成交标记。每卖出或退回一件商品，在这个流水表上插入一行，因为insert是不阻塞其他会话的，并且速度很快。所以业务逻辑应该是这样的：</p>
+<p>设计一个procedure,先对流水表成交标记做汇总，跟业务表的库存数比较，等于0，则在页面上显示秒杀完。如果大于0，那就在流水表插入一条记录，标记库存减1并提交。如果退货，则标记库存加1.这样在促销完后，再将流水表的记录更新到业务表里。这样一个操作，估计执行时间不会超过0.5秒，并且不会阻塞其他会话，有条件的可以测试一下。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/oracle-，troubleshooting/" rel="tag"># oracle ，troubleshooting</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/02/20/sysaux异常增长后空间清理/" rel="next" title="sysaux异常增长后空间清理">
+                <i class="fa fa-chevron-left"></i> sysaux异常增长后空间清理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+  <p>热评文章</p>
+  <div class="ds-top-threads" data-range="weekly" data-num-items="4"></div>
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2017/02/23/ORACLE环境下的秒杀场景分析/"
+           data-title="ORACLE环境下的秒杀场景分析" data-url="http://tyoracle.com/2017/02/23/ORACLE环境下的秒杀场景分析/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="TY" />
+          <p class="site-author-name" itemprop="name">TY</p>
+          <p class="site-description motion-element" itemprop="description">IT职业生涯规划与技术分享</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">13</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/wuxubj" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/wuxubj" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-link"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  ##<a href="http://www.ce-service.com.cn/blog/" title="中亦安图技术博客" target="_blank">中亦安图技术博客</a>
+                  <a href="http://creativecommons.org/licenses//4.0" class="cc-opacity" target="_blank">中亦安图技术博客</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  ##<a href="https://oracleblog.org/" title="天堂向左 DBA向右" target="_blank">天堂向左 DBA向右</a>
+                  <a href="http://creativecommons.org/licenses//4.0" class="cc-opacity" target="_blank">天堂向左 DBA向右</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1、-全局死锁的分析"><span class="nav-number">2.</span> <span class="nav-text">1、 全局死锁的分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#建议"><span class="nav-number">2.1.</span> <span class="nav-text">建议</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2、ENQ-TX锁的分析"><span class="nav-number">3.</span> <span class="nav-text">2、ENQ:TX锁的分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#建议-1"><span class="nav-number">3.1.</span> <span class="nav-text">建议</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3、-内存的使用问题"><span class="nav-number">4.</span> <span class="nav-text">3、 内存的使用问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#建议-2"><span class="nav-number">4.1.</span> <span class="nav-text">建议</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4、-总结"><span class="nav-number">5.</span> <span class="nav-text">4、 总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5、彩蛋"><span class="nav-number">6.</span> <span class="nav-text">5、彩蛋</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        ﻿<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">TY</span>
+</div>
+
+
+<div class="powered-by">
+  由Tony Yang强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="tyoracle.com">
+    IT 职业生涯规划  
+  </a>
+</div>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+本站总访问量 <span id="busuanzi_value_site_pv"></span> &nbsp&nbsp&nbsp
+您是第 <span id="busuanzi_value_site_uv"></span> 个来到的小伙伴
+
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"tyoracle"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
