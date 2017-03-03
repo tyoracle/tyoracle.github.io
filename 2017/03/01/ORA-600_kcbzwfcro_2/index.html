@@ -97,7 +97,7 @@
 
 背景新年开始，一切都变得繁忙，所以一直没有时间去写博文，离今年的目标还远着呢。最近两天一个客户在升级到了11.2.0.4最新的PSU后，在每天晚上跑批时，都会报大量的ORA-00600: internal error code, arguments: [kcbzwfcro_2]报错">
 <meta property="og:image" content="http://odh3pyi7v.bkt.clouddn.com/ora600_1.png">
-<meta property="og:updated_time" content="2017-03-03T00:59:34.442Z">
+<meta property="og:updated_time" content="2017-03-03T01:08:14.840Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ORA-600 [kcbzwfcro_2]">
 <meta name="twitter:description" content="版本声明：本文为tyoracle.com原创，如需转发，无需经我同意，但必须要注明来自于tyoracle.com
@@ -449,12 +449,13 @@ Current SQL information unavailable - no cursor.
 
 <p>没有发现有SQL，这种情况下，一般是后台进程引起的报错，接着寻找最关键的call stack</p>
 <pre><code>
+
 skdstdst()      
 ksedst1()   
 ksedst()       
 dbkedDefDump()
 ksedmp()        
-kturab()          <<--kernel transaction="" undo="" recovery="" abort="" ktdabortmultinodetransaction()="" <<---中止多个节点事务="" ktdabt()="" <<---kernel="" distributed="" k2vdrv()="" ksbabs()="" k2vabs()="" ksbrdp()="" opirip()="" opidrv()="" sou2o()="" opimai_real()="" ssthrdmain()="" main()="" __libc_start_main()="" _start()+41="" <="" code=""></--kernel></code></pre>
+kturab()                         <<--kernel transaction="" undo="" recovery="" abort="" ktdabortmultinodetransaction()="" <<---中止多个节点事务="" ktdabt()="" <<---kernel="" distributed="" k2vdrv()="" ksbabs()="" k2vabs()="" ksbrdp()="" opirip()="" opidrv()="" sou2o()="" opimai_real()="" ssthrdmain()="" main()="" __libc_start_main()="" _start()+41="" <="" code=""></--kernel></code></pre>
 
 <p>从call stack里看，报错是出现在事务层，在做一个undo recovery时，被中止后报出这个错语。对于bug，我们没有什么好的想法时，只能求助于metalink，但是在metalink上，在当前版本11.2.0.4与kcbzwfcro_2相关的，只有一个bug相关，见下图<br><img src="http://odh3pyi7v.bkt.clouddn.com/ora600_1.png" alt=""></p>
 <p>这个bug是指在when querying a dropped table会出现ORA-600 [kcbzwfcro_2],其原理是因为Force-cr-override ,Force-cr-override 是从11.2.0.3引进来的一个特性，是指当一个buffer要求一个强制的一致性读时，在这个时候，看到一个current状态的buffer<br>在群集的另一个节点时，我们从另一个节点复制这个current状态的buffer并覆盖这个强制的一致性读的buffer。如果这个buffer块重新使用时，<br>缓存熔合将会使在整个群集中的这个buffer block包括这个强制性一致读的buffer变得无效。但这个情况下有一个很少的时间间隔。<br>所以在这个间隔里，会容易出现问题。如果我们发现潜在的陈旧缓冲区是一个强制重写缓冲区，等待最大5分钟，以确保缓存融合有时间来获得force-cr重写缓冲区，<br>但如果时间上不允许，这个时候就会出现buffer 的不一致，从而报出ORA-00600[kcbzwfcro_2]的错误。</p>
