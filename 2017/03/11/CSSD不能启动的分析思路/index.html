@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="oracle,bug," />
+  <meta name="keywords" content="Oracle,Troubleshoting," />
 
 
 
@@ -88,22 +88,26 @@
 
 <meta name="description" content="版本声明：本文为tyoracle.com原创，如需转发，无需经我同意，但必须要注明来自于tyoracle.com
 
-背景新年开始，一切都变得繁忙，所以一直没有时间去写博文，离今年的目标还远着呢。最近两天一个客户在升级到了11.2.0.4最新的PSU后，在每天晚上跑批时，都会报大量的ORA-00600: internal error code, arguments: [kcbzwfcro_2]报错">
+背景最近一直忙，所以没有大量的输入，没有输入，当然是没有输出。只有零零散散的一些工作经验。没有时间去将期整理成一个完整的案例。
+这周先把最近处理的一个 CSSD不能启动的问题写下来与大家分享。
+在一个下着毛毛细雨的南方的凌晨，窗外暗黄的马路灯光下，可以清晰地照出雨水落下的痕迹。而我">
 <meta property="og:type" content="article">
-<meta property="og:title" content="ORA-600 [kcbzwfcro_2]">
-<meta property="og:url" content="http://tyoracle.com/2017/03/01/ORA-600_kcbzwfcro_2/index.html">
+<meta property="og:title" content="CSSD不能启动的分析思路">
+<meta property="og:url" content="http://tyoracle.com/2017/03/11/CSSD不能启动的分析思路/index.html">
 <meta property="og:site_name" content="IT 职业生涯规划">
 <meta property="og:description" content="版本声明：本文为tyoracle.com原创，如需转发，无需经我同意，但必须要注明来自于tyoracle.com
 
-背景新年开始，一切都变得繁忙，所以一直没有时间去写博文，离今年的目标还远着呢。最近两天一个客户在升级到了11.2.0.4最新的PSU后，在每天晚上跑批时，都会报大量的ORA-00600: internal error code, arguments: [kcbzwfcro_2]报错">
-<meta property="og:image" content="http://odh3pyi7v.bkt.clouddn.com/ora600_1.png">
-<meta property="og:updated_time" content="2017-03-03T01:16:03.454Z">
+背景最近一直忙，所以没有大量的输入，没有输入，当然是没有输出。只有零零散散的一些工作经验。没有时间去将期整理成一个完整的案例。
+这周先把最近处理的一个 CSSD不能启动的问题写下来与大家分享。
+在一个下着毛毛细雨的南方的凌晨，窗外暗黄的马路灯光下，可以清晰地照出雨水落下的痕迹。而我">
+<meta property="og:updated_time" content="2017-03-16T08:27:21.014Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="ORA-600 [kcbzwfcro_2]">
+<meta name="twitter:title" content="CSSD不能启动的分析思路">
 <meta name="twitter:description" content="版本声明：本文为tyoracle.com原创，如需转发，无需经我同意，但必须要注明来自于tyoracle.com
 
-背景新年开始，一切都变得繁忙，所以一直没有时间去写博文，离今年的目标还远着呢。最近两天一个客户在升级到了11.2.0.4最新的PSU后，在每天晚上跑批时，都会报大量的ORA-00600: internal error code, arguments: [kcbzwfcro_2]报错">
-<meta name="twitter:image" content="http://odh3pyi7v.bkt.clouddn.com/ora600_1.png">
+背景最近一直忙，所以没有大量的输入，没有输入，当然是没有输出。只有零零散散的一些工作经验。没有时间去将期整理成一个完整的案例。
+这周先把最近处理的一个 CSSD不能启动的问题写下来与大家分享。
+在一个下着毛毛细雨的南方的凌晨，窗外暗黄的马路灯光下，可以清晰地照出雨水落下的痕迹。而我">
 
 
 
@@ -131,13 +135,13 @@
 
 
 
-  <link rel="canonical" href="http://tyoracle.com/2017/03/01/ORA-600_kcbzwfcro_2/"/>
+  <link rel="canonical" href="http://tyoracle.com/2017/03/11/CSSD不能启动的分析思路/"/>
 
 
 
 
 
-  <title> ORA-600 [kcbzwfcro_2] | IT 职业生涯规划 </title>
+  <title> CSSD不能启动的分析思路 | IT 职业生涯规划 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -299,7 +303,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://tyoracle.com/2017/03/01/ORA-600_kcbzwfcro_2/">
+  <link itemprop="mainEntityOfPage" href="http://tyoracle.com/2017/03/11/CSSD不能启动的分析思路/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="TY">
@@ -323,7 +327,7 @@
             
             
               
-                ORA-600 [kcbzwfcro_2]
+                CSSD不能启动的分析思路
               
             
           </h1>
@@ -338,8 +342,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-01T00:00:00+08:00">
-                2017-03-01
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-11T00:00:00+08:00">
+                2017-03-11
               </time>
             
 
@@ -361,8 +365,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/oracle-bug/" itemprop="url" rel="index">
-                    <span itemprop="name">oracle,bug</span>
+                  <a href="/categories/Oracle-Troubleshoting/" itemprop="url" rel="index">
+                    <span itemprop="name">Oracle,Troubleshoting</span>
                   </a>
                 </span>
 
@@ -379,8 +383,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2017/03/01/ORA-600_kcbzwfcro_2/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/03/01/ORA-600_kcbzwfcro_2/" itemprop="commentCount"></span>
+                <a href="/2017/03/11/CSSD不能启动的分析思路/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/03/11/CSSD不能启动的分析思路/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -413,102 +417,127 @@
         <blockquote>
 <p>版本声明：本文为tyoracle.com原创，如需转发，无需经我同意，但必须要注明来自于tyoracle.com</p>
 </blockquote>
-<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>新年开始，一切都变得繁忙，所以一直没有时间去写博文，离今年的目标还远着呢。最近两天一个客户在升级到了11.2.0.4最新的PSU后，在每天晚上跑批时，都会报大量的ORA-00600: internal error code, arguments: [kcbzwfcro_2]报错，客户原以为升级至最新的PSU就不会遇到BUG，还是遇到了坑，虽然没有让数据库DOWN机，但每晚半夜的报警声也让他无法安睡。所以让我帮忙分析一下，看能不能解决。</p>
+<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>最近一直忙，所以没有大量的输入，没有输入，当然是没有输出。只有零零散散的一些工作经验。没有时间去将期整理成一个完整的案例。</p>
+<p>这周先把最近处理的一个 CSSD不能启动的问题写下来与大家分享。</p>
+<p>在一个下着毛毛细雨的南方的凌晨，窗外暗黄的马路灯光下，可以清晰地照出雨水落下的痕迹。而我身后的办公室才灯火通明，七八个人正低着头啪啪敲着键盘准备着今晚的变更。忽然，听到有人在后面叫我，有套核心库的CRS启动不了。</p>
+<p>我很奇怪，今晚只是版本发布加正常运维的主机重启，对数据库层面没有任何的操作。我今晚过来只是负责保障，怎么会起不来呢？</p>
 <a id="more"></a>
-<h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><p>分析类似的报错，需要先看看这个报错的trace文件</p>
-<pre><code>
-*** 2017-02-28 23:37:47.304
-ORA-00600: internal error code, arguments: [kcbzwfcro_2], [112999], [1], [32768], [0], [], [], [], [], [], [], []
-
-************ dump undo block **********
-Dump of buffer cache at level 3 for tsn=4 rdba=20283934
-BH (0x5ff78f3d8) file#: 4 rdba: 0x0135821e (4/3506718) class: 61262 ba: 0x5faf2e000
-  set: 180 pool: 3 bsz: 8192 bsi: 0 sflg: 2 pwc: 10594,28
-  dbwrid: 3 obj: -1 objn: 0 tsn: 4 afn: 4 hint: f
-  hash: [0xeb453f8b8,0xeb453f8b8] lru: [0x5ff78f668,0x5ff78f328]
-  ckptq: [NULL] fileq: [NULL] objq: [0x5ff7901f0,0x5ff790870] objaq: [0x5ff78f6a0,0x5ff78f360]
-  st: XCURRENT md: NULL fpin: 'ktuwh03: ktugnb' tch: 48 atm: 2618846620,4211868687
-  flags: block_written_once redo_since_read affinity_lock
-  LRBA: [0x0.0.0] LSCN: [0x0.0] HSCN: [0xffff.ffffffff] HSUB: [2]
-  buffer tsn: 4 rdba: 0x0135821e (4/3506718)
-  scn: 0x001b.22ffe9b2 seq: 0x02 flg: 0x04 tail: 0xe9b20202
-  frmt: 0x02 chkval: 0xdd51 type: 0x02=KTU UNDO BLOCK
-Hex dump of block: st=0, typ_found=1
-Dump of memory from 0x00000005FAF2E000 to 0x00000005FAF30000
-</code></pre>
-
-<p>从上述的trace里看到，是对undo的一个块做dump，这个undo持有的是XCURRENT状态，看似是与事务相关的报错，继续往下分析，寻找有没有引起这个ORA-00600的SQL</p>
-<pre><code>
-dbkedDefDump(): Starting a non-incident diagnostic dump (flags=0x0, level=3, mask=0x0)
------ Error Stack Dump -----
-ORA-00600: internal error code, arguments: [kcbzwfcro_2], [112999], [1], [32768], [0], [], [], [], [], [], [], []
------ SQL Statement (None) -----
-Current SQL information unavailable - no cursor.
-
-</code></pre>
-
-
-<p>没有发现有SQL，这种情况下，一般是后台进程引起的报错，接着寻找最关键的call stack</p>
-<pre><code>
-
-skdstdst()      
-ksedst1()   
-ksedst()       
-dbkedDefDump()
-ksedmp()        
-kturab()                         <<--kernel transaction="" undo="" recovery="" abort="" ktdabortmultinodetransaction()="" <<---中止多个节点事务="" ktdabt()="" <<---kernel="" distributed="" k2vdrv()="" ksbabs()="" k2vabs()="" ksbrdp()="" opirip()="" opidrv()="" sou2o()="" opimai_real()="" ssthrdmain()="" main()="" __libc_start_main()="" _start()+41="" <="" code=""></--kernel></code></pre>
-
-
-<p>从call stack里看，报错是出现在事务层，在做一个undo recovery时，被中止后报出这个错语。对于bug，我们没有什么好的想法时，只能求助于metalink，但是在metalink上，在当前版本11.2.0.4与kcbzwfcro_2相关的，只有一个bug相关，见下图<br><img src="http://odh3pyi7v.bkt.clouddn.com/ora600_1.png" alt=""></p>
-<p>这个bug是指在when querying a dropped table会出现ORA-600 [kcbzwfcro_2],其原理是因为Force-cr-override ,Force-cr-override 是从11.2.0.3引进来的一个特性，是指当一个buffer要求一个强制的一致性读时，在这个时候，看到一个current状态的buffer<br>在群集的另一个节点时，我们从另一个节点复制这个current状态的buffer并覆盖这个强制的一致性读的buffer。如果这个buffer块重新使用时，<br>缓存熔合将会使在整个群集中的这个buffer block包括这个强制性一致读的buffer变得无效。但这个情况下有一个很少的时间间隔。<br>所以在这个间隔里，会容易出现问题。如果我们发现潜在的陈旧缓冲区是一个强制重写缓冲区，等待最大5分钟，以确保缓存融合有时间来获得force-cr重写缓冲区，<br>但如果时间上不允许，这个时候就会出现buffer 的不一致，从而报出ORA-00600[kcbzwfcro_2]的错误。</p>
-<pre><code>
-Description
-
-A query on a dropped segment could signal an ORA-600 [kcbzwfcro_2]
-
-Rediscovery Notes
-  ORA-600[kcbzwfcro_2] in a trace file or the alert.log
-
-Workaround
-  None
-
-</code></pre>
-
-
-<p>但是很不幸，这个bug的描述与客户环境并不一致，客户并没有删除表，call stack与这个bug的描述也不相关。从客户的trace里看，是基于事务的current buffer block不一致，需要Force-cr-override ，从而引起了ORA-00600的报错。在客户的trace里，看到的确一直在等待Force-cr-override </p>
-<pre><code>
-   sample interval: 1 sec, max history 120 sec
-    ---------------------------------------------------
-      [7 samples,                                          23:38:00 - 23:38:06]
-        not in wait at each sample
-      [1 sample,                                                      23:37:59]
-        waited for 'control file sequential read', seq_num: 59511
-          p1: 'file#'=0x0
-          p2: 'block#'=0x2a
-          p3: 'blocks'=0x1
-          time_waited: 0.001477 sec (sample interval: 0 sec)
-      [1 sample,                                                      23:37:58]
-        waited for 'force-cr-override flush', seq_num: 59134
-          p1: 'file#'=0x7
-          p2: 'block#'=0x258e5b
-          p3: ''=0x7fffffff
-          time_waited: >= 0 sec (still in wait)    <<<------这里一直在等待 <="" code=""></------这里一直在等待></code></pre>
-
-
-<p>这个时候真的没有什么思绪了，因为与客户版本吻合的只有一个bug，但这个bug并现有场景并不一致。只能继续在搜索，通过ktdabt+ktdAbortMultinodeTransaction 搜索到一个相近的</p>
+<h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><p>既然出问题了，我也立刻转身投入到身后的战斗队伍当中。先看看环境配置情况</p>
 <blockquote>
-<p>bug:22593521<br>ORA-600: [kcbzwfcro_2], [83592], [1], [32768], [0] was raised when<br>doing “rollback force” on distributed transaction. </p>
+<p> AIX 6.1 + ORACLE 11.2.0.3 rac + emc 存储  + ASM + 多路径管理软件</p>
 </blockquote>
-<p>这个bug的bh dump是相似的，也是dump undo block，但是其callstack是不相似的，所以也不是完全匹配。</p>
-<p>对于这种情况，既然在官方没有找到匹配的，一般只能开一个SR，提交相关的trace给官方，然后漫长的等待确认是BUG，这个时候他们还不能给你 patch，必须要等上一段时间才有patch，这对于生产系统来说，这是非常严重的事，需要想办法避免这个bug才可以。</p>
-<p>要避免这个bug，只能复盘，看看这个Bug的原理，上文已经提到了，这个报错是因为Force-cr-override的特性引起的。 这个错误可能是由于cache_cr_override缓冲区上的高速缓存融合问题而出现，或由于空间层问题（像块被不同的重用）对象或缓冲区已损坏）所致。</p>
-<p>既然是知道了引起问题的特性，那我们只能想办法把这个force-cr-override关闭，是不是可以绕过这个bug?关闭这个,高速缓存融合对current buffer block的管理将会回到11.2.0.3以前的常规方式，对数据库的性能影响应该是比较少的。所以与客户沟通后，决定关闭这个特性</p>
-<p>alter system set  “_gc_override_force_cr”=false scope=both ;</p>
-<p>无需重启，参数即可生效。</p>
-<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>参数设置后，几天都没有再出现相关的ORA-00600错误，当然这个还得长期观察 。</p>
-<p>当你遇到ORA-00600或07445的时候，绝大部分的情况是遇到了BUG，你只需到metalink上去确认，是不是这个是不是BUG，什么情况下是确认这个BUG与你的吻合呢？首先，版本，平台，肯定要一致吧？产生的原因也类似吧？如是不是因为rollback引起的或commit引起的， 还需要验证call stack是不是一致。如果上述都吻合，那你的库命中这个bug的概率达90%以上，如果这个bug有提供WORKAROUND方法，那么恭喜你，你可以应用WORKAROUND推荐的方法，从而解决这个报错。</p>
-<p>但是如果很不幸，你在metalink上找不到跟你的报错相符合的bug，那你只能开个SR，慢慢等待确认。要不你就通读整个trace，找出产生这个bug的原理，想办法绕过它。</p>
-<p>上述两点，基本上是解决BUG的思路，希望能对你的DBA生涯有所帮助。</p>
+<p>两个节点分别重启后，节点一的CRS可以顺利启动，并且数据库实例已经启动，而节点二重启后，CRS的启动一直卡在cssd无法启动的过程。先看看ocssd.log里的报错信息</p>
+<pre><code>
+
+2017-02-24 17:21:41.776: [    CSSD][17]clssnmvDiskVerify: Successful discovery of 3 disks
+2017-02-24 17:21:41.776: [    CSSD][17]clssnmCompleteInitVFDiscovery: Completing initial voting file discovery
+2017-02-24 17:21:41.776: [    CSSD][17]clssnmCompleteVFDiscovery: Completing voting file discovery
+2017-02-24 17:21:41.777: [    CSSD][17]clssnmvDiskStateChange: state from discovered to deconfigured disk /dev/rdsk/emcpower15
+2017-02-24 17:21:41.777: [    CSSD][17]clssnmvDiskStateChange: state from discovered to deconfigured disk /dev/rdsk/emcpower14
+2017-02-24 17:21:41.777: [    CSSD][17]clssnmvDiskStateChange: state from discovered to deconfigured disk /dev/rdsk/emcpower13
+2017-02-24 17:21:41.777: [    CSSD][17]clssnmvVerifyCommittedConfigVFs: Insufficient voting files found, found 0 of 3 configured, needed 2 voting files
+2017-02-24 17:21:41.778: [    CSSD][17](:CSSNM00020:)clssnmvVerifyCommittedConfigVFs: voting file 0, id ae6026ad-91804f21-bfdc9227-aced3ee1 not found
+2017-02-24 17:21:41.778: [    CSSD][17](:CSSNM00020:)clssnmvVerifyCommittedConfigVFs: voting file 1, id b848bcd9-24684fa7-bfadc40b-506de4ab not found
+2017-02-24 17:21:41.778: [    CSSD][17](:CSSNM00020:)clssnmvVerifyCommittedConfigVFs: voting file 2, id 2694f601-b61d4fbb-bfee0a0c-9a32246e not found
+2017-02-24 17:21:41.779: [    CSSD][17]ASSERT clssnm1.c 3375
+2017-02-24 17:21:41.779: [    CSSD][17](:CSSNM00021:)clssnmCompleteVFDiscovery: Found 0 voting files, but 2 are required.  Terminating due to insufficient configured voting files
+2017-02-24 17:21:41.779: [    CSSD][17]###################################
+2017-02-24 17:21:41.779: [    CSSD][17]clssscExit: CSSD aborting from thread clssnmvDDiscThread
+2017-02-24 17:21:41.779: [    CSSD][17]###################################
+
+</code></pre>
+
+<p>日志里报因缺少足够的votedisk磁盘而无法启动cssd进程。大家知道，11.2的CRS启动过程，是先去获取gpnp profile，然后根据先根据gpnp 的profile.xml里配置，找到对应的votedisk的盘，然后根据votedisk 与ocr，网络的信息，才能启动CSSD。基于此，我首先用 gpnptool get  查一下gpnp profile的配置是否有问题，发现asm_diskstring都是正常的，指向的磁盘搜索路径是正常的，并且gpnp profile这个文件已经几年没有修改过了。</p>
+<p>因为只有一边节点可以访问，另一边节点不可访问，当时也怀疑是AIX下的磁盘共享锁没有打开，使用以下命令进行检查 </p>
+<pre><code># for i in `lspv | grep power | awk &apos;{print $1}&apos;`;do echo $i; lsattr -El $i | grep reserve;done;
+注意：reserve_policy的值是否为no_reserve
+</code></pre><p>检查发现这个值是正常的，已经是no_reserver.</p>
+<p>接着检查votedisk<br>crsctl query css votedisk 结果正常</p>
+<p>但是在对比两个节点的kfod,发现有问题的节点OCR的确缺少了两块盘，并且报权限不足</p>
+<p>问题节点扫描结果：</p>
+<pre><code>$ kfod disk=all status=true
+--------------------------------------------------------------------------------
+ Disk  Size HeaderPath User Group   
+================================================================================
+   1:   2048 Mb MEMBER/dev/rhdiskpower1grid asmadmin
+   2:  51200 Mb MEMBER/dev/rhdiskpower10   grid asmadmin
+   3:   2048 Mb MEMBER/dev/rhdiskpower3grid asmadmin
+   4:  51200 Mb MEMBER/dev/rhdiskpower6grid asmadmin
+   5:  51200 Mb MEMBER/dev/rhdiskpower7grid asmadmin
+   6:  51200 Mb MEMBER/dev/rhdiskpower8grid asmadmin
+KFOD-00301: Unable to contact Cluster Synchronization Services (CSS). Return code 2 from kgxgncin.
+KFOD-00311: Error scanning device /dev/rhdiskpower9
+KFOD-00311: Error scanning device /dev/rhdiskpower5
+KFOD-00311: Error scanning device /dev/rhdiskpower4
+KFOD-00311: Error scanning device /dev/rhdiskpower2
+KFOD-00311: Error scanning device /dev/rhdiskpower14
+ORA-15025: could not open disk “/dev/rhdiskpower14”
+IBM AIX RISC System/6000 Error: 13: Permission denied
+Additional information: 42
+Additional information: 270656976
+Additional information: 270657872
+KFOD-00311: Error scanning device /dev/rhdiskpower13
+ORA-15025: could not open disk “/dev/rhdiskpower13”
+IBM AIX RISC System/6000 Error: 13: Permission denied
+Additional information: 42
+Additional information: 270656976
+Additional information: 270657872
+</code></pre><p>报KFOD-00311，系统层的log与多路径管理软件没有任何报错，并且一直报 Permission denied，真是奇了怪。<br>我在想，既然读取路径正确，共享锁打开，权限设置正确，那会不会是因为设备号重复导致的呢？接下来检查设备号，看是否存在着问题。</p>
+<p>cat cssd.log |grep Duplicate<br>如果发现有Duplicate ，即代表设备好有重复的<br>确认主设备号与备设备号是否有冲突<br>ls -alt /dev/rhdiskpower1<br>看 43,1  (前面43是指主设备号，1是备设备号，属性应该是grid:asmadmin 660)<br>如果有冲突，可以按以下的方式处理：</p>
+<pre><code>系统管理员删除重复的设备号，然后重新生成新设备号，然后再更改属性
+# chmod 660 /dev/raw/raw[1-2]
+# chown grid:asmadmin /dev/raw/raw[1-2]
+</code></pre><p>可惜的是，日志里没有报Duplicate ，系统层面也没有设备号重复。</p>
+<p>使用dd进行了报有问题的两块votedisk的磁盘头进行读出，发现在二节点上读出的内容与节点一的相同</p>
+<pre><code>dd if=/dev/rhdiskpower0 of=/dev/null bs=4096 count=1000
+</code></pre><p>而使用kfod则找不到有问题的磁盘</p>
+<pre><code>$ kfod asm_diskstring=&apos;&apos;/dev/rdsk/*&apos; disks=all
+or
+$ kfod asm_diskstring=&apos;dev/oracleasm/disks/*&apos; disks=all
+</code></pre><p>墙上的钟的秒针嘀嗒嘀嗒地响，抬头已经是清晨5点了，八点需要恢复业务，大家都急得热窝上的蚂蚁，虽然幸好还有一个节点可以使用，对业务影响不是太大，但客户还是说，六点前必须给出解决方案。<br>客户就是上帝，到此，基本上毫无头绪，权限，系统层磁盘共享锁，dd磁盘内容，都没有问题，但CRS死活就是认不到那两块盘。</p>
+<p>一个晚上没有睡觉，脑袋已经变得晕晕沉沉的，起身去冲了杯咖啡，一饮而尽后，决定重新理一下，收集所有的信息，重新看看那里出现了问题</p>
+<pre><code>
+
+
+
+1. powermt display dev=all > luns.out
+
+2. 以独占模式启动二节点的crs，让其不访问asm
+ crsctl start crs -excl -nocrs 
+
+3. 在grid用户下使用sysasm进行asm实例的启动，并且对crsdg mount的过程进行trace
+ sqlplus 
+spool mount.out
+set time on
+select spid, s.program from v$process p, v$session s where paddr = addr and 
+s.username = 'SYS' and s.program like '%sqlplus%';
+.
+From another xterm, start a truss on spid from above sql o/p-
+truss -aefldDE -o /tmp/mount_dskstr_orig.truss -p <spid>
+.
+back on the sqlplus session, 
+run 'alter diskgroup mount DG'
+
+4.  truss -aefldDE -o /tmp/kfod.truss kfod asm_diskstring=/dev/rdsk/* status=true disks=all op=disks
+
+
+</spid></code></pre>
+
+<p>通过上述的信息收集（因为客户的信息无法取出来，所以无法帖在这里），仔细分析后发现，确定是操作系统层面读取不了有问题的两个磁盘。</p>
+<p>分析powermt display dev=all仔细对比Logical device ID没发现两个节点间的异常。</p>
+<p>在解决无果后，只能求助于google和metalink，查阅了无数与RAC，OCSSd相关文档，都无法解决我们当前的问题。后来灵机一闪，这会不会是EMC的concurrent访问出现了问题呢？</p>
+<p>使用powerpath concurrent lock在google上进行搜索，翻了数十个文档后终于有所收获，原来EMC为了保证系统crash后对磁盘的访问，开发了一个二进制代码emcpowerreset ，这个代码会在底层对EMC的盘加一个锁，与我们的现象有点相似。原文引述如下：</p>
+<blockquote>
+<p>EMC has developed a binary called emcpowerreset for removing disk reservations, held by PowerPath devices</p>
+</blockquote>
+<p>这个锁不同于系统层面的磁盘锁，是存储多路径管理上的一个锁，这个锁在操作系统层面和当前的powerpath日志中看不出来，为了解决问题，所以决定对这个锁重设一下。</p>
+<pre><code>/usr/lpp/EMC/Symmetrix/bin/emcpowerreset fscsiX hdiskpowerX 
+</code></pre><p>比较幸运，在重设后，使用</p>
+<pre><code>kfod asm_diskstring=&apos;&apos;/dev/rdsk/*&apos; disks=all
+</code></pre><p>可以顺利的把原来访问不了的磁盘扫描出来了。现场气氛一下热烈起来，马上进行拉CRS，起库，一切顺利，后面就不表了</p>
+<p>但是有点奇怪的是，这个锁是在系统异常关闭或crash时才会被加上，询问系统管理员说是正常关闭的，所以有些奇怪。更奇怪的是，这个锁的存在，在系统层面与存储层都查不到相关的信息，网上解决是因为当前的powerpath版本过低，在高版本才会记录相关的信息。</p>
+<p>但是HDS也有类似的磁盘锁，如果HDS存在磁盘锁，在有问题的节点是不能做dd的，而我们的环境是可以dd和kfed出磁盘的内容的。EMC的实现机制有点想不明白。</p>
+<p>非常抱歉未能在存储层面上找到根因，但本文主要还是想讲讲分析类似的cssd不能启动的思路，按照这样的思路，基本上都能找到cssd不能启动的原因。</p>
 
       
     </div>
@@ -532,7 +561,7 @@ Workaround
       
         <div class="post-tags">
           
-            <a href="/tags/oracle-bug/" rel="tag"># oracle,bug</a>
+            <a href="/tags/Oracle-Troubleshoting/" rel="tag"># Oracle,Troubleshoting</a>
           
         </div>
       
@@ -541,8 +570,8 @@ Workaround
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/02/23/ORACLE环境下的秒杀场景分析/" rel="next" title="ORACLE环境下的秒杀场景分析">
-                <i class="fa fa-chevron-left"></i> ORACLE环境下的秒杀场景分析
+              <a href="/2017/03/01/ORA-600_kcbzwfcro_2/" rel="next" title="ORA-600 [kcbzwfcro_2]">
+                <i class="fa fa-chevron-left"></i> ORA-600 [kcbzwfcro_2]
               </a>
             
           </div>
@@ -551,8 +580,8 @@ Workaround
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2017/03/11/CSSD不能启动的分析思路/" rel="prev" title="CSSD不能启动的分析思路">
-                CSSD不能启动的分析思路 <i class="fa fa-chevron-right"></i>
+              <a href="/2017/03/17/你看清自己的目标了吗/" rel="prev" title="你看清自己的目标了吗?">
+                你看清自己的目标了吗? <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -582,8 +611,8 @@ Workaround
           
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2017/03/01/ORA-600_kcbzwfcro_2/"
-           data-title="ORA-600 [kcbzwfcro_2]" data-url="http://tyoracle.com/2017/03/01/ORA-600_kcbzwfcro_2/">
+      <div class="ds-thread" data-thread-key="2017/03/11/CSSD不能启动的分析思路/"
+           data-title="CSSD不能启动的分析思路" data-url="http://tyoracle.com/2017/03/11/CSSD不能启动的分析思路/">
       </div>
     
   </div>
@@ -721,7 +750,7 @@ Workaround
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分析"><span class="nav-number">2.</span> <span class="nav-text">分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结论"><span class="nav-number">3.</span> <span class="nav-text">结论</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分析"><span class="nav-number">2.</span> <span class="nav-text">分析</span></a></li></ol></div>
             
 
           </div>
