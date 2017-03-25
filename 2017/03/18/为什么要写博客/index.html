@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="oracle,troubleshooting," />
+  <meta name="keywords" content="职业生涯," />
 
 
 
@@ -86,25 +86,22 @@
 
 
 
-<meta name="description" content="版本声明：本文为tyoracle.com原创，如需转发，无需经我同意，但必须要注明来自于tyoracle.com
-
-问题描述客户的环境是10.2.0.1+Linux单机版，没有打任何的PATCH，最近一段时间经常出现数据库hang住，无法使用sqlplus进行登录的操作，通过检查数据库日志发现，最近一次故障发生在9月4日的11：47分，客户不得不将整个数据库重启后，业务恢复正常
-分析因为客户的A">
+<meta name="description" content="##1像我们做IT的，每天接触着信息量居大无比的互联网，今天的热点，明天可能就被人遗忘了。技术也一样，从PHP到java，从dos到linux，从sybase到现在的nosql。我们每天都在接触新的技术，疲于应对。
+每天还需要面对工作上各种各样的琐碎小事，IT人的上班时间绝不只是上班的那个八小时，更多的是八小时以外的工作与学习。
+现代大都市，上下班的时间越来越长了，当一天的工作完成，从客户处拖着疲">
 <meta property="og:type" content="article">
-<meta property="og:title" content="PMON unable to acquire latch的问题分析">
-<meta property="og:url" content="http://tyoracle.com/2016/10/09/PMON_unable_to_acquire_latch的问题分析/index.html">
+<meta property="og:title" content="为什么要写博客">
+<meta property="og:url" content="http://tyoracle.com/2017/03/18/为什么要写博客/index.html">
 <meta property="og:site_name" content="IT 职业生涯规划">
-<meta property="og:description" content="版本声明：本文为tyoracle.com原创，如需转发，无需经我同意，但必须要注明来自于tyoracle.com
-
-问题描述客户的环境是10.2.0.1+Linux单机版，没有打任何的PATCH，最近一段时间经常出现数据库hang住，无法使用sqlplus进行登录的操作，通过检查数据库日志发现，最近一次故障发生在9月4日的11：47分，客户不得不将整个数据库重启后，业务恢复正常
-分析因为客户的A">
-<meta property="og:updated_time" content="2017-02-25T14:26:23.275Z">
+<meta property="og:description" content="##1像我们做IT的，每天接触着信息量居大无比的互联网，今天的热点，明天可能就被人遗忘了。技术也一样，从PHP到java，从dos到linux，从sybase到现在的nosql。我们每天都在接触新的技术，疲于应对。
+每天还需要面对工作上各种各样的琐碎小事，IT人的上班时间绝不只是上班的那个八小时，更多的是八小时以外的工作与学习。
+现代大都市，上下班的时间越来越长了，当一天的工作完成，从客户处拖着疲">
+<meta property="og:updated_time" content="2017-03-17T02:22:37.789Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="PMON unable to acquire latch的问题分析">
-<meta name="twitter:description" content="版本声明：本文为tyoracle.com原创，如需转发，无需经我同意，但必须要注明来自于tyoracle.com
-
-问题描述客户的环境是10.2.0.1+Linux单机版，没有打任何的PATCH，最近一段时间经常出现数据库hang住，无法使用sqlplus进行登录的操作，通过检查数据库日志发现，最近一次故障发生在9月4日的11：47分，客户不得不将整个数据库重启后，业务恢复正常
-分析因为客户的A">
+<meta name="twitter:title" content="为什么要写博客">
+<meta name="twitter:description" content="##1像我们做IT的，每天接触着信息量居大无比的互联网，今天的热点，明天可能就被人遗忘了。技术也一样，从PHP到java，从dos到linux，从sybase到现在的nosql。我们每天都在接触新的技术，疲于应对。
+每天还需要面对工作上各种各样的琐碎小事，IT人的上班时间绝不只是上班的那个八小时，更多的是八小时以外的工作与学习。
+现代大都市，上下班的时间越来越长了，当一天的工作完成，从客户处拖着疲">
 
 
 
@@ -132,13 +129,13 @@
 
 
 
-  <link rel="canonical" href="http://tyoracle.com/2016/10/09/PMON_unable_to_acquire_latch的问题分析/"/>
+  <link rel="canonical" href="http://tyoracle.com/2017/03/18/为什么要写博客/"/>
 
 
 
 
 
-  <title> PMON unable to acquire latch的问题分析 | IT 职业生涯规划 </title>
+  <title> 为什么要写博客 | IT 职业生涯规划 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -300,7 +297,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://tyoracle.com/2016/10/09/PMON_unable_to_acquire_latch的问题分析/">
+  <link itemprop="mainEntityOfPage" href="http://tyoracle.com/2017/03/18/为什么要写博客/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="TY">
@@ -324,7 +321,7 @@
             
             
               
-                PMON unable to acquire latch的问题分析
+                为什么要写博客
               
             
           </h1>
@@ -339,8 +336,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-10-09T00:00:00+08:00">
-                2016-10-09
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-18T00:00:00+08:00">
+                2017-03-18
               </time>
             
 
@@ -362,8 +359,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/oracle-troubleshooting/" itemprop="url" rel="index">
-                    <span itemprop="name">oracle,troubleshooting</span>
+                  <a href="/categories/生涯，规划/" itemprop="url" rel="index">
+                    <span itemprop="name">生涯，规划</span>
                   </a>
                 </span>
 
@@ -380,8 +377,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2016/10/09/PMON_unable_to_acquire_latch的问题分析/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/10/09/PMON_unable_to_acquire_latch的问题分析/" itemprop="commentCount"></span>
+                <a href="/2017/03/18/为什么要写博客/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/03/18/为什么要写博客/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -411,102 +408,34 @@
       
 
       
-        <blockquote>
-<p>版本声明：本文为tyoracle.com原创，如需转发，无需经我同意，但必须要注明来自于tyoracle.com</p>
+        <p>##1<br>像我们做IT的，每天接触着信息量居大无比的互联网，今天的热点，明天可能就被人遗忘了。技术也一样，从PHP到java，从dos到linux，从sybase到现在的nosql。我们每天都在接触新的技术，疲于应对。</p>
+<p>每天还需要面对工作上各种各样的琐碎小事，IT人的上班时间绝不只是上班的那个八小时，更多的是八小时以外的工作与学习。</p>
+<p>现代大都市，上下班的时间越来越长了，当一天的工作完成，从客户处拖着疲惫的身心回到家的时候，还有一堆的文档要写，一堆的资料要翻阅，一堆的邮件等着你去回复，还要再学点什么东西的情况下，基本上没有时间了。所以你看到这个网站上的文章更新得很慢。有时在问自己，我为什么要写这个呢？</p>
+<a id="more"></a>
+<p>##2<br>学生时代的语文考试，作文往往能取得不错的分数，所以很喜欢写东西，也曾投稿到全国的中学生期刊拿过所谓的三等奖，也曾做过作家梦。但毕业后，为了生计，早已忘掉读书时的梦想。有的只是社会上大多数人有着的浮燥。</p>
+<p>随着年纪的增长，发现自己的人生已走了近半，却忘掉了自己的初衷。除了日常交付的文档，偶尔想提笔写写的时候，总是没写几句就没再写下去，以前也曾有过自己的博客，有兴趣的可以去翻阅一下：</p>
+<blockquote>
+<p><a href="http://blog.itpub.net/12482/" target="_blank" rel="external">http://blog.itpub.net/12482/</a></p>
 </blockquote>
-<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>客户的环境是10.2.0.1+Linux单机版，没有打任何的PATCH，最近一段时间经常出现数据库hang住，无法使用sqlplus进行登录的操作，通过检查数据库日志发现，最近一次故障发生在9月4日的11：47分，客户不得不将整个数据库重启后，业务恢复正常</p>
-<h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><p>因为客户的ASH只保留了七天（这个是默认设置），所以无法通过数据库历史信息进行问题回溯，并且在后台日志目录里，只发现了orcl_pmon_4617.trc这个trace，包括alert_orcl.log里也没有任何的信息存在，基于如此少的信息，很难真正定位问题的根因。但我们通过丰富的经验，慢慢从pmon的trace里，整理出关键的线索，可能的原因指向了base Bug 4221927 : PMON HANGS UNABLE TO ACQUIRE LATCH FROM KSUKIA, INSTANCE WONT STARTUP</p>
-<p>下面是整个的分析过程  <a id="more"></a><br>这是pmon trace的信息：</p>
-<pre><code> 
-*** 2016-09-04 11:40:52.415
-*** SERVICE NAME:(SYS$BACKGROUND) 2016-09-04 11:40:52.414
-*** SESSION ID:(555.1) 2016-09-04 11:40:52.414
-<font color="red">PMON unable to acquire latch  20003d74 process allocation level=1</font> 
-        Location from where latch is held: ksukia: 
-        Context saved from call: 0
-        state=busy, wlstate=free
-    gotten 196 times wait, failed first 0 sleeps 0
-    gotten 140 times nowait, failed: 0<font color="red">
-  possible holder pid = 109 ospid=21814
-</font>
-----------------------------------------
-SO: 0x653620c8, type: 2, owner: (nil), flag: INIT/-/-/0x00
-  (process) Oracle pid=109, calls cur/top: (nil)/0x62c32940, flag: (0) -
-            int error: 0, call error: 0, sess error: 0, txn error 0
-  (post info) last post received: 1089 8 12
-              last post received-location: ksusig
-              last process to post me: 653620c8 2 0
-              last post sent: 0 0 200
-              last post sent-location: kmmpsh
-              last process posted by me: 653514bc 1 0
-  (latch info) wait_event=0 bits=2
-    holding    (efd=4) 20003d74 process allocation level=1
-        Location from where latch is held:<font color="red"> ksukia: </font>
-        Context saved from call: 0
-        state=busy, wlstate=free
-    Process Group: DEFAULT, pseudo proc: 0x653a84d4<font color="red">
-    O/S info: user: oracle, term: pts/4, ospid: 21814
-    OSD pid info: Unix process pid: 21814, image: oracle@szsdxwgA (TNS V1-V3)</font>
-    Short stack dump: <font color="red">
-ksdxfstk()+19<-ksdxcb()+1321<-sspuser()+81<-semtimedop()+31<-sskgpwwait()+304<-skgpwwait()+146<-ksliwat()+891<-kslwaitns()+29<-kskthbwt()+370<-kslwait()+57<-ksupetrm()+818<-ksupxtrm()+25<-ksukia()+137<-opistp_real()+4641<-opistp()+712<-opiodr()+2347<-ttcpip()+4227<-opitsk()+1991<-opiino()+1387<-opiodr()+2347<-opidrv()+915<-sou2o()+113<-opimai_real()+212<-main()+111<-__libc_start_main()+220< font="">
-Dump of memory from 0x6533C3C0 to 0x6533C544
-</-ksdxcb()+1321<-sspuser()+81<-semtimedop()+31<-sskgpwwait()+304<-skgpwwait()+146<-ksliwat()+891<-kslwaitns()+29<-kskthbwt()+370<-kslwait()+57<-ksupetrm()+818<-ksupxtrm()+25<-ksukia()+137<-opistp_real()+4641<-opistp()+712<-opiodr()+2347<-ttcpip()+4227<-opitsk()+1991<-opiino()+1387<-opiodr()+2347<-opidrv()+915<-sou2o()+113<-opimai_real()+212<-main()+111<-__libc_start_main()+220<></font></code></pre>
-
-<p>请注意我上述日志中标红的部分，共有五部分，分别解释如下：</p>
-<p>1、这个trace指出了系统的PMON因为不能获取到系统的latch，而整个数据库当前被hang住，所以体现到客户运行任何的命令，包括sqlplus都无任何反应</p>
-<p>2、这里显示了，当前的pmon进程是被 PID:109,OS进程号：21814所阻塞着了。</p>
-<p>3、而阻塞着的pmon的OS进程号：21814当前持有着的数据库内核函数为ksukia.</p>
-<p>4、这部分说明了OS进程号：21814是一个前台进程，并不是数据库的后台进程。</p>
-<p>5、这是最关键的信息，就是数据库出现问题时，OS进程号：21814当时正在调用的ORACLE底层函数，正是利用了这些底层函数，我们定位到了相应的BUG</p>
-<p>PMON的trace文件就只有给了我们上述这些信息，我们通过stack dump 的关键字ksupetrm&lt;-ksupxtrm&lt;-ksukia 及对应的数据库版本号，定位到下面这个base bug:</p>
-<pre><code>
-Bug 4221927 : PMON HANGS UNABLE TO ACQUIRE LATCH FROM KSUKIA, INSTANCE WONT STARTUP
-@ PMON is not hung.  It is blocked, unable to clean up processes while the 
-@ foreground driving the shutdown is in ksukia().  Eventually, when the 
-@ foreground is finished, PMON can acquire the Process Allocation Latch and 
-@ finish its cleanup.  Since the instance will be shutdown, marking this bug as 
-@ devpri 4.
-</code></pre>
-
-<p>最最关键的是此bug的stack dump 与pmon trace的stack dump相匹配。所以才确认是这个base bug.</p>
-<p>上述这段话的意思是说，当前的pmon并不是hang住，而是被某一个前台进程阻塞着，而这个阻塞的前台进程当前正在调用ksukia这个函数进行进程关闭的动作。按道理，一般这个bug只会出现在进行数据库shutdown时，前台进程发出了shutdown命令，而pmon被阻塞。但此时客户并没有发出shutdown的命令，这到底是怎么一回事？我们继续翻阅metalink，发现Bug 4221927又变种出很多其他的bug,所以Bug 4221927称为base bug.</p>
-<p>我们发现另外的一些bug这样描述：</p>
-<pre><code>
-Bug 4413798 : PMON HANG PREVENTS SHUTDOWN OF DATABASE
-@ This indicates that the foreground that has initiated the shutdown is not 
-@ able to kill one of the instance processes, namely pid 10618.
-@ The shutdown is waiting for this particular process to die.
-@ The message "PMON failed to acquire latch" is somewhat of a red herring.  
-@ PMON is waiting for the foreground to finish killing all processes so it can 
-@ do process cleanup.  
-@ .
-@ We have made a conscious decision not to allow shutdown normal or immediate 
-@ to complete until all processes have been successfully killed because, from 
-@ our prior experience, subsequent startups will be problematic.
-@ .
-@ Why did process with pid 10618 not die?  Linux is particularly susceptible to 
-@ this issue.  If the foreground's (pid 10618) parent is stopped, the 
-@ foreground kill will hang because the foreground goes into a zombie state.  
-@ This is actually a Linux bug.  We could, of course, revisit our above 
-@ decision, but this will cause other issues. 
-@ .
-@ Please investigate how this zombie process came about.  This should not 
-@ normally happen.
-</code></pre>
-
-<p>上述这段话的意思是说，pmon在等待阻塞的前台进程进行进程关闭或者进程死掉，这样pmon才好去清理这个阻塞的进程，但是这个阻塞的进程一直没有关闭或死掉，这个原因可能是进程进入了一个zombie state，这个状态是指，这个进程也在等待其下面的一个子进程返回可关闭的状态给他（但这个子进程可能出现异常，或者早已被关闭，这个是linux的一个bug），但因为这个子进程异常，导致了这个前台进程一直在等待，从而阻塞了pmon。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>   从上述的pmon trace里分析，只能分析到上述这么多的信息，我们只能大胆的推测，数据库是遇到了base bug 4221927，其pmon期望去清理进程时，被某一个前台进程所阻塞，而这个前台进程有可能进入了一种异常的状态，而因为缺少当时的systemstate dump与hanganalyze trace，无法确认当时这个前台进程正在做什么。因为这个问题最近经常出现，只能在问题重现时，尽量收集更详细的信息进行问题定位，请使用下面的方式进行信息收集</p>
-<pre><code>
-sqlplus -prelim '/ as sysdba'
-oradebug setmypid
-oradebug unlimit;
-oradebug hanganalyze 3
-oradebug dump systemstate 266
-oradebug tracefile_name
-</code></pre>
-
-<p>把上述输出的trace文件，及pmon和alert.log的日志发出来，就可以更准确的定位到问题的所在。</p>
-<p>但是，对于重要的生产系统，因为这个库的版本实在是太低了，我们不应该等待定位真正的原因，而是应该尽快的升级到11GR2或者打补丁到10.2.0.5.12，如果不能马上升级，打补丁是一个非常好的选择。</p>
+<p>也是写了一段时间后没有继续下去。直至看到这样一句话：</p>
+<p><strong><em>尽管你有着不同凡响的愿望，但却时时刻刻像那些终究碌碌无为的人一样思考</em></strong></p>
+<p>当今社会最重要的两项基本技能是“当众演讲”与“写作”。这两个技能谁不会呢？你看，谁不会说话，谁不会写字？但是，能真正拥有懂得运用这两个技能的人有多少呢？如果真有那么多，那估计到处都是作家，都是演讲家了。那如何习得这个技能呢？只有不断去练习，不断去写，你才能把自己的文字能力提高。</p>
+<p>如果当初你在思考的时候，用文字把它们记录下来，那么在现在，将来回顾的时候，你不光能知道当时自己的想法，更能看到自己在过去的这段时间内，是否有过深入的思考，有过进步。</p>
+<p>思考能力，分析能力比别人要强。想要在任何一个领域成功，思考能力、分析 能力都是不可或缺的能力—这是一个铁一样的事实。</p>
+<p>持续的写作可以锻炼一个人的学习能力、思考能力、分析能力、也是锻炼沟通能力最直接，成本最低的一种方式。这就是输出倒逼输入的一个最佳的方法。只有你持续不断去写作，你需要大量的输入，大量的做实验去证明自己的论点，这样你才能经过自己的思考，提炼出你对这个知识点的理解。</p>
+<p>最好的学，是把一个概念教给别人，当你能把一个概念清晰，完整地讲解出来，并且被别人所接受时，那么你就完全掌握了这个概念了。你在讲解的过程中，是不是需要做大量的输入？大量的阅读相关的材料，甚至自己亲手去做做实验，你才能把这个概念的细节研究清楚，从而才能讲清楚这个概念？把一个概念教给别人，写作就是一个很好的手段，世界上没有比文字更清晰明确去表达的了。只有不断的写作，才能提高自己的文字表达能力，才能达到把概念教给别人，而让自己在教的过程中学得更好。</p>
+<p>其实写作本身也是一种记录，以前读书的时候，我们会做笔记，但出来工作后，在你学习的时候，你记得自己做过多少笔记？所以很多东西，很多概念，在你看的时候，眼睛录入了，但是却没有真正的在脑袋里落地，也没有在脑细胞里生成连结节点，所以虽然很多概念都看过，但是真正要用的时候，却拼了命都想不起来。所以我们在看文档的时候，一定不是只用看，而应该是用笔去记录，把自己的思考写下来，然后让这些概念植根于自己的脑袋里，从而与原有知识形成连接结点，这样你就再也忘不掉了。只有这样，你的学习效率才会比别人高，从而走在了别人的前面。</p>
+<p>##3 </p>
+<p>做什么，最难的就是坚持 ，所以写也是一样的道理，只有持续不断的写，虽然现在文字很简陋，没什么人看，但有什么关系呢？只有不断去坚持，不断去思考训练，总会看到自己这一段时间的变化。其实坚持这个词，在别人看来或许是一个煲义词，但对你来说，需要坚持的东西，证明并不是你心甘情愿去做的，你只是作为一种任务，一种形式去做，并不是发自你的内心。既然如此，你也肯定 “坚持”不了多久。我们要赋予其一个意义，就是告诉自己，写作是让自己不断成长，这样，你才会主动去思考，内化为一种动力，一有空就把近期的所思所学写下来。</p>
+<p>也许你又想问了，“那我如何开始呢？”还是那句话，这个问题没必要问。</p>
+<p>等什么？写就是了！</p>
+<p>写什么？写就是了！</p>
+<p>怎么写？写就是了！</p>
+<p>不过，倒时有个想法需要认真思考</p>
+<blockquote>
+<p>我写的这个东西对别人有用吗？</p>
+</blockquote>
+<p>只有有用的东西，才会帮助别人，从而体现你的价值。所以在tyoracle.com，我希望你看到的都是对你有所帮助的，特别是在数据库这一块，我会尽力把自己学习的，经历过的知识整理出来后进行分享。我做的是，不管自己写得好不好，写了有没有人看，只要是一直写下去。送自己一句话：“但行好事，莫问前程…….”</p>
 
       
     </div>
@@ -530,7 +459,7 @@ oradebug tracefile_name
       
         <div class="post-tags">
           
-            <a href="/tags/oracle-troubleshooting/" rel="tag"># oracle,troubleshooting</a>
+            <a href="/tags/职业生涯/" rel="tag"># 职业生涯</a>
           
         </div>
       
@@ -539,8 +468,8 @@ oradebug tracefile_name
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/09/30/JDBC参数导致大量的library cache lock/" rel="next" title="JDBC参数导致大量的library cache lock">
-                <i class="fa fa-chevron-left"></i> JDBC参数导致大量的library cache lock
+              <a href="/2017/03/17/你看清自己的目标了吗/" rel="next" title="你看清自己的目标了吗?">
+                <i class="fa fa-chevron-left"></i> 你看清自己的目标了吗?
               </a>
             
           </div>
@@ -548,10 +477,6 @@ oradebug tracefile_name
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/01/03/2017_new_begining/" rel="prev" title="2017_new_begining">
-                2017_new_begining <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -580,8 +505,8 @@ oradebug tracefile_name
           
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2016/10/09/PMON_unable_to_acquire_latch的问题分析/"
-           data-title="PMON unable to acquire latch的问题分析" data-url="http://tyoracle.com/2016/10/09/PMON_unable_to_acquire_latch的问题分析/">
+      <div class="ds-thread" data-thread-key="2017/03/18/为什么要写博客/"
+           data-title="为什么要写博客" data-url="http://tyoracle.com/2017/03/18/为什么要写博客/">
       </div>
     
   </div>
@@ -605,17 +530,8 @@ oradebug tracefile_name
       
 
       
-        <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
-            文章目录
-          </li>
-          <li class="sidebar-nav-overview" data-target="site-overview">
-            站点概览
-          </li>
-        </ul>
-      
 
-      <section class="site-overview sidebar-panel">
+      <section class="site-overview sidebar-panel sidebar-panel-active">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/images/weixin.png"
@@ -709,22 +625,6 @@ oradebug tracefile_name
 
       </section>
 
-      
-      <!--noindex-->
-        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc">
-
-            
-              
-            
-
-            
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#问题描述"><span class="nav-number">1.</span> <span class="nav-text">问题描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分析"><span class="nav-number">2.</span> <span class="nav-text">分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li></ol></div>
-            
-
-          </div>
-        </section>
-      <!--/noindex-->
       
 
     </div>
