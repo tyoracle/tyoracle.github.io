@@ -1,0 +1,755 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  ﻿<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="IT 职业生涯规划" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="Things to Check in ASM When Replacing an ONLINE disk from Exadata Storage Cell (文档 ID 1326611.1)
+APPLIES TO:
+Oracle Exadata Storage Server Software - Version 11.1.0.3.0 and laterExadata Database Machi">
+<meta property="og:type" content="website">
+<meta property="og:title" content="IT 职业生涯规划">
+<meta property="og:url" content="http://tyoracle.com/exadata替换磁盘.html">
+<meta property="og:site_name" content="IT 职业生涯规划">
+<meta property="og:description" content="Things to Check in ASM When Replacing an ONLINE disk from Exadata Storage Cell (文档 ID 1326611.1)
+APPLIES TO:
+Oracle Exadata Storage Server Software - Version 11.1.0.3.0 and laterExadata Database Machi">
+<meta property="og:updated_time" content="2017-03-27T08:15:53.661Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="IT 职业生涯规划">
+<meta name="twitter:description" content="Things to Check in ASM When Replacing an ONLINE disk from Exadata Storage Cell (文档 ID 1326611.1)
+APPLIES TO:
+Oracle Exadata Storage Server Software - Version 11.1.0.3.0 and laterExadata Database Machi">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"always"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://tyoracle.com/exadata替换磁盘.html"/>
+
+
+
+
+
+  <title>
+  
+
+  
+     | IT 职业生涯规划
+  
+</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', '83296706-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?7a57fee69b03840c9f7dd4d904a40d7b";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left  ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner">﻿<div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">IT 职业生涯规划</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle">时间的朋友</p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+  ﻿<header class="post-header">
+
+	<h2 class="post-title" itemprop="name headline"></h2>
+
+
+
+</header>
+
+    
+    
+      <p>Things to Check in ASM When Replacing an ONLINE disk from Exadata Storage Cell (文档 ID 1326611.1)</p>
+<p>APPLIES TO:</p>
+<p>Oracle Exadata Storage Server Software - Version 11.1.0.3.0 and later<br>Exadata Database Machine X2-2 Hardware - Version All Versions to All Versions [Release All Releases]<br>Oracle Solaris on x86-64 (64-bit)<br>Linux x86-64<br>GOAL</p>
+<p>Replace ONLINE disk(s) in Exadata storage cell due to various reason (such as increasing Media Error Count). An ONLINE disk for the purpose of this document is one which has not been dropped from the ASM diskgroups by the Exadata auto disk management features.</p>
+<p>SOLUTION</p>
+<p>11.2.3.3.0 and later</p>
+<p>For Exadata Storage Server Software versions 11.2.3.3.0 and later, a new cellcli command has been introduced to facilitate the process, “ALTER PHYSICALDISK <disk number=""> DROP FOR REPLACEMENT”. Example:</disk></p>
+<p>CellCLI&gt; ALTER PHYSICALDISK 20:2 DROP FOR REPLACEMENT<br>The command will perform checks to determine whether it is safe to remove the disk, then prepares it for replacement. Upon it’s successful completion, the blue LED on the disk will have been turned on. A rough overview of the checks and actions that the command performs in the background:</p>
+<ul>
+<li><p>Checks ASM to see if the partner disks associated to the disk to be replaced are online. These partner disks reside in different storage cells. The command will fail if any of the partner disks are offline in ASM. This is equivalent to running “list griddisk attributes name, asmdeactivationoutcome”</p>
+</li>
+<li><p>If ran against one of the two disks that the cell’s operating system resides on (slots 0 and 1), it will check if the MD partner disks are in sync. If they are not, the command will fail</p>
+</li>
+<li><p>If above checks are successful, the Management Server (MS) will request that the griddisks residing on the physicaldisk be marked as Inactive. This results in the griddisks being offlined in ASM</p>
+</li>
+<li><p>The celldisk is dropped (from memory only) and the blue LED is turned on. The disk is now ready for physical replacement </p>
+</li>
+</ul>
+<p>Note that the command does not initiate a drop of the griddisks from ASM, instead opting for an offline of the disks. As such, a rebalance will not occur as a result of this command being run. The advantage to this approach is that the disk can be replaced as soon as the command completes and that a single rebalance operation will occur, the one that takes place after the new disk has been inserted. The approach relies on the integrity of the secondary (mirror) extents residing on the partner disks in order to restore redundancy after the disk is replaced. It is in many ways similar to what takes place after a disk fails. If other disks residing in different cells have or are experiencing I/O issues (such as increased Media Error Count or I/O errors in ASM or database instances alert logs) and they are still online in ASM and part of the diskgroups while this procedure is undertaken, it may be more prudent to instead follow the manual procedure below, which will result in disk being dropped from ASM and rebalance taking place. The rebalance would be able to access (bar any medium errors, bad blocks, etc) both the primary extents stored on the disk being dropped and the mirrored extents stored on the partner disks in order to restore full redundancy after the disk is dropped. This is in contrast to a single rebalance following new disk being inserted, which could only access the mirrored extents on the partner disks.</p>
+<p>If after running “ALTER PHYSICALDISK DROP FOR REPLACEMENT”, a decision is made to not physically replace the disk, or if the command was run against the incorrect disk, the following command can be run to re-enable the disk and re-add it back:</p>
+<p>CellCLI&gt; ALTER PHYSICALDISK 20:2 REENABLE<br> If a disk was removed and is re-added to a different slot, “cellcli -e list lun” may report a status of “normal - rejected due to wrong slot”. To resolve, run:</p>
+<p>CellCLI&gt; ALTER PHYSICALDISK 20:2 REENABLE FORCE</p>
+<p>Manual procedure (11.2.3.2.1 and earlier)</p>
+<p>Steps 1 through 7 should be ideally performed several hours prior to the Field Engineer’s scheduled arrival on site, as to allow the rebalance following the dropping of the disk from ASM to complete. While allowing the rebalance that commences after the disk is dropped to complete is not a requirement and may not be applicable to all failure scenarios, it may help avoid rare cases that can affect data integrity. </p>
+<ol>
+<li>You have identified a disk to be replaced:</li>
+</ol>
+<p>See: Determining when Disks should be replaced on Oracle Exadata Database Machine Document 1452325.1</p>
+<ol>
+<li>You must make sure that no other disks that are partners to the disk to be replaced are offline or missing. There are up to 8 partner disks and are located  in other cells (failgroups). NB:<br>If there are other disks offline on other storage cells and they happen to be partners of the disk being replaced, replacing the disk may result in all the diskgroups to be dismounted, database instances to crash and potential data loss. At any point of time, disks from two different storage cells should not be simultaneusly removed. Furthermore, no disk should be removed from a given storage cell (prior to performing the below checks) if one or more disks are already offline on another storage cell.</li>
+</ol>
+<p>a) Run the following queries in ASM. By default, each failgroup should contain 12 disks in the RECO and DATA diskgroups and 10 disks in DBFS_DG. The mode_status should be CACHED and mount_status  ONLINE<br>col path format a40<br>col name format a30<br>col failgroup format a30<br>set linesize 200<br>select group_number, name from v$asm_diskgroup;<br>select inst_id,group_number,failgroup,mount_status,count(<em>) from gv$asm_disk<br>group by inst_id,group_number,failgroup,mount_status;<br>select inst_id,group_number,failgroup,mode_status,count(</em>) from gv$asm_disk<br>group by inst_id,group_number,failgroup,mode_status;<br>b) On the storage cell that the disk to be removed is located, run the following cellcli query. Only proceed with the replacement if “asmdeactivationoutcome” is “Yes” for all the disks:</p>
+<p>cellcli -e list griddisk attributes name, status, asmdeactivationoutcome</p>
+<p>c) It is also a good practice to get the ASM formatted output and review it for any offline disks:<br>How To Gather/Backup ASM Metadata In A Formatted Manner? (Doc ID 470211.1)</p>
+<ol>
+<li>Check the value for ASM_POWER_LIMIT attribute. If it is 0, then set it to a non zero value so that after the disk replacement rebalance can happen and the newly added disks will have data written on them.<br>alter system set asm_power_limit=4;</li>
+</ol>
+<ol>
+<li>Make sure there are no rebalance operation running on any instance on any node:</li>
+</ol>
+<p>select * from gv$asm_operation;</p>
+<p>Above query should return 0 rows. Only when it returns 0 rows can we conclude that there is no rebalance running. If there are any rows, we must wait until the rebalance completes and the query returns no rows.</p>
+<p>Please note that we are using gv$ view which will give data from all the ASM instances in the rack. Querying v$ is not sufficient, as the rebalance may be running on a different ASM instance.</p>
+<ol>
+<li>Identify the ASM griddisks which are residing on the physical disk to be replaced:</li>
+</ol>
+<p>a. On the cell node execute following:</p>
+<ul>
+<li><p>Find the lun number “0_11” in the list physicaldisk detail output</p>
+<h1 id="cellcli-e-list-physicaldisk-detail"><a href="#cellcli-e-list-physicaldisk-detail" class="headerlink" title="cellcli -e list physicaldisk detail"></a>cellcli -e list physicaldisk detail</h1><p>…..<br>luns: 0_11<br>…..</p>
+</li>
+<li><p>Find the “name” associated to this LUN using the following syntax</p>
+<h1 id="cellcli-e-list-lun-attributes-name-where-id-0-11"><a href="#cellcli-e-list-lun-attributes-name-where-id-0-11" class="headerlink" title="cellcli -e list lun attributes name where id=0_11"></a>cellcli -e list lun attributes name where id=0_11</h1></li>
+<li><p>Find the celldisk created for this lun (physicaldisk)</p>
+<h1 id="cellcli-e-list-celldisk-where-lun-0-11"><a href="#cellcli-e-list-celldisk-where-lun-0-11" class="headerlink" title="cellcli -e list celldisk where lun=0_11"></a>cellcli -e list celldisk where lun=0_11</h1><p>CD_11_dmorlcel02 normal</p>
+</li>
+<li><p>Find the griddisks created for this celldisk</p>
+<h1 id="cellcli-e-list-griddisk-where-celldisk-CD-11-dmorlcel02"><a href="#cellcli-e-list-griddisk-where-celldisk-CD-11-dmorlcel02" class="headerlink" title="cellcli -e list griddisk where celldisk=CD_11_dmorlcel02"></a>cellcli -e list griddisk where celldisk=CD_11_dmorlcel02</h1><p>DATA_CD_11_dmorlcel02 active<br>RECO_CD_11_dmorlcel02 active<br>DBFS_DG_CD_11_dmorlcel02</p>
+</li>
+</ul>
+<p>b. Execute following on any db node connecting to the ASM instance:</p>
+<p>SQL&gt; select name, substr(path,1,50) , mount_status, header_status, state from v$asm_disk where name in (‘DATA_CD_11_DMORLCEL02’,’RECO_CD_11_DMORLCEL02’);</p>
+<p>NAME SUBSTR           (PATH,1,50)                        MOUNT_S HEADER_STA STATE</p>
+<hr>
+<p>DATA_CD_11_DMORLCEL02 o/192.168.10.6/DATA_CD_11_dmorlcel02 CACHED  MEMBER  NORMAL<br>RECO_CD_11_DMORLCEL02 o/192.168.10.6/RECO_CD_11_dmorlcel02 CACHED  MEMBER  NORMAL<br>DBFS_DG_CD_11_DMORLCEL02 o/192.168.10.6/DBFS_DG_CD_11_dmorlcel02 CACHED  MEMBER  NORMAL </p>
+<ol>
+<li>Now drop the disk from the diskgroup(s):</li>
+</ol>
+<p>alter diskgroup DATA drop disk ‘DATA_CD_11_DMORLCEL02’;<br>alter diskgroup RECO drop disk ‘RECO_CD_11_DMORLCEL02’;<br>alter diskgroup DBFS_DG drop disk ‘DBFS_DG_CD_11_DMORLCEL02’;</p>
+<ol>
+<li>Wait until the Oracle ASM disks associated with the grid disks on the bad disk have been successfully dropped and the rebalance has completed by querying the V$ASM_DISK_STAT and the GV$ASM_OPERATION views. The rebalance is completed once GV$ASM_OPERATION returns no rows.</li>
+</ol>
+<p>V$ASM_DISK_STAT displays disk statistics in the same way that V$ASM_DISK does, but without performing discovery of new disks. This results in a less expensive operation. However, since discovery is not performed, the output of this view does not include any data about disks that are new to the system.</p>
+<ol>
+<li>Mark this disk at the hardware level to be serviced by turning on the amber locator LED:</li>
+</ol>
+<p>cellcli -e ‘alter physicaldisk disk_name serviceled on’</p>
+<p>Here disk_name should be replaced by the name of the physical disk ‘20:11’.</p>
+<p>This step will help in identifying the disk to be replaced. Please note that this command may not work in versions lower than 11.2.2.2, but it is not mandatory.</p>
+<ol>
+<li><p>Now replace the disk at the hardware level. The service LED will be illuminated for this disk as a result of the previous step.</p>
+</li>
+<li><p>After replacing the disk, the Exadata software should automatically create the LUN, celldisk and griddisks. You can tail the cell alert.log and ASM alert.log to see this activity. However, the disks will not be added back to the ASM diskgroups as we did not use FORCE option while dropping them. So we need to add them manually. Run the following from ASM:</p>
+</li>
+</ol>
+<p>alter diskgroup DATA add  disk ‘o/192.168.10.6/DATA_CD_11_dmorlcel02’;<br>alter diskgroup RECO add  disk ‘o/192.168.10.6/RECO_CD_11_dmorlcel02’;<br>alter diskgroup DBFS_DG add  disk ‘o/192.168.10.6/DBFS_DG_CD_11_dmorlcel02’;<br>– Location of the cell alert.log file:<br>$CELLTRACE/alert.log.</p>
+<p>– Location of the ASM alert.log</p>
+<p><diagnostic_dest>/diag/asm/+asm/+ASM2/trace</diagnostic_dest></p>
+<ol>
+<li><p>Check until the rebalance completes using followingquery:<br>select * from gv$asm_operation;</p>
+</li>
+<li><p>Once the rebalance is over, check the status of the ASM disks again and verify that everything is fine. We expect all disks to have a mount_status of ONLINE and mode_status of CACHED:</p>
+</li>
+</ol>
+<p>SQL&gt; select name, substr(path,1,50) , mount_status, header_status, state from v$asm_disk where name in (‘DATA_CD_11_DMORLCEL02’,’RECO_CD_11_DMORLCEL02’);</p>
+<ol>
+<li>When a new disk is inserted, the “Disk Cache Policy” may be set to “Disk’s Default”.<br>Ideally it should be ‘Disabled’ otherwise the exachk utility will report a failure. Run the following change this value after a new disk is inserted.</li>
+</ol>
+<h1 id="opt-MegaRAID-MegaCli-MegaCli64-LDSetProp-DisDskCache-LAll-a0"><a href="#opt-MegaRAID-MegaCli-MegaCli64-LDSetProp-DisDskCache-LAll-a0" class="headerlink" title="/opt/MegaRAID/MegaCli/MegaCli64 -LDSetProp -DisDskCache -LAll -a0"></a>/opt/MegaRAID/MegaCli/MegaCli64 -LDSetProp -DisDskCache -LAll -a0</h1><p>Refer to the following note for more information:<br>Exachk Fail With Disk Cache Policy is Not Set to Disabled On One or More Storage Server (Doc ID 1347716.1)</p>
+<p>REFERENCES</p>
+<p>NOTE:470211.1 - How To Gather &amp; Backup ASM/ACFS Metadata In A Formatted Manner version 10.1, 10.2, 11.1, 11.2 and 12.1?<br>NOTE:1347716.1 - Exachk Fail With Disk Cache Policy is Not Set to Disabled On One or More Storage Server</p>
+<hr>
+<p>How to : Replace a Hard Drive in an Exadata Storage Server</p>
+<p>In my last company, we support a lot of Exadata. unlike with other company the DBA’s job is only limited to DB Node. but with my previous company we DBA’s support everything.. as in everything, since we have access to root of both DB and Storage Cell.</p>
+<ol>
+<li>Check the Disk having issue.</li>
+</ol>
+<p>CellCLI&gt; LIST PHYSICALDISK WHERE diskType=HardDisk AND status LIKE “.<em>failure.</em>“ DETAIL<br>         name:                   20:3<br>         deviceId:               21<br>         diskType:               HardDisk<br>         enclosureDeviceId:      20<br>         errMediaCount:          14<br>         errOtherCount:          0<br>         luns:                   0_3<br>         makeModel:              “SEAGATE ST32000SSSUN2.0T”<br>         physicalFirmware:       061A<br>         physicalInsertTime:     2014-06-30T14:15:33+00:00<br>         physicalInterface:      sas<br>         physicalSerial:         L2KDFT<br>         physicalSize:           1863.0166854858398G<br>         slotNumber:             3<br>         status:                 warning - predictive failure</p>
+<p>CellCLI&gt;</p>
+<ol>
+<li>Check the diskgroups..</li>
+</ol>
+<p>SQL&gt; 1<br>  1* select group_number,name,state from v$asm_diskgroup<br>SQL&gt; /</p>
+<p>GROUP_NUMBER NAME                                               STATE</p>
+<hr>
+<pre><code> 1 DATA_EXA2                                          MOUNTED
+ 2 ARCH_EXA2                                          MOUNTED
+ 3 RECO_EXA2                                          MOUNTED
+ 4 DATA2_EXA2                                         MOUNTED
+ 5 RECO2_EXA2                                         MOUNTED
+ 6 DATA1_CORP                                         MOUNTED
+ 7 DATA2_CORP                                         MOUNTED
+ 8 DATA3_CORP                                         MOUNTED
+ 9 DATA4_CORP                                         MOUNTED
+10 DATA5_CORP                                         MOUNTED
+11 DATA6_CORP                                         MOUNTED
+12 DATA7_CORP                                         MOUNTED
+13 DATA8_CORP                                         MOUNTED
+14 DATA9_CORP                                         MOUNTED
+15 DATA10_CORP                                        MOUNTED
+16 DATA11_CORP                                        MOUNTED
+17 DATA12_CORP                                        MOUNTED
+</code></pre><p>17 rows selected.</p>
+<p>SQL&gt;<br>3.Check if any rebalance operation running.</p>
+<p>SQL&gt; select * from gv$asm_operation where state=’RUN’;</p>
+<p>no rows selected</p>
+<p>SQL&gt;</p>
+<ol>
+<li>check the status of disk to be replaced.</li>
+</ol>
+<p>CellCLI&gt; list celldisk where lun=0_3<br>         CD_03_exa2cel06         proactive failure</p>
+<p>CellCLI&gt; list griddisk where celldisk=CD_03_exa2cel06 attributes name,size,status,asmmodestatus<br>         ARCH_EXA2_CD_03_exa2cel06       29.109375G      proactive failure       DROPPED<br>         DATA4_CORP_CD_03_exa2cel06      300G            proactive failure       DROPPED<br>         DATA_EXA2_CD_03_exa2cel06       1532.546875G    proactive failure       DROPPED</p>
+<p>CellCLI&gt;<br>Optional but i always do it.</p>
+<p>CellCLI&gt; alter physicaldisk 20:3 drop for replacement<br>Physical disk 20:3 was dropped for replacement.</p>
+<p>CellCLI&gt;</p>
+<p>CellCLI&gt; list physicaldisk 20:3 detail<br>         name:                   20:3<br>         deviceId:               21<br>         diskType:               HardDisk<br>         enclosureDeviceId:      20<br>         errMediaCount:          14<br>         errOtherCount:          0<br>         makeModel:              “SEAGATE ST32000SSSUN2.0T”<br>         physicalFirmware:       061A<br>         physicalInsertTime:     2014-06-30T14:15:33+00:00<br>         physicalInterface:      sas<br>         physicalSerial:         L2KDFT<br>         physicalSize:           1863.0166854858398G<br>         slotNumber:             3<br>         status:                 warning - predictive failure - dropped for replacement</p>
+<p>CellCLI&gt;<br>5.Now inform Oracle support to replace the Disk. Once done do the validation.</p>
+<p>CellCLI&gt; list physicaldisk 20:3 detail<br>         name:                   20:3<br>         deviceId:               22<br>         diskType:               HardDisk<br>         enclosureDeviceId:      20<br>         errMediaCount:          0<br>         errOtherCount:          0<br>         luns:                   0_3<br>         makeModel:              “SEAGATE ST32000SSSUN2.0T”<br>         physicalFirmware:       061A<br>         physicalInsertTime:     2014-10-24T14:33:23+00:00<br>         physicalInterface:      sas<br>         physicalSerial:         L89VNM<br>         physicalSize:           1863.0166854858398G<br>         slotNumber:             3<br>         status:                 normal</p>
+<p>CellCLI&gt;</p>
+<p>CellCLI&gt; list celldisk where lun=0_3 detail<br>         name:                   CD_03_exa2cel06<br>         comment:<br>         creationTime:           2014-10-24T14:33:23+00:00<br>         deviceName:             /dev/sdd<br>         devicePartition:        /dev/sdd<br>         diskType:               HardDisk<br>         errorCount:             0<br>         freeSpace:              0<br>        id:                     4948604a-ee85-47c3-b644-740531516331<br>         interleaving:           none<br>         lun:                    0_3<br>         physicalDisk:           L89VNM<br>         raidLevel:              0<br>         size:                   1861.703125G<br>         status:                 normal</p>
+<p>CellCLI&gt;</p>
+<p>CellCLI&gt; list griddisk where celldisk=CD_03_exa2cel06 attributes name,size,status,asmmodestatus<br>         ARCH_EXA2_CD_03_exa2cel06       29.109375G      active  ONLINE<br>         DATA4_CORP_CD_03_exa2cel06      300G            active  ONLINE<br>         DATA_EXA2_CD_03_exa2cel06       1532.546875G    active  ONLINE</p>
+<p>CellCLI&gt;<br>Thanks for visiting..</p>
+
+    
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="exadata替换磁盘.html"
+           data-title="" data-url="http://tyoracle.com/exadata替换磁盘.html">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview sidebar-panel sidebar-panel-active">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/weixin.png"
+               alt="TY" />
+          <p class="site-author-name" itemprop="name">TY</p>
+          <p class="site-description motion-element" itemprop="description">IT职业生涯规划与技术分享</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">20</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/tyoracle.com" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-link"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  ##<a href="http://www.ce-service.com.cn/blog/" title="中亦安图技术博客" target="_blank">中亦安图技术博客</a>
+                  <a href="http://creativecommons.org/licenses//4.0" class="cc-opacity" target="_blank">中亦安图技术博客</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  ##<a href="https://oracleblog.org/" title="天堂向左 DBA向右" target="_blank">天堂向左 DBA向右</a>
+                  <a href="http://creativecommons.org/licenses//4.0" class="cc-opacity" target="_blank">天堂向左 DBA向右</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        ﻿<div class="copyright" >
+  
+  &copy;  Thu Jul 28 2016 08:00:00 GMT+0800 (中国标准时间) - 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">TY</span>
+</div>
+
+
+<div class="powered-by">
+  由Tony Yang强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="tyoracle.com">
+    IT 职业生涯规划  
+  </a>
+</div>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+本站总访问量 <span id="busuanzi_value_site_pv"></span> &nbsp&nbsp&nbsp
+您是第 <span id="busuanzi_value_site_uv"></span> 个来到的小伙伴
+
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"tyoracle"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

@@ -292,6 +292,792 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://tyoracle.com/2017/06/01/数据库恢复之移花接木/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="TY">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/weixin.png">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="IT 职业生涯规划">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="IT 职业生涯规划" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2017/06/01/数据库恢复之移花接木/" itemprop="url">
+                  数据库恢复之移花接木
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-06-01T00:00:00+08:00">
+                2017-06-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/oracle-troubleshooting/" itemprop="url" rel="index">
+                    <span itemprop="name">oracle,troubleshooting</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/06/01/数据库恢复之移花接木/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/06/01/数据库恢复之移花接木/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <blockquote>
+<p>版本声明：本文为tyoracle.com原创，如需转发，无需经我同意，但必须要注明来自于tyoracle.com</p>
+</blockquote>
+<p>#背景<br>端午假期前最后一天，人人都期待着小长假的到来，所以心情轻松。晚上十点的时候，正准备冲凉休息，这时一个陌生的电话打了过来。对方以急促的语气告诉我，他是公司的项目经理，客户那边因为使用VMWARE的ESX 虚拟平台，其虚拟机存放的存储（LUN）满了，导致了数台虚拟机异常，而其中有一台是客户的生产数据库，数据较为关键。</p>
+<p>现在客户已经给存储扩容，看起来数据库是启动了，但是应用始终连不上，需要我远程帮忙看看。听到这，心想，既然数据库已经启动，应该不会有什么问题，便欣然接受，远程上去检查数据库的状态。</p>
+<p>在这里先交待一下客户环境：<br>客户使用的是VMWARE ESX虚拟化环境，这套系统是采用linux HA高可用结构；两节点共享磁盘VMDK200GB（位于LUN11上）因为底层存储爆满，而导致IO写入丢失，使部分目录损坏。</p>
+<p>数据库层面先说几个奇怪的地方，当前数据库运行在二节点：<br>Thu Mar 09 15:54:32 2017<br>Shutting down archive processes<br>Archiving is disabled<br>Archive process shutdown avoided: 0 active<br>Thread 1 closed at log sequence 161<br>Successful close of redo thread 1<br>Completed: ALTER DATABASE CLOSE NORMAL</p>
+<blockquote>
+<p>注意log sequence 161 在3月9日时，已经在使用了。从那以后，数据库就切换到一节点上运行，所以二节点上的alert.log 一直没有日志</p>
+</blockquote>
+<p>Sat May 27 22:01:46 2017<br>ALTER DATABASE OPEN<br>Thread 1 opened at log sequence 161<br>  Current log# 2 seq# 161 mem# 0: /oradata/ecology/redo02a.log<br>  Current log# 2 seq# 161 mem# 1: /oradata/ecology/redo02b.log<br>Successful open of redo thread 1<br>MTTR advisory is disabled because FAST_START_MTTR_TARGET is not set<br>SMON: enabling cache recovery   </p>
+<blockquote>
+<p>奇怪的是，在5.27日数据库打开时，却继续打开3.9日的redo log </p>
+<p>然后日志里报出异常：   </p>
+</blockquote>
+<p><code><pre><br>Successfully allocated 7 recovery slaves<br>Using 20 overflow buffers per recovery slave<br>Thread 1 checkpoint: logseq 161, block 11707, scn 96010099<br>    on-disk rba: logseq 161, block 24434, scn 96024340<br>  start recovery at logseq 161, block 24434, scn 96024340<br>Logfile reuse: expected 161 found 563</pre></code></p>
+<p><em>*</em> 2017-05-28 00:28:16.503<br>Started resilvering redo thread 1 seq 161 blocks 24434-24475</p>
+<p><em>*</em> 2017-05-28 00:28:16.504<br>Completed resilvering redo thread 1 seq 161<br>Reuse of Online Log [Thr=1,Seq=161] detected!<br>Incident 107252 created, dump file: /oracle/app/oracle/diag/rdbms/ecology/ecology/incident/incdir_107252/ecology_ora_31494_i107252.trc<br>ORA-00600: internal error code, arguments: [kcratr_scan_rc], [4], [1], [161], [24476], [], [], [], [], [], [], []<br></p>
+<p>在这种状态下，数据库居然可以open，数据库说其需要161这个redolog，但是打开当前的redolog发现序号已经变成了563了，这种状态按道理，数据库不应该能被打开，因为redolog信息与控制文件记录不一致了。数据库启动时需要使用161这个redolog，很大程度是因为使用了不正确的控制文件进行启动。</p>
+<p>这样打开了必然会导致数据库底层信息紊乱，果然后台报了大量的ORA-00600,7445的核心错误，在此列举几个，在别的地方可没有机会一次看到这么多600 ：-）</p>
+<p><code><pre><br>ORA-00600: 内部错误代码, 参数: [2662], [0], [17376781], [0], [48090977], [4236865], [], [], [], [], [], []<br>ORA-00600: internal error code, arguments: [kcfrbd_3], [2], [95672], [1], [79360], [79360], [], [], [], [], [], []<br>ORA-00600: 内部错误代码, 参数: [kkpo_rcinfo_defstg:objnotfound], [31866], [], [], [], [], [], [], [], [], [], []<br>ORA-00600: 内部错误代码, 参数: [kdsgrp1], [], [], [], [], [], [], [], [], [], [], []<br>ORA-00600: 内部错误代码, 参数: [6002], [0], [0], [2], [125], [], [], [], [], [], [], []<br>ORA-00600: 内部错误代码, 参数: [ktecgsc:kcbz_objdchk], [0], [0], [1], [], [], [], [], [], [], [], []<br>ORA-00600: internal error code, arguments: [kewrose_1], [600], [ORA-00600: internal error code, arguments: [kdsgrp1], [], [], [], [], [], [], [], [], [], [], []<br>ORA-00600: 内部错误代码, 参数: [13013], [5001], [74], [4236437], [83], [4236437], [17], [], [], [], [], []<br>ORA-00600: 内部错误代码, 参数: [4097], [10], [28], [58026], [], [], [], [], [], [], [], []<br>ORA-00600: 内部错误代码, 参数: [kdifind:kcbz_objdchk], [0], [0], [1], [], [], [], [], [], [], [], []<br>ORA-00600: 内部错误代码, 参数: [ktspfpblk:kcbz_objdchk], [64], [63], [67], [], [], [], [], [], [], [], []<br>ORA-00600: internal error code, arguments: [kcratr_scan_rc], [4], [1], [161], [24476], [], [], [], [], [], [], []</pre></code></p>
+<p>ORA-07445: 出现异常错误: 核心转储 [kkdlavc()+191] [SIGSEGV] [ADDR:0x0] [PC:0x1A7B43B] [Address not mapped to object] []<br>ORA-07445: 出现异常错误: 核心转储 [pfrins()+216] [SIGSEGV] [ADDR:0x0] [PC:0x37A816C] [Address not mapped to object] []<br></p>
+<p>上述的报错大意是，出现大量的数据逻辑坏块，块检查时，出现各种ORA-600错误，进行exp和expdp也直接报错退出，执行RMAN直接将库宕机，这个应该是因为控制文件损坏所致的。因为RMAN需要读取控制文件的相关信息才能启动。 同时也理解了，因为控制文件的异常，而导致了数据库在open时，还一直需要使用3.9日的redolog.<br><img src="http://odh3pyi7v.bkt.clouddn.com/rman_error1.jpg" alt=""></p>
+<p>数据库宕机后，马上对所有的数据文件进行了DBV的检查，幸好数据文件不多，只有9个，数据量也不大，一百多G的分配空间。DBV没有任何的坏块，包括system表空间，这是因为dbv是检查不出逻辑损坏的。使用fsck对存储挂载点进行修复，修复完后连控制文件都不见了，符合猜想，幸好数据文件FSCK后都还在，并且DBV没有坏块。</p>
+<p>客户只有故障当天中午的全备，归档目录下的所有归档日志丢失。如果从备份恢复，只能恢复到中午的27日中午，从中午到晚上的数据必然会丢失。因为是小长假前的工作日，客户大部分的工作在27日下午进行，下班后，数据库才没什么数据变化，晚上的数据没有，客户可以接受，但丢失下午的数据，客户是不能接受的。</p>
+<p>#尝试恢复<br>既然客户不允许丢数据，那只有华山一条路，想办法去修复前面那一堆的ORA-600了。在做之前，我们还是要养成一个良好的习惯，做这些异常恢复前，一定要保护好现场，否则自己就没有回退的余地了。所以我们先划出了一个新的目录，把数据库的数据文件与redo log都复制到新的目录，以防万一。</p>
+<p>首先尝试解决2662的问题，按照常规的方法，都说是scn的问题，但仔细想想，实际上是库用损坏的控制文件打开，其SCN使用的是seq 161的redolog，所以必然与当前的数据文件scn不一致。理解了这一点，重建控制文件应该就能解决。</p>
+<p>因为缺少了控制文件，所以无法使用alter database backup controlfile to trace来获得控制文件的内容，当然我们也可以从备份中恢复，但这次，我直接从alert.log里获取到相关的信息，直接编写脚本重建了。重建后open resetlog 报<br><code><pre><br>Sun May 28 02:35:32 2017<br>SMON: enabling cache recovery<br>Errors in file /oracle/app/oracle/diag/rdbms/ecology/ecology/trace/ecology_ora_8020.trc  (incident=189655):<br>ORA-00600: internal error code, arguments: [kdsgrp1], [], [], [], [], [], [], [], [], [], [], []</pre></code></p>
+<p></p>
+<p>kdsgrp1报错大概的意思是当数据库操作找不到预期行时，会抛出ora-600 [kdsgrp1]错误。 错误在内存中被命中，因此可能是仅内存错误或由磁盘损坏导致的错误。这种报错在我们这种场景下是正常的，可以想像，数据库发出一个IO，但是因为底层空间满了，这个IO无法写入，这个IO就会被丢弃，所以磁盘上的块出现不完整。</p>
+<p>检查这个trace,发现是与undo$相关，我们注意到这个报错是出现在打开数据库smon进行事务恢复时所出现的，当smon需要做事务恢复时，去读取undo$的信息，发现file 1  block 225上的数据不致，从而抛出了kdsgrp1,这个时候我们考虑禁用smon的事务恢复，并且将undo进行offline，使用以下的参数文件进行启动。</p>
+<p><img src="http://odh3pyi7v.bkt.clouddn.com/parameter.jpg" alt=""><br><img src="http://odh3pyi7v.bkt.clouddn.com/parameter2.jpg" alt=""></p>
+<p>上述的参数，主要作用是，禁止smon进行rollback,offline undo segment,允许控制文件与数据文件的scn不一至情况下启动数据库，允许跳过坏块.</p>
+<p>这样一折腾后，终于成功的把数据库打开了，心中那种激动啊，看起来成功在望啊<br><img src="http://odh3pyi7v.bkt.clouddn.com/open.jpg" alt=""></p>
+<p>但是很快随即一盆冷水淋过，大家发现没有，标红的用户只有三个对象啊，这怎么可能呢？另外还有一个应用用户也没有找到，余下的全是系统自带对象，我的天啊，数据库明明打开了，数据文件也online，数据到那里呢？想想，让我找个地方先静静………..</p>
+<p>想了好一阵子，发现参数里有个10231，这个参数是会跳过坏块的，正因为这个参数的作用，因为system的基表有坏块，把相关损坏的块都跳过了，从而把真正的用户对象全弄掉了，system表空间因为IO异常，数据块肯定埋着无数的地雷，不可能去掉10231这个参数，一个一个坏块去修复。</p>
+<p>那这样打开库有什么用呢？白白折腾了这么久，心中一阵沮丧。</p>
+<p>或者有些读者想到，能不能试试用终级杀器DUL呢？这种情况下，DUL能好用吗？</p>
+<p>我们也使用了DUL去尝试，但因为system表空间的user$和obj$等基表有问题，dul一样扫描不出用户的相关对象。也曾想过跳过system表空间，但没有了数据字典，就算抽出来数据，也只是一堆无意义的记录，对客户来说，没有什么意义。</p>
+<p>看起来真的没有办法，只能让客户丢失半天数据了？？</p>
+<p>#柳暗花明</p>
+<p>折腾了十几个小时，加上没有得到好的休息，脑袋都晕乎乎的，决定到楼下买杯咖啡透透气。外面，帝都正阳光灿烂，鸟语花香，正值假期，金融区这一块反而人丁稀少。园区里的园丁，正在辛勤地给树苗进行嫁接。望着这些勤劳的背影，忽然灵光闪动，能不能先将备份恢复出来，然后将恢复出来的system表空间移花接木到损坏的数据库呢？损坏的数据库不是只有system有问题吗？数据文件暂时不知道有没有问题，但至少解决了system表空间找不到用户数据的问题。</p>
+<p>说干就干，马上冲上楼，与系统工程师把新的环境搭建起来，把备份恢复到新环境，数据也推进至备份的时间点27日中午的十二点。然后把系统表空间复制到旧的环境，有点常识都知道，这样复制过来并不能直接使用的，还需要使用BBED修改system的头部SCN,使其与其他数据文件的相一致。在这里就不一一细述了，修改后，重建控制文件，非常幸运的又重新把库打开了。<br><img src="http://odh3pyi7v.bkt.clouddn.com/open2.jpg" alt=""></p>
+<p>看到上图终于出现了用户的数据，并且是12500个，与我们从备份恢复出来的对象数是一致的。当然虽然数据库成功打开了，但是后台还是一堆的报错，赶紧把用户的数据导出来，非常幸运的是，用户数据只有七张表导出报错，这七张表都是含有lob字段的，经客户确认，属于非关键表，可以允许丢一小部分数据，所以我们就使用了RMAN备份中的表代替。</p>
+<p>经过详细的数据比对，27日下午操作的数据都被挽救回来了，至此，经过将近二十个小时折腾，终于把数据库恢复到宕机前的数据状态，最大程度的挽救了数据，减少了数据的丢失。</p>
+<p>#故事让我们学到什么？<br>对于将ORACLE生产环境运行在ESX虚拟化上，相信有非常多的客户是这样做的，并且有很多客户太过信任vmware的snapshot机制，认为对操作系统做好快照，做好虚拟机的整机备份就不会有问题了，但是如果发生类似于这个故事的场景，虚拟机的备份，肯定是会丢失数据的。如昨晚做了虚拟机的备份，但今天下午七点时，数据库挂了，就只能恢复到昨晚虚拟机备份的状态。</p>
+<p>对于这个故事，幸运的是客户使用的是数据库层面的备份，并且用户数据文件没有损坏，否则也同样会丢失数据，对于生产系统，强烈建议为其配置dataguard灾备环境，如果配置了DG，类似于这样的场景，就不会那么麻烦了，直接切换到dg环境即可。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://tyoracle.com/2017/05/27/各种系统使用oradebug推进SCN方法/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="TY">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/weixin.png">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="IT 职业生涯规划">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="IT 职业生涯规划" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2017/05/27/各种系统使用oradebug推进SCN方法/" itemprop="url">
+                  各种系统使用oradebug推进SCN方法
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-05-27T00:00:00+08:00">
+                2017-05-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/oracle-troubleshooting/" itemprop="url" rel="index">
+                    <span itemprop="name">oracle,troubleshooting</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/05/27/各种系统使用oradebug推进SCN方法/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/05/27/各种系统使用oradebug推进SCN方法/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <blockquote>
+<p>版本声明：本文为tyoracle.com原创，如需转发，无需经我同意，但必须要注明来自于tyoracle.com</p>
+</blockquote>
+<h1 id="什么时候需要推进SCN？"><a href="#什么时候需要推进SCN？" class="headerlink" title="什么时候需要推进SCN？"></a>什么时候需要推进SCN？</h1><p>在启动时出现下面的错误时，需要推进SCN</p>
+<blockquote>
+<p><em>*</em> 2017-04-01 12:46:03.768<br>ORA-00704: bootstrap process failure<br>ORA-00704: bootstrap process failure<br>ORA-00604: error occurred at recursive SQL level 1<br>ORA-01555: snapshot too old: rollback segment number 33 with name    “_SYSSMU33_2839196578$” too small<br>ORA-00704: bootstrap process failure<br>ORA-00704: bootstrap process failure<br>ORA-00604: error occurred at recursive SQL level 1<br>ORA-01555: snapshot too old: rollback segment number 33 with name “_SYSSMU33_2839196578$” too small</p>
+</blockquote>
+<p>这时可以在pfile.ora里尝试加入以下这些参数：</p>
+<blockquote>
+<p><em>.undo_management=MANUAL      
+</em>._allow_resetlogs_corruption=true<br><em>._no_recovery_through_resetlogs=true   
+</em>._corrupted_rollback_segments=’_SYSSMU33_2839196578$’<br>*.event=”10513 trace name context forever, level 2” </p>
+</blockquote>
+<p><strong>首先，报ORA-01555肯定 需要加大SCN的，原来我们试过加10000，后来加到100000都不行，直接加到1千万。</strong>   </p>
+<p>另外的经典错误：<br>ERROR:<br>ORA-600 [2662] [a] [c] [d] [e]</p>
+<p>也是需要推进SCN解决  </p>
+<p>在这里，总结每一种不同系统推进的方法，方便以后直接查阅</p>
+<p>##SCN小知识<br>scn是由scn base及scn wrap构成的，当scn base达到一定程度，scn wrap则会递增，一般情况下scn wrap是0，不会变化<br>scn base及scn wrap也是数据块中的数据结构，可见scn base是4个字节，而scn wrap是2个字节<br>  也就是说scn base要用4个字节用完，scn wrap就会递增<br>  依理推理，4个字节为 power(2,32),也就是达到这个数据时，scn base就会归0，scn wrap递增1</p>
+<p>计算公式：<br>(SCN_WRP * 4294967296) + SCN_BAS should give us the SCN in the number format</p>
+<p>举例<br><code><pre><br>SCN: 14441583156<br>15:12:29 sys@DCNPOS5G&gt; select dbms_flashback.get_system_change_number a from dual;<br>  14441583156<br>Elapsed: 00:00:00.00</pre></code></p>
+<p>select to_char(14441583156,’xxxxxxxxxxx’) from dual;<br>  35cc91234<br>计算：<br>SYS@PROD2&gt;select 14441583156/4294967296 from dual;<br>            3.3624431</p>
+<p>SYS@PROD2&gt;select to_char(14441583156-3*4294967296,’xxxxxxxxx’) from dual;<br>  5cc91234<br>其SCN_WRP 为3, SCN_BAS为 5cc91234</p>
+<p></p>
+<p>其在文件头中的位置如下（如果需要单独修改某一个数据文件，SCN只需要修改这两个地方)</p>
+<p><code><pre><br>BBED&gt; p kcvfh<br>   struct kcvfhckp, 36 bytes                @484<br>      struct kcvcpscn, 8 bytes              @484<br>         ub4 kscnbas                        @484      0x028f5c58  –scn base<br>         ub2 kscnwrp                        @488      0x0000      –scn wrap</pre></code></p>
+<p></p>
+<p>##推进SCN的方法<br>1、使用oredebug poke (本文主要讲这一种）  </p>
+<p>2、alter session set events ‘10015 trace name adjust_scn level 1’; （10015 本身仅仅是一个事件， 它在当smon做transaction recovery时被触发，实际造成scn 增长的是 adjust_scn 这个事件；是指 在触发10015 事件时 做adjust_scn 这个action 调整scn ）</p>
+<p>3、利用alter system set “_MINIMUM_GIGA_SCN”=6 scope=spfile;<br>_MINIMUM_GIGA_SCN推进SCN，1代表2的30次方，值为1073741824，如你希望将SCN推进至<br>6442451243左右，即将上述参数设为6</p>
+<p>上述方法各有优缺点，但在11.2.0.3以上的版本，使用poke的方法更方便快捷</p>
+<p>##oradebug poke说明<br>oradebug poke可以推进SCN，分为在数据库OPEN及MOUNT皆可以<br>oradebug setmypid<br>oradebug DUMPvar SGA kcsgscn<em>     （获取当前内存中的scn)<br>但是一般我们只会在mount的时候使用,在mount时，oradebug DUMPvar SGA kcsgscn</em>得到的值会全是0，这是因为数据库没有打开。</p>
+<p>查看某一个地址的当前值可以使用oradebug peek 0x3497DE1C 300</p>
+<p><strong>另外要注意，使用oradebug poke进行SCN递增，没有高低字节转换，直接to_char出来的值，直接加0x就可以,AIX的加法，与LINUX不同，32位与64位的增加方法也不同</strong></p>
+<p>此文将各种常见系统的推进方法做了记录，方便出现问题时对号入座</p>
+<p>#1、LINUX X64</p>
+<p><code><pre><br>SQL&gt; select * from v$version;<br>Oracle Database 11g Enterprise Edition Release 11.2.0.3.0   64bit Production<br>PL/SQL Release 11.2.0.3.0 - Production<br>CORE    11.2.0.3.0      Production<br>TNS for Linux: Version 11.2.0.3.0 - Production<br>NLSRTL Version 11.2.0.3.0 - Production</pre></code></p>
+<p>数据库open的时候：<br>SQL&gt; select name, CHECKPOINT_CHANGE# from v$datafile;</p>
+<p>/oradata/EAP/datafile/o1_mf_system<em>c501mzlt</em>.dbf              5078791<br>/oradata/EAP/datafile/o1_mf_sysaux<em>c501mzlz</em>.dbf              5078791<br>/oradata/EAP/datafile/o1_mf_undotbs1<em>c501mzo4</em>.dbf            5078791<br>/oradata/EAP/datafile/o1_mf_users<em>c501mzo9</em>.dbf               5078791<br>/ora/oradata/test01.dbf                                   5078791</p>
+<p>查内存里的当前SCN<br>select dbms_flashback.get_system_change_number a from dual;</p>
+<p>代表这时库是5078791，我想往前推进1000<br>select 5079542+1000 from dual;<br>select to_char(5079542+1000,’xxxxxxxxxxxxxxx’) from dual;<br>结果：4d85de</p>
+<p>startup mount<br>SYS@PROD2&gt;oradebug setmypid<br>Statement processed.</p>
+<p>SQL&gt;  oradebug DUMPvar SGA kcsgscn<br>kcslf kcsgscn_ [060019598, 0600195C8) = <strong>00000000 00000000</strong> 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 60019278 00000000  </p>
+<p>这个时候因为数据库没有打开，所以SCN在内存中的当前值全是0，<br>在64位，我们直接推进<br>SQL&gt; ORADEBUG POKE 0x060019598 8 0x4d85de<br>BEFORE: [060019598, 0600195A0) = 00000000 00000000<br>AFTER:  [060019598, 0600195A0) = 004D85DE 00000000<br></p>
+<p>然后打开库，会发现SCN的确推进了1000</p>
+<pre><code>
+SQL>  alter database open ;
+
+Database altered.
+
+SQL> col name format a50
+SQL> select distinct CHECKPOINT_CHANGE# from v$datafile_header;
+
+      CHECKPOINT_CHANGE#
+------------------------
+                 5080543
+</code></pre>
+
+<p>#2 linux 32位</p>
+<p>改这个就不能按照64位的方法去改了，直接报错，看下面的</p>
+<pre><code>
+SYS@PROD2>select distinct CHECKPOINT_CHANGE# from v$datafile_header;
+
+      CHECKPOINT_CHANGE#
+------------------------
+                  991779
+
+SYS@PROD2>select to_char(991779+10000) from dual;
+
+TO_CHAR
+-------
+1001779
+
+SYS@PROD2>select to_char(991779+10000,'xxxxxxxxxxxxxxx') from dual;
+
+TO_CHAR(991779+1
+----------------
+           f4933
+
+SYS@PROD2>oradebug setmypid
+Statement processed.
+SYS@PROD2>oradebug DUMPvar SGA kcsgscn
+kcslf kcsgscn_ [2000E060, 2000E080) = 00000000 00000000 00000000 00000000 00000000 00000000 00000000 2000DE6C
+SYS@PROD2>ORADEBUG POKE 0x2000E060 4 0xf4933
+BEFORE: [2000E060, 2000E064) = 00000000
+AFTER:  [2000E060, 2000E064) = 000F4933
+SYS@PROD2>oradebug DUMPvar SGA kcsgscn
+kcslf kcsgscn_ [2000E060, 2000E080) = 000F4933 00000000 00000000 00000000 00000000 00000000 00000000 2000DE6C
+SYS@PROD2>alter database open ;
+alter database open
+*
+ERROR at line 1:
+ORA-03113: end-of-file on communication channel
+Process ID: 5515
+Session ID: 125 Serial number: 5
+
+报错：
+ARC0: STARTING ARCH PROCESSES COMPLETE
+Errors in file /u01/app/oracle/diag/rdbms/prod2/PROD2/trace/PROD2_lgwr_5396.trc  (incident=15689):
+ORA-00600: internal error code, arguments: [2252], [18739], [1], [4635], [3939336192], [], [], [], [], [], [], []
+Incident details in: /u01/app/oracle/diag/rdbms/prod2/PROD2/incident/incdir_15689/PROD2_lgwr_5396_i15689.trc
+
+</code></pre>
+
+<p>原因是什么呢？为了搞清楚那里改错了，我们可以找一台相同系统版本的，然后做做测试，看那里改错了，下面是测试过程：</p>
+<pre><code>
+SYS@PROD2>alter database open;
+
+Database altered.
+
+SYS@PROD2>select distinct CHECKPOINT_CHANGE# from v$datafile_header;
+
+      CHECKPOINT_CHANGE#
+------------------------
+                  991782
+
+SYS@PROD2>oradebug setmypid
+Statement processed.
+SYS@PROD2>oradebug DUMPvar SGA kcsgscn
+kcslf kcsgscn_ [2000E060, 2000E080) = 00000000 **000F2336** 0000003D 00000000 00000000 00000000 00000000 2000DE6C
+
+原来是改错位置，64位的是修改前面四位，32位是修改后面4位。
+
+SYS@PROD2>select to_number('F2336','xxxxxxxx') from dual;
+
+TO_NUMBER('F2336','XXXXXXXX')
+-----------------------------
+                       992054
+
+SYS@PROD2>select dbms_flashback.get_system_change_number a from dual; 
+
+         A
+----------
+    992068
+</code></pre>
+
+<p>重新来修改一次吧，0x2000E064是指从SCN的开始地址加了4位的offset</p>
+<pre><code>
+SYS@PROD2>oradebug poke 0x2000E064 4 0xf4933
+BEFORE: [2000E064, 2000E068) = 00000000
+AFTER:  [2000E064, 2000E068) = 000F4933
+SYS@PROD2>oradebug DUMPvar SGA kcsgscn
+kcslf kcsgscn_ [2000E060, 2000E080) = 00000000 000F4933 00000000 00000000 00000000 00000000 00000000 2000DE6C
+
+SYS@PROD2>alter database open;
+
+Database altered.
+
+SYS@PROD2>select distinct CHECKPOINT_CHANGE# from v$datafile_header;
+
+      CHECKPOINT_CHANGE#
+------------------------
+                 1001780
+
+SYS@PROD2>select dbms_flashback.get_system_change_number a from dual;
+
+         A
+----------
+   1002030
+
+SYS@PROD2>
+</code></pre>
+的确推进了，查看某一个地址的当前值可以使用oradebug peek 0x3497DE1C 300
+
+#3、winddows 7 64位
+
+这个与linux 64位没啥区别
+<pre><code>
+SQL> select to_char('1957888','xxxxxxxx') from dual;
+
+TO_CHAR('
+---------
+   1de000
+
+SQL> oradebug poke 0x0049c0950 8 0x1de000
+BEFORE: [0049C0950, 0049C0958) = 00000000 00000000
+AFTER:  [0049C0950, 0049C0958) = 001DE000 00000000
+SQL>  oradebug DUMPvar SGA kcsgscn_
+kcslf kcsgscn_ [0049C0950, 0049C0980) = 001DE000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 049C0630 0
+0000000
+SQL> alter database open;
+</code></pre>
+
+<p>#4、solaris 10 sparc</p>
+<p>大端序<br>前4字节表示SCN WRAP:00000000<br>5～8字节表示SCN BASE:0002FB37</p>
+<pre><code>
+
+SQL> oradebug dumpvar sga kcsgscn_
+kcslf kcsgscn_ [380016528, 380016558) = 00000000 0002FB37 00000000 00000000 0000D5E9 00000000 00000000 00000000 00000000 00000000 00000003 80016208
+SQL> oradebug dumpvar sga kcsgscn_
+kcslf kcsgscn_ [380016528, 380016558) = 00000000 0002FC5C 00000000 00000000 0000D634 00000000 00000000 00000000 00000000 00000000 00000003 80016208
+SQL>
+SQL> select to_char(checkpoint_change#,'XXXXXXXX') from v$database;
+
+TO_CHAR(C
+---------
+    3C264
+SQL> select checkpoint_change#  from v$database;
+
+CHECKPOINT_CHANGE#
+------------------
+            246372
+
+1)设置SCN BASE值
+SQL> oradebug poke 0x380016528 8 0x3C264  8表示修改8个字节的值
+BEFORE: [380016528, 380016530) = 00000000 00000000  （mount数据库时kcsgscn_=0）
+AFTER:  [380016528, 380016530) = 00000000 0003C264   -->更改成功
+
+SQL> oradebug dumpvar sga kcsgscn_
+kcslf kcsgscn_ [380016528, 380016558) = 00000000 0003C264 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000003 80016208
+
+SQL> oradebug poke 0x380016528 4 0x00000001   --> 4表示修改前4个字节SCN_WRAP，改成1
+BEFORE: [380016528, 38001652C) = 00000000
+AFTER:  [380016528, 38001652C) = 00000001
+SQL> oradebug dumpvar sga kcsgscn_
+kcslf kcsgscn_ [380016528, 380016558) = 00000001 0003C264 --> 最终SCN_WRAP和SCN_BASE都修改成功
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000003 80016208
+
+
+SQL> alter database open;
+SQL>
+SQL>  select dbms_flashback.get_system_change_number from dual;
+
+GET_SYSTEM_CHANGE_NUMBER
+------------------------
+              4295213826 
+SQL> select to_char(dbms_flashback.get_system_change_number,'XXXXXXXXXXXXXXXX') from dual;
+
+TO_CHAR(DBMS_FLAS
+-----------------
+        10003C30B   --> SCN WRAP跳了一位
+SQL>
+实际上用poke 地址 8 0x000000010003C264直接修改也可以
+SQL> oradebug dumpvar sga kcsgscn_
+kcslf kcsgscn_ [380016528, 380016558) = 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000003 80016208
+SQL> select to_char(checkpoint_change#,'XXXXXXXXXXXXXXXX') from v$database;
+
+TO_CHAR(CHECKPOIN
+-----------------
+        10003C482 
+SQL> oradebug poke 0x380016528 8 0x10003C482
+BEFORE: [380016528, 380016530) = 00000000 00000000
+AFTER:  [380016528, 380016530) = 00000001 0003C482
+
+</code></pre>
+
+<p>本测试说明大字节序64位系统，语法<br>oradebug poke 地址  8  SCN号</p>
+<p>#5、 AIX 64位<br>这个也是大字节序，与SOLARIS  64位没什么区别，语法也是<br>oradebug poke 地址  8  SCN号</p>
+<pre><code>
+
+15:12:29 sys@DCNPOS5G> select dbms_flashback.get_system_change_number a from dual;
+
+             A
+--------------
+   14441583156
+
+Elapsed: 00:00:00.00
+
+select to_char(14441583156,'xxxxxxxxxxx') from dual;
+
+TO_CHAR(1444
+------------
+   35cc91234
+
+15:12:29 sys@DCNPOS5G> 
+15:12:29 sys@DCNPOS5G>  oradebug setmypid
+Statement processed.
+15:12:29 sys@DCNPOS5G>  oradebug DUMPvar SGA kcsgscn  
+kcslf kcsgscn_ [700000000019B70, 700000000019BA0) = 00000003 5CC91234 00000000 00000000 0000FD13 00000000 000
+
+</code></pre>
+
+
+<p>#总结<br>推进SCN，是万不得已的操作，推进的过程往往需要结合加入其他隐含参数，重建控制文件的动作，所以具体问题具体分析。但是对于SCN的相关问题，并没有想像中复杂，需要修改的地方就那么几个地方，细心加耐心，保证方向正确，肯定能把库拉起来。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://tyoracle.com/2017/05/27/2017已近过半/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="TY">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/weixin.png">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="IT 职业生涯规划">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="IT 职业生涯规划" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2017/05/27/2017已近过半/" itemprop="url">
+                  2017已近过半
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-05-27T00:00:00+08:00">
+                2017-05-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/life/" itemprop="url" rel="index">
+                    <span itemprop="name">life</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/05/27/2017已近过半/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/05/27/2017已近过半/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <blockquote>
+<p>版本声明：本文为tyoracle.com原创，如需转发，无需经我同意，但必须要注明来自于tyoracle.com</p>
+</blockquote>
+<p>#近况</p>
+<p>最近一直没有更新博客，已经几个月没有写东西了，年初定下来的目标，又再一次停了下来。人总会能为自己不去做某些事而找到各种各样的理由，这样可以从内心上说服自己，让自己不再承受内心的责备</p>
+<p>我最近在做什么呢？学了很多的知识，但没几个记住，听了很多的道理，却没改变我的任何生活。因为，我只是在那里听着，看着，而从没有去践行，没有去做到。</p>
+<p>最近，因为某些机会，与印度人电话了几次，最后都是他在讲他的印度英语，而我在讲我的广式英语，借用广东人的一句就是：鸡同鸭讲。结果他最后也受不了，说要拉一个会讲英语的中国人加入会议才能继续讨论，内心深深受到打击。</p>
+<p>最近一直没有时间去更新的原因，一个是因为自己变懒了，一个是需要准备OCM的考试。终于在上周考完了。这个试本来应该在原厂的时候就考了（当时还不需要自己花钱呢）可是一拖再拖，因为公司的要求，拖到了今天才把他考完了。成绩需要两周后才能知道，在没有成绩前，不能有任何的幻想，所以在此先总结一下考试的一些信息，避免自己遗忘得太快。</p>
+<p>#OCM考试</p>
+<p>OCM考试现在都是很成熟的考试了，在网上能找到各类的资料，特别是培训学校出来的，能得到的东西都非常全，但是，他们给你的，并不就是你的，你还需要自己去看，去消化，去不断练习。这一次考试，给我最大的感觉就是时间会非常紧，无论你考前做过多少实验，但一到考试，总会有少许紧张，且题目的确较多，记忆力稍微差点，如命令行少个括号，或逗号，都会逼着你在这一题停下来，反复尝试，从而多花几分钟到十几分钟找原因，这样对于只有几十分钟的考试，后面的题就会变得没有时间去做。</p>
+<p>在这次考试，有三个场景我是刚刚够时间做完，dataguard的场景，因为开始创建时出现问题，卡了几分钟，创建service时，卡了几分钟，最后导致了fast failover差三分钟才能完成，所以很遗撼，DG这个场景我没有完成：-（</p>
+<p>所以给考试的同学建议，一定要多练习，在做练习时，给自己定一个考试时间，这样有压力，才会提高速度。另一个就是遇到卡壳的问题，一定不要坚持，三分钟想不出答案，五分钟做不出来，一定要跳到下一题，当你把所有题做完后，再回过头来慢慢思考这一题，这样能保证你，仅有一题丢分。</p>
+<p>对于查文档，除非你对文档的所在文档名和位置非常熟，否则你还是放弃这个想法吧，在那种场景下去查文档（文档内的查找非常慢），纯属浪费时间，不到万不得已，千万别去查文档。</p>
+<p>这样的考试下来，感觉OCM就是考记忆力，它覆盖的知识面的确非常广，对于实际问题的解决帮助却非常少，所以获取这个证书只是一个称号，不要把这个称号与能力挂钩，因为OCM不会考你log file sync为什么异常的高，数据库宕机了如何去分析…….</p>
+<p>#最近的学习<br>其实最近也一直在学习，学习什么呢？在《得到》上的各种专栏，听了很多的道理，但是却没有过好一生，这是最真实的写照。 在每天通勤的路上，我每天都听着各位大牛在讲述不同方面的道理，当时听着，很有感觉，有时也有很多想法，很想写下来，但晚上一回家，啥也想不起来了。</p>
+<p>这种学习状态一定要改变了，尝试每种专栏先听一次，听到有想法的专栏，先记下来，在晚上再听一次，然后再写写自己的想法，这样才能有所收获。将这些想法内化，然后行动，才是真正的获益。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
   <link itemprop="mainEntityOfPage" href="http://tyoracle.com/2017/03/18/为什么要写博客/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1344,416 +2130,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-person " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://tyoracle.com/2017/02/12/为什么网站叫IT职业生涯规划/">
-
-  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <meta itemprop="name" content="TY">
-    <meta itemprop="description" content="">
-    <meta itemprop="image" content="/images/weixin.png">
-  </span>
-
-  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-    <meta itemprop="name" content="IT 职业生涯规划">
-    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
-      <img style="display:none;" itemprop="url image" alt="IT 职业生涯规划" src="">
-    </span>
-  </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/02/12/为什么网站叫IT职业生涯规划/" itemprop="url">
-                  为什么网站叫"IT职业生涯规划“
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-12T00:00:00+08:00">
-                2017-02-12
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/02/12/为什么网站叫IT职业生涯规划/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/02/12/为什么网站叫IT职业生涯规划/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h2 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h2><p>这个网站域名是从去年7月份生日的时候，给自己送的一份礼物，希望能在这个网站上记录下自己的成长点滴。起初我是使用pelican进行建站，从八月开始写，也只写了七八篇的博文，甚是懒。所以今年给自己定下一个目标，一定要勤写。</p>
-<p>转眼2017年已经过去了40多天了，但是产出还是不高。春节也过完了，自己的腰长了一圈。而年初定下的计划，是时候要实施了。</p>
-<p>在2016，这个网站是”ORACLE星系“，可能在google上都找不到多少痕迹，因为写的东西实在太小了，为什么要叫这个名呢？这是因为，我从事ORACLE十几年，从8I开始到现在的12C，一直靠他养家活口，所以对其是十分熟悉的，所以希望将自己这十多年的经验，日常遇到的一些疑难或有趣的问题，放在这里，一个是记录自己的足迹，一个是可以分享一下自己的一些经验给行业内的新人。</p>
-<p>但在今年年初的时候，我听到了一个故事，让我非常有感触，决定将这个网站，不再只是单纯的定位在技术网站，而是将其变成一个可以帮助行业内的新人成长与技术随笔的网站。这是一个什么样的故事呢？<br>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2017/02/12/为什么网站叫IT职业生涯规划/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-person " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://tyoracle.com/2017/02/06/该奋斗了/">
-
-  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <meta itemprop="name" content="TY">
-    <meta itemprop="description" content="">
-    <meta itemprop="image" content="/images/weixin.png">
-  </span>
-
-  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-    <meta itemprop="name" content="IT 职业生涯规划">
-    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
-      <img style="display:none;" itemprop="url image" alt="IT 职业生涯规划" src="">
-    </span>
-  </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/02/06/该奋斗了/" itemprop="url">
-                  该奋斗了
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-06T00:00:00+08:00">
-                2017-02-06
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/02/06/该奋斗了/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/02/06/该奋斗了/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h2 id="假期都做了什么"><a href="#假期都做了什么" class="headerlink" title="假期都做了什么"></a>假期都做了什么</h2><p>2017年的春节就这样过去了，转眼就到了年初十了，在过去的将近十天时间里，你过得如何呢？是陪伴着家人？还是被一大帮朋友拉着在外面胡吃海喝？还是以特别的方式渡过这个鸡年的春节？当大部分人都处于完全放松的状态时，却有一小部分人，永不知倦，继续着自己学习的轨迹，远远地把我们抛在了身后。</p>
-<p>这就是选择什么样渡过假期的方式，就决定了你未来的生活质量了。</p>
-<p>相信今天应该是很多人假期结束后回到公司上班的第一天，刚结束假期，是不是有点假期综合症？这个生物钟早已习惯了半夜才睡，中午才起的模式了。早上当闹钟响起来的时候，艰难地爬起床来，那真的是痛苦。因为人不是机器，想切换模式就切换模式。那我们如何能快速的进入到新的角色呢？</p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2017/02/06/该奋斗了/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-person " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://tyoracle.com/2017/01/03/2017_new_begining/">
-
-  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <meta itemprop="name" content="TY">
-    <meta itemprop="description" content="">
-    <meta itemprop="image" content="/images/weixin.png">
-  </span>
-
-  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-    <meta itemprop="name" content="IT 职业生涯规划">
-    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
-      <img style="display:none;" itemprop="url image" alt="IT 职业生涯规划" src="">
-    </span>
-  </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/01/03/2017_new_begining/" itemprop="url">
-                  2017_new_begining
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-03T00:00:00+08:00">
-                2017-01-03
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/01/03/2017_new_begining/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/01/03/2017_new_begining/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="感想"><a href="#感想" class="headerlink" title="感想"></a>感想</h2><p>当时光飞逝，进入2017年已经三天了，感觉还是停留在2016里，恍如昨日。时间总是在过去了，才会让人感觉到飞快，拥有的时候，才不知如何使用，白白浪费在刷微信，浏览无聊的网页上。</p>
-<p>在朋友圈，这几天不断的刷着2016的成绩与2017的计划，这种期望是好的，但是又有多少人在年底的时候能完成自己年初定下的计划，并且完成的呢？</p>
-<p>在新一年的开始，的确需要对过去进行回顾，对未来进行规划，但是任何的一切，不会因为新的一年而改变，如未读的书依然在书柜里，未背的单词，还是不会，未跑的里程，还是需要用汗水去浇灌。如果你今年还是定下了要读多少本书，背多少单词，做多少事，只不过是把往年的计划重复。对你来说，2017并没有什么特别。</p>
-<p>我们是需要将每一年活出精彩，还是重复过着每一年的生活呢？这需要我们每个人深入地思考。</p>
-<p>在新年伊始，回顾与展望，的确让人有一种庄严的仪式感。这样可以让人有一种新生的感觉。那我也不能免俗，让自己在2017年写下新一年的初步计划。</p>
-<p>2016年里发生了很多的事情，世界的，中国的，身边的，但那是外部的环境，你不能改变，那只能适应。2016年是一个知识变现的年，在这一年里，看到很多技术牛人，将知识通过网络变现，知识开始以各种不同的付费形式出现。而我也参与其中，成为付费学习的一份子。在2017，需要将这些付费学习的知识，整理成文字，内化在自己的思维里，才不枉付出时间与金钱进行学习。</p>
-<p>财富自由，生涯规划，人生升级，这些概念，需要无时无刻的提醒自己去不断地思考，反省与努力。</p>
-<p>2017年，需要更关注时间的消耗，时间是不可再生资源，你的时间花在了这些地方，就没有时间进行学习。时间放在那，成长就在那。希望是一个人前进的动力，虽然前路并不可知，但是认准了方向，只需去做就行了，做了，至少你往前移动了一点，能看清前方的路也多一点，所以怀着希望，认准方向，就拼命去努力，不要浪费时间在那里胡思乱想。</p>
-<p>再多的计划都是空谈，实干出真知，简单地说，继续一百天的计划，一百天跑步，一百篇博客更新，一百天持续英语朗读，每天坚持碎片化学习付费订阅，学习冥想。</p>
-<p>其实最好的执行方式，取于一张A4纸自制一个2017的日历，每坚持一天，就在上面打个圆圈，对，这是我准备去做的。</p>
-<p>愿你我在2017年活出与2016年不一样的自我，而不是重复过去一年的自己。</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1801,7 +2177,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">17</span>
+                <span class="site-state-item-count">20</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1810,7 +2186,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-count">7</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -1819,7 +2195,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-count">9</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
