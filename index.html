@@ -407,7 +407,7 @@
             <blockquote>
 <p>版本声明：本文为tyoracle.com原创，如需转发，无需经我同意，但必须要注明来自于tyoracle.com</p>
 </blockquote>
-<p>#背景<br>端午假期前最后一天，人人都期待着小长假的到来，所以心情轻松。晚上十点的时候，正准备冲凉休息，这时一个陌生的电话打了过来。对方以急促的语气告诉我，他是公司的项目经理，客户那边因为使用VMWARE的ESX 虚拟平台，其虚拟机存放的存储（LUN）满了，导致了数台虚拟机异常，而其中有一台是客户的生产数据库，数据较为关键。</p>
+<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>端午假期前最后一天，人人都期待着小长假的到来，所以心情轻松。晚上十点的时候，正准备冲凉休息，这时一个陌生的电话打了过来。对方以急促的语气告诉我，他是公司的项目经理，客户那边因为使用VMWARE的ESX 虚拟平台，其虚拟机存放的存储（LUN）满了，导致了数台虚拟机异常，而其中有一台是客户的生产数据库，数据较为关键。</p>
 <p>现在客户已经给存储扩容，看起来数据库是启动了，但是应用始终连不上，需要我远程帮忙看看。听到这，心想，既然数据库已经启动，应该不会有什么问题，便欣然接受，远程上去检查数据库的状态。</p>
 <p>在这里先交待一下客户环境：<br>客户使用的是VMWARE ESX虚拟化环境，这套系统是采用linux HA高可用结构；两节点共享磁盘VMDK200GB（位于LUN11上）因为底层存储爆满，而导致IO写入丢失，使部分目录损坏。</p>
 <p>数据库层面先说几个奇怪的地方，当前数据库运行在二节点：<br>Thu Mar 09 15:54:32 2017<br>Shutting down archive processes<br>Archiving is disabled<br>Archive process shutdown avoided: 0 active<br>Thread 1 closed at log sequence 161<br>Successful close of redo thread 1<br>Completed: ALTER DATABASE CLOSE NORMAL</p>
@@ -429,7 +429,7 @@
 <p>上述的报错大意是，出现大量的数据逻辑坏块，块检查时，出现各种ORA-600错误，进行exp和expdp也直接报错退出，执行RMAN直接将库宕机，这个应该是因为控制文件损坏所致的。因为RMAN需要读取控制文件的相关信息才能启动。 同时也理解了，因为控制文件的异常，而导致了数据库在open时，还一直需要使用3.9日的redolog.<br><img src="http://odh3pyi7v.bkt.clouddn.com/rman_error1.jpg" alt=""></p>
 <p>数据库宕机后，马上对所有的数据文件进行了DBV的检查，幸好数据文件不多，只有9个，数据量也不大，一百多G的分配空间。DBV没有任何的坏块，包括system表空间，这是因为dbv是检查不出逻辑损坏的。使用fsck对存储挂载点进行修复，修复完后连控制文件都不见了，符合猜想，幸好数据文件FSCK后都还在，并且DBV没有坏块。</p>
 <p>客户只有故障当天中午的全备，归档目录下的所有归档日志丢失。如果从备份恢复，只能恢复到中午的27日中午，从中午到晚上的数据必然会丢失。因为是小长假前的工作日，客户大部分的工作在27日下午进行，下班后，数据库才没什么数据变化，晚上的数据没有，客户可以接受，但丢失下午的数据，客户是不能接受的。</p>
-<p>#尝试恢复<br>既然客户不允许丢数据，那只有华山一条路，想办法去修复前面那一堆的ORA-600了。在做之前，我们还是要养成一个良好的习惯，做这些异常恢复前，一定要保护好现场，否则自己就没有回退的余地了。所以我们先划出了一个新的目录，把数据库的数据文件与redo log都复制到新的目录，以防万一。</p>
+<h1 id="尝试恢复"><a href="#尝试恢复" class="headerlink" title="尝试恢复"></a>尝试恢复</h1><p>既然客户不允许丢数据，那只有华山一条路，想办法去修复前面那一堆的ORA-600了。在做之前，我们还是要养成一个良好的习惯，做这些异常恢复前，一定要保护好现场，否则自己就没有回退的余地了。所以我们先划出了一个新的目录，把数据库的数据文件与redo log都复制到新的目录，以防万一。</p>
 <p>首先尝试解决2662的问题，按照常规的方法，都说是scn的问题，但仔细想想，实际上是库用损坏的控制文件打开，其SCN使用的是seq 161的redolog，所以必然与当前的数据文件scn不一致。理解了这一点，重建控制文件应该就能解决。</p>
 <p>因为缺少了控制文件，所以无法使用alter database backup controlfile to trace来获得控制文件的内容，当然我们也可以从备份中恢复，但这次，我直接从alert.log里获取到相关的信息，直接编写脚本重建了。重建后open resetlog 报<br><code><pre><br>Sun May 28 02:35:32 2017<br>SMON: enabling cache recovery<br>Errors in file /oracle/app/oracle/diag/rdbms/ecology/ecology/trace/ecology_ora_8020.trc  (incident=189655):<br>ORA-00600: internal error code, arguments: [kdsgrp1], [], [], [], [], [], [], [], [], [], [], []</pre></code></p>
 <p></p>
@@ -444,12 +444,11 @@
 <p>或者有些读者想到，能不能试试用终级杀器DUL呢？这种情况下，DUL能好用吗？</p>
 <p>我们也使用了DUL去尝试，但因为system表空间的user$和obj$等基表有问题，dul一样扫描不出用户的相关对象。也曾想过跳过system表空间，但没有了数据字典，就算抽出来数据，也只是一堆无意义的记录，对客户来说，没有什么意义。</p>
 <p>看起来真的没有办法，只能让客户丢失半天数据了？？</p>
-<p>#柳暗花明</p>
-<p>折腾了十几个小时，加上没有得到好的休息，脑袋都晕乎乎的，决定到楼下买杯咖啡透透气。外面，帝都正阳光灿烂，鸟语花香，正值假期，金融区这一块反而人丁稀少。园区里的园丁，正在辛勤地给树苗进行嫁接。望着这些勤劳的背影，忽然灵光闪动，能不能先将备份恢复出来，然后将恢复出来的system表空间移花接木到损坏的数据库呢？损坏的数据库不是只有system有问题吗？数据文件暂时不知道有没有问题，但至少解决了system表空间找不到用户数据的问题。</p>
+<h1 id="柳暗花明"><a href="#柳暗花明" class="headerlink" title="柳暗花明"></a>柳暗花明</h1><p>折腾了十几个小时，加上没有得到好的休息，脑袋都晕乎乎的，决定到楼下买杯咖啡透透气。外面，帝都正阳光灿烂，鸟语花香，正值假期，金融区这一块反而人丁稀少。园区里的园丁，正在辛勤地给树苗进行嫁接。望着这些勤劳的背影，忽然灵光闪动，能不能先将备份恢复出来，然后将恢复出来的system表空间移花接木到损坏的数据库呢？损坏的数据库不是只有system有问题吗？数据文件暂时不知道有没有问题，但至少解决了system表空间找不到用户数据的问题。</p>
 <p>说干就干，马上冲上楼，与系统工程师把新的环境搭建起来，把备份恢复到新环境，数据也推进至备份的时间点27日中午的十二点。然后把系统表空间复制到旧的环境，有点常识都知道，这样复制过来并不能直接使用的，还需要使用BBED修改system的头部SCN,使其与其他数据文件的相一致。在这里就不一一细述了，修改后，重建控制文件，非常幸运的又重新把库打开了。<br><img src="http://odh3pyi7v.bkt.clouddn.com/open2.jpg" alt=""></p>
 <p>看到上图终于出现了用户的数据，并且是12500个，与我们从备份恢复出来的对象数是一致的。当然虽然数据库成功打开了，但是后台还是一堆的报错，赶紧把用户的数据导出来，非常幸运的是，用户数据只有七张表导出报错，这七张表都是含有lob字段的，经客户确认，属于非关键表，可以允许丢一小部分数据，所以我们就使用了RMAN备份中的表代替。</p>
 <p>经过详细的数据比对，27日下午操作的数据都被挽救回来了，至此，经过将近二十个小时折腾，终于把数据库恢复到宕机前的数据状态，最大程度的挽救了数据，减少了数据的丢失。</p>
-<p>#故事让我们学到什么？<br>对于将ORACLE生产环境运行在ESX虚拟化上，相信有非常多的客户是这样做的，并且有很多客户太过信任vmware的snapshot机制，认为对操作系统做好快照，做好虚拟机的整机备份就不会有问题了，但是如果发生类似于这个故事的场景，虚拟机的备份，肯定是会丢失数据的。如昨晚做了虚拟机的备份，但今天下午七点时，数据库挂了，就只能恢复到昨晚虚拟机备份的状态。</p>
+<h1 id="故事让我们学到什么？"><a href="#故事让我们学到什么？" class="headerlink" title="故事让我们学到什么？"></a>故事让我们学到什么？</h1><p>对于将ORACLE生产环境运行在ESX虚拟化上，相信有非常多的客户是这样做的，并且有很多客户太过信任vmware的snapshot机制，认为对操作系统做好快照，做好虚拟机的整机备份就不会有问题了，但是如果发生类似于这个故事的场景，虚拟机的备份，肯定是会丢失数据的。如昨晚做了虚拟机的备份，但今天下午七点时，数据库挂了，就只能恢复到昨晚虚拟机备份的状态。</p>
 <p>对于这个故事，幸运的是客户使用的是数据库层面的备份，并且用户数据文件没有损坏，否则也同样会丢失数据，对于生产系统，强烈建议为其配置dataguard灾备环境，如果配置了DG，类似于这样的场景，就不会那么麻烦了，直接切换到dg环境即可。</p>
 
           
@@ -618,7 +617,7 @@
 <p>另外的经典错误：<br>ERROR:<br>ORA-600 [2662] [a] [c] [d] [e]</p>
 <p>也是需要推进SCN解决  </p>
 <p>在这里，总结每一种不同系统推进的方法，方便以后直接查阅</p>
-<p>##SCN小知识<br>scn是由scn base及scn wrap构成的，当scn base达到一定程度，scn wrap则会递增，一般情况下scn wrap是0，不会变化<br>scn base及scn wrap也是数据块中的数据结构，可见scn base是4个字节，而scn wrap是2个字节<br>  也就是说scn base要用4个字节用完，scn wrap就会递增<br>  依理推理，4个字节为 power(2,32),也就是达到这个数据时，scn base就会归0，scn wrap递增1</p>
+<h2 id="SCN小知识"><a href="#SCN小知识" class="headerlink" title="SCN小知识"></a>SCN小知识</h2><p>scn是由scn base及scn wrap构成的，当scn base达到一定程度，scn wrap则会递增，一般情况下scn wrap是0，不会变化<br>scn base及scn wrap也是数据块中的数据结构，可见scn base是4个字节，而scn wrap是2个字节<br>  也就是说scn base要用4个字节用完，scn wrap就会递增<br>  依理推理，4个字节为 power(2,32),也就是达到这个数据时，scn base就会归0，scn wrap递增1</p>
 <p>计算公式：<br>(SCN_WRP * 4294967296) + SCN_BAS should give us the SCN in the number format</p>
 <p>举例<br><code><pre><br>SCN: 14441583156<br>15:12:29 sys@DCNPOS5G&gt; select dbms_flashback.get_system_change_number a from dual;<br>  14441583156<br>Elapsed: 00:00:00.00</pre></code></p>
 <p>select to_char(14441583156,’xxxxxxxxxxx’) from dual;<br>  35cc91234<br>计算：<br>SYS@PROD2&gt;select 14441583156/4294967296 from dual;<br>            3.3624431</p>
@@ -627,11 +626,11 @@
 <p>其在文件头中的位置如下（如果需要单独修改某一个数据文件，SCN只需要修改这两个地方)</p>
 <p><code><pre><br>BBED&gt; p kcvfh<br>   struct kcvfhckp, 36 bytes                @484<br>      struct kcvcpscn, 8 bytes              @484<br>         ub4 kscnbas                        @484      0x028f5c58  –scn base<br>         ub2 kscnwrp                        @488      0x0000      –scn wrap</pre></code></p>
 <p></p>
-<p>##推进SCN的方法<br>1、使用oredebug poke (本文主要讲这一种）  </p>
+<h1 id="推进SCN的方法"><a href="#推进SCN的方法" class="headerlink" title="推进SCN的方法"></a>推进SCN的方法</h1><p>1、使用oredebug poke (本文主要讲这一种）  </p>
 <p>2、alter session set events ‘10015 trace name adjust_scn level 1’; （10015 本身仅仅是一个事件， 它在当smon做transaction recovery时被触发，实际造成scn 增长的是 adjust_scn 这个事件；是指 在触发10015 事件时 做adjust_scn 这个action 调整scn ）</p>
 <p>3、利用alter system set “_MINIMUM_GIGA_SCN”=6 scope=spfile;<br>_MINIMUM_GIGA_SCN推进SCN，1代表2的30次方，值为1073741824，如你希望将SCN推进至<br>6442451243左右，即将上述参数设为6</p>
 <p>上述方法各有优缺点，但在11.2.0.3以上的版本，使用poke的方法更方便快捷</p>
-<p>##oradebug poke说明<br>oradebug poke可以推进SCN，分为在数据库OPEN及MOUNT皆可以<br>oradebug setmypid<br>oradebug DUMPvar SGA kcsgscn<em>     （获取当前内存中的scn)<br>但是一般我们只会在mount的时候使用,在mount时，oradebug DUMPvar SGA kcsgscn</em>得到的值会全是0，这是因为数据库没有打开。</p>
+<h2 id="oradebug-poke说明"><a href="#oradebug-poke说明" class="headerlink" title="oradebug poke说明"></a>oradebug poke说明</h2><p>oradebug poke可以推进SCN，分为在数据库OPEN及MOUNT皆可以<br>oradebug setmypid<br>oradebug DUMPvar SGA kcsgscn<em>     （获取当前内存中的scn)<br>但是一般我们只会在mount的时候使用,在mount时，oradebug DUMPvar SGA kcsgscn</em>得到的值会全是0，这是因为数据库没有打开。</p>
 <p>查看某一个地址的当前值可以使用oradebug peek 0x3497DE1C 300</p>
 <p><strong>另外要注意，使用oradebug poke进行SCN递增，没有高低字节转换，直接to_char出来的值，直接加0x就可以,AIX的加法，与LINUX不同，32位与64位的增加方法也不同</strong></p>
 <p>此文将各种常见系统的推进方法做了记录，方便出现问题时对号入座</p>
@@ -658,8 +657,7 @@ SQL> select distinct CHECKPOINT_CHANGE# from v$datafile_header;
                  5080543
 </code></pre>
 
-<p>#2 linux 32位</p>
-<p>改这个就不能按照64位的方法去改了，直接报错，看下面的</p>
+<h1 id="2、linux-32位"><a href="#2、linux-32位" class="headerlink" title="2、linux 32位"></a>2、linux 32位</h1><p>改这个就不能按照64位的方法去改了，直接报错，看下面的</p>
 <pre><code>
 SYS@PROD2>select distinct CHECKPOINT_CHANGE# from v$datafile_header;
 
@@ -764,7 +762,7 @@ SYS@PROD2>
 </code></pre>
 的确推进了，查看某一个地址的当前值可以使用oradebug peek 0x3497DE1C 300
 
-#3、winddows 7 64位
+# 3、winddows 7 64位
 
 这个与linux 64位没啥区别
 <pre><code>
@@ -783,8 +781,7 @@ kcslf kcsgscn_ [0049C0950, 0049C0980) = 001DE000 00000000 00000000 00000000 0000
 SQL> alter database open;
 </code></pre>
 
-<p>#4、solaris 10 sparc</p>
-<p>大端序<br>前4字节表示SCN WRAP:00000000<br>5～8字节表示SCN BASE:0002FB37</p>
+<h1 id="4、solaris-10-sparc"><a href="#4、solaris-10-sparc" class="headerlink" title="4、solaris 10 sparc"></a>4、solaris 10 sparc</h1><p>大端序<br>前4字节表示SCN WRAP:00000000<br>5～8字节表示SCN BASE:0002FB37</p>
 <pre><code>
 
 SQL> oradebug dumpvar sga kcsgscn_
@@ -847,7 +844,7 @@ AFTER:  [380016528, 380016530) = 00000001 0003C482
 </code></pre>
 
 <p>本测试说明大字节序64位系统，语法<br>oradebug poke 地址  8  SCN号</p>
-<p>#5、 AIX 64位<br>这个也是大字节序，与SOLARIS  64位没什么区别，语法也是<br>oradebug poke 地址  8  SCN号</p>
+<h1 id="5、-AIX-64位"><a href="#5、-AIX-64位" class="headerlink" title="5、 AIX 64位"></a>5、 AIX 64位</h1><p>这个也是大字节序，与SOLARIS  64位没什么区别，语法也是<br>oradebug poke 地址  8  SCN号</p>
 <pre><code>
 
 15:12:29 sys@DCNPOS5G> select dbms_flashback.get_system_change_number a from dual;
@@ -873,7 +870,7 @@ kcslf kcsgscn_ [700000000019B70, 700000000019BA0) = 00000003 5CC91234 00000000 0
 </code></pre>
 
 
-<p>#总结<br>推进SCN，是万不得已的操作，推进的过程往往需要结合加入其他隐含参数，重建控制文件的动作，所以具体问题具体分析。但是对于SCN的相关问题，并没有想像中复杂，需要修改的地方就那么几个地方，细心加耐心，保证方向正确，肯定能把库拉起来。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>推进SCN，是万不得已的操作，推进的过程往往需要结合加入其他隐含参数，重建控制文件的动作，所以具体问题具体分析。但是对于SCN的相关问题，并没有想像中复杂，需要修改的地方就那么几个地方，细心加耐心，保证方向正确，肯定能把库拉起来。</p>
 
           
         
