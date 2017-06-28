@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Oracle,Troubleshoting," />
+  <meta name="keywords" content="oracle,troubleshooting," />
 
 
 
@@ -88,26 +88,29 @@
 
 <meta name="description" content="版本声明：本文为tyoracle.com原创，如需转发，无需经我同意，但必须要注明来自于tyoracle.com
 
-背景最近一直忙，所以没有大量的输入，没有输入，当然是没有输出。只有零零散散的一些工作经验。没有时间去将期整理成一个完整的案例。
-这周先把最近处理的一个 CSSD不能启动的问题写下来与大家分享。
-在一个下着毛毛细雨的南方的凌晨，窗外暗黄的马路灯光下，可以清晰地照出雨水落下的痕迹。而我">
+前言最近在看一些关于parallel的相关ppt，计划写一定这方面的东西，这些都是比较基础的东西，但是需要概念清晰。并行执行是通过将任务分解成更小的子任务来加速操作的常用方法。
+那我们为什么需要使用并行呢？
+假设，我们需要计算停在一条马路上汽车有多少辆，我们可以一个人从头到尾，慢慢">
 <meta property="og:type" content="article">
-<meta property="og:title" content="CSSD不能启动的分析思路">
-<meta property="og:url" content="http://tyoracle.com/2017/03/11/CSSD不能启动的分析思路/index.html">
+<meta property="og:title" content="ORACLE的并行概念">
+<meta property="og:url" content="http://tyoracle.com/2017/06/28/ORACLE的并行概念/index.html">
 <meta property="og:site_name" content="IT 职业生涯规划">
 <meta property="og:description" content="版本声明：本文为tyoracle.com原创，如需转发，无需经我同意，但必须要注明来自于tyoracle.com
 
-背景最近一直忙，所以没有大量的输入，没有输入，当然是没有输出。只有零零散散的一些工作经验。没有时间去将期整理成一个完整的案例。
-这周先把最近处理的一个 CSSD不能启动的问题写下来与大家分享。
-在一个下着毛毛细雨的南方的凌晨，窗外暗黄的马路灯光下，可以清晰地照出雨水落下的痕迹。而我">
-<meta property="og:updated_time" content="2017-03-16T08:27:21.014Z">
+前言最近在看一些关于parallel的相关ppt，计划写一定这方面的东西，这些都是比较基础的东西，但是需要概念清晰。并行执行是通过将任务分解成更小的子任务来加速操作的常用方法。
+那我们为什么需要使用并行呢？
+假设，我们需要计算停在一条马路上汽车有多少辆，我们可以一个人从头到尾，慢慢">
+<meta property="og:image" content="http://odh3pyi7v.bkt.clouddn.com/parallel_1.png">
+<meta property="og:image" content="http://odh3pyi7v.bkt.clouddn.com/parallel_2.png">
+<meta property="og:updated_time" content="2017-06-28T07:47:00.376Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="CSSD不能启动的分析思路">
+<meta name="twitter:title" content="ORACLE的并行概念">
 <meta name="twitter:description" content="版本声明：本文为tyoracle.com原创，如需转发，无需经我同意，但必须要注明来自于tyoracle.com
 
-背景最近一直忙，所以没有大量的输入，没有输入，当然是没有输出。只有零零散散的一些工作经验。没有时间去将期整理成一个完整的案例。
-这周先把最近处理的一个 CSSD不能启动的问题写下来与大家分享。
-在一个下着毛毛细雨的南方的凌晨，窗外暗黄的马路灯光下，可以清晰地照出雨水落下的痕迹。而我">
+前言最近在看一些关于parallel的相关ppt，计划写一定这方面的东西，这些都是比较基础的东西，但是需要概念清晰。并行执行是通过将任务分解成更小的子任务来加速操作的常用方法。
+那我们为什么需要使用并行呢？
+假设，我们需要计算停在一条马路上汽车有多少辆，我们可以一个人从头到尾，慢慢">
+<meta name="twitter:image" content="http://odh3pyi7v.bkt.clouddn.com/parallel_1.png">
 
 
 
@@ -135,13 +138,13 @@
 
 
 
-  <link rel="canonical" href="http://tyoracle.com/2017/03/11/CSSD不能启动的分析思路/"/>
+  <link rel="canonical" href="http://tyoracle.com/2017/06/28/ORACLE的并行概念/"/>
 
 
 
 
 
-  <title> CSSD不能启动的分析思路 | IT 职业生涯规划 </title>
+  <title> ORACLE的并行概念 | IT 职业生涯规划 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -303,7 +306,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://tyoracle.com/2017/03/11/CSSD不能启动的分析思路/">
+  <link itemprop="mainEntityOfPage" href="http://tyoracle.com/2017/06/28/ORACLE的并行概念/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="TY">
@@ -327,7 +330,7 @@
             
             
               
-                CSSD不能启动的分析思路
+                ORACLE的并行概念
               
             
           </h1>
@@ -342,8 +345,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-11T00:00:00+08:00">
-                2017-03-11
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-06-28T00:00:00+08:00">
+                2017-06-28
               </time>
             
 
@@ -365,8 +368,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Oracle-Troubleshoting/" itemprop="url" rel="index">
-                    <span itemprop="name">Oracle,Troubleshoting</span>
+                  <a href="/categories/oracle-troubleshooting/" itemprop="url" rel="index">
+                    <span itemprop="name">oracle,troubleshooting</span>
                   </a>
                 </span>
 
@@ -383,8 +386,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2017/03/11/CSSD不能启动的分析思路/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/03/11/CSSD不能启动的分析思路/" itemprop="commentCount"></span>
+                <a href="/2017/06/28/ORACLE的并行概念/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/06/28/ORACLE的并行概念/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -417,127 +420,36 @@
         <blockquote>
 <p>版本声明：本文为tyoracle.com原创，如需转发，无需经我同意，但必须要注明来自于tyoracle.com</p>
 </blockquote>
-<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>最近一直忙，所以没有大量的输入，没有输入，当然是没有输出。只有零零散散的一些工作经验。没有时间去将期整理成一个完整的案例。</p>
-<p>这周先把最近处理的一个 CSSD不能启动的问题写下来与大家分享。</p>
-<p>在一个下着毛毛细雨的南方的凌晨，窗外暗黄的马路灯光下，可以清晰地照出雨水落下的痕迹。而我身后的办公室才灯火通明，七八个人正低着头啪啪敲着键盘准备着今晚的变更。忽然，听到有人在后面叫我，有套核心库的CRS启动不了。</p>
-<p>我很奇怪，今晚只是版本发布加正常运维的主机重启，对数据库层面没有任何的操作。我今晚过来只是负责保障，怎么会起不来呢？</p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>最近在看一些关于parallel的相关ppt，计划写一定这方面的东西，这些都是比较基础的东西，但是需要概念清晰。并行执行是通过将任务分解成更小的子任务来加速操作的常用方法。</p>
+<p>那我们为什么需要使用并行呢？</p>
+<p>假设，我们需要计算停在一条马路上汽车有多少辆，我们可以一个人从头到尾，慢慢数，直至清点完，你也可以请你的一个朋友帮忙，让他从另一边数过来，直至你们两个在路中间相遇。假设你和你朋友的清算速度一样，这样就相当于节省了原来的一半时间，这就是并行的好处。</p>
+<p>在ORACLE里有什么操作可以使用并行：</p>
+<ul>
+<li>Access methods. For example, table scans, index full scans, and partitioned index range scans.</li>
+<li>Join methods. For example, nested loop, sort merge, hash, and star transformation.</li>
+<li>DDL statements. CREATE TABLE AS SELECT, CREATE INDEX, REBUILD INDEX, REBUILD INDEX PARTITION, and MOVE SPLIT COALESCE PARTITION</li>
+<li>DML statements. For example, INSERT AS SELECT, updates, deletes, and MERGE operations.</li>
+<li>其他杂项的操作. For example, GROUP BY, NOT IN, SELECT DISTINCT, UNION, UNION ALL, CUBE, and ROLLUP, as well as aggregate and table functions.</li>
+</ul>
+<p>通常并行大多数是在数据仓库环境中使用，因为数仓都是大数据，大的批处理。有时在OLTP环境中，使用适当的并行，如批处理，并行DDL，也能获得不错的效果。</p>
 <a id="more"></a>
-<h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><p>既然出问题了，我也立刻转身投入到身后的战斗队伍当中。先看看环境配置情况</p>
-<blockquote>
-<p> AIX 6.1 + ORACLE 11.2.0.3 rac + emc 存储  + ASM + 多路径管理软件</p>
-</blockquote>
-<p>两个节点分别重启后，节点一的CRS可以顺利启动，并且数据库实例已经启动，而节点二重启后，CRS的启动一直卡在cssd无法启动的过程。先看看ocssd.log里的报错信息</p>
-<pre><code>
-
-2017-02-24 17:21:41.776: [    CSSD][17]clssnmvDiskVerify: Successful discovery of 3 disks
-2017-02-24 17:21:41.776: [    CSSD][17]clssnmCompleteInitVFDiscovery: Completing initial voting file discovery
-2017-02-24 17:21:41.776: [    CSSD][17]clssnmCompleteVFDiscovery: Completing voting file discovery
-2017-02-24 17:21:41.777: [    CSSD][17]clssnmvDiskStateChange: state from discovered to deconfigured disk /dev/rdsk/emcpower15
-2017-02-24 17:21:41.777: [    CSSD][17]clssnmvDiskStateChange: state from discovered to deconfigured disk /dev/rdsk/emcpower14
-2017-02-24 17:21:41.777: [    CSSD][17]clssnmvDiskStateChange: state from discovered to deconfigured disk /dev/rdsk/emcpower13
-2017-02-24 17:21:41.777: [    CSSD][17]clssnmvVerifyCommittedConfigVFs: Insufficient voting files found, found 0 of 3 configured, needed 2 voting files
-2017-02-24 17:21:41.778: [    CSSD][17](:CSSNM00020:)clssnmvVerifyCommittedConfigVFs: voting file 0, id ae6026ad-91804f21-bfdc9227-aced3ee1 not found
-2017-02-24 17:21:41.778: [    CSSD][17](:CSSNM00020:)clssnmvVerifyCommittedConfigVFs: voting file 1, id b848bcd9-24684fa7-bfadc40b-506de4ab not found
-2017-02-24 17:21:41.778: [    CSSD][17](:CSSNM00020:)clssnmvVerifyCommittedConfigVFs: voting file 2, id 2694f601-b61d4fbb-bfee0a0c-9a32246e not found
-2017-02-24 17:21:41.779: [    CSSD][17]ASSERT clssnm1.c 3375
-2017-02-24 17:21:41.779: [    CSSD][17](:CSSNM00021:)clssnmCompleteVFDiscovery: Found 0 voting files, but 2 are required.  Terminating due to insufficient configured voting files
-2017-02-24 17:21:41.779: [    CSSD][17]###################################
-2017-02-24 17:21:41.779: [    CSSD][17]clssscExit: CSSD aborting from thread clssnmvDDiscThread
-2017-02-24 17:21:41.779: [    CSSD][17]###################################
-
-</code></pre>
-
-<p>日志里报因缺少足够的votedisk磁盘而无法启动cssd进程。大家知道，11.2的CRS启动过程，是先去获取gpnp profile，然后根据先根据gpnp 的profile.xml里配置，找到对应的votedisk的盘，然后根据votedisk 与ocr，网络的信息，才能启动CSSD。基于此，我首先用 gpnptool get  查一下gpnp profile的配置是否有问题，发现asm_diskstring都是正常的，指向的磁盘搜索路径是正常的，并且gpnp profile这个文件已经几年没有修改过了。</p>
-<p>因为只有一边节点可以访问，另一边节点不可访问，当时也怀疑是AIX下的磁盘共享锁没有打开，使用以下命令进行检查 </p>
-<pre><code># for i in `lspv | grep power | awk &apos;{print $1}&apos;`;do echo $i; lsattr -El $i | grep reserve;done;
-注意：reserve_policy的值是否为no_reserve
-</code></pre><p>检查发现这个值是正常的，已经是no_reserver.</p>
-<p>接着检查votedisk<br>crsctl query css votedisk 结果正常</p>
-<p>但是在对比两个节点的kfod,发现有问题的节点OCR的确缺少了两块盘，并且报权限不足</p>
-<p>问题节点扫描结果：</p>
-<pre><code>$ kfod disk=all status=true
---------------------------------------------------------------------------------
- Disk  Size HeaderPath User Group   
-================================================================================
-   1:   2048 Mb MEMBER/dev/rhdiskpower1grid asmadmin
-   2:  51200 Mb MEMBER/dev/rhdiskpower10   grid asmadmin
-   3:   2048 Mb MEMBER/dev/rhdiskpower3grid asmadmin
-   4:  51200 Mb MEMBER/dev/rhdiskpower6grid asmadmin
-   5:  51200 Mb MEMBER/dev/rhdiskpower7grid asmadmin
-   6:  51200 Mb MEMBER/dev/rhdiskpower8grid asmadmin
-KFOD-00301: Unable to contact Cluster Synchronization Services (CSS). Return code 2 from kgxgncin.
-KFOD-00311: Error scanning device /dev/rhdiskpower9
-KFOD-00311: Error scanning device /dev/rhdiskpower5
-KFOD-00311: Error scanning device /dev/rhdiskpower4
-KFOD-00311: Error scanning device /dev/rhdiskpower2
-KFOD-00311: Error scanning device /dev/rhdiskpower14
-ORA-15025: could not open disk “/dev/rhdiskpower14”
-IBM AIX RISC System/6000 Error: 13: Permission denied
-Additional information: 42
-Additional information: 270656976
-Additional information: 270657872
-KFOD-00311: Error scanning device /dev/rhdiskpower13
-ORA-15025: could not open disk “/dev/rhdiskpower13”
-IBM AIX RISC System/6000 Error: 13: Permission denied
-Additional information: 42
-Additional information: 270656976
-Additional information: 270657872
-</code></pre><p>报KFOD-00311，系统层的log与多路径管理软件没有任何报错，并且一直报 Permission denied，真是奇了怪。<br>我在想，既然读取路径正确，共享锁打开，权限设置正确，那会不会是因为设备号重复导致的呢？接下来检查设备号，看是否存在着问题。</p>
-<p>cat cssd.log |grep Duplicate<br>如果发现有Duplicate ，即代表设备好有重复的<br>确认主设备号与备设备号是否有冲突<br>ls -alt /dev/rhdiskpower1<br>看 43,1  (前面43是指主设备号，1是备设备号，属性应该是grid:asmadmin 660)<br>如果有冲突，可以按以下的方式处理：</p>
-<pre><code>系统管理员删除重复的设备号，然后重新生成新设备号，然后再更改属性
-# chmod 660 /dev/raw/raw[1-2]
-# chown grid:asmadmin /dev/raw/raw[1-2]
-</code></pre><p>可惜的是，日志里没有报Duplicate ，系统层面也没有设备号重复。</p>
-<p>使用dd进行了报有问题的两块votedisk的磁盘头进行读出，发现在二节点上读出的内容与节点一的相同</p>
-<pre><code>dd if=/dev/rhdiskpower0 of=/dev/null bs=4096 count=1000
-</code></pre><p>而使用kfod则找不到有问题的磁盘</p>
-<pre><code>$ kfod asm_diskstring=&apos;&apos;/dev/rdsk/*&apos; disks=all
-or
-$ kfod asm_diskstring=&apos;dev/oracleasm/disks/*&apos; disks=all
-</code></pre><p>墙上的钟的秒针嘀嗒嘀嗒地响，抬头已经是清晨5点了，八点需要恢复业务，大家都急得热窝上的蚂蚁，虽然幸好还有一个节点可以使用，对业务影响不是太大，但客户还是说，六点前必须给出解决方案。<br>客户就是上帝，到此，基本上毫无头绪，权限，系统层磁盘共享锁，dd磁盘内容，都没有问题，但CRS死活就是认不到那两块盘。</p>
-<p>一个晚上没有睡觉，脑袋已经变得晕晕沉沉的，起身去冲了杯咖啡，一饮而尽后，决定重新理一下，收集所有的信息，重新看看那里出现了问题</p>
-<pre><code>
-
-
-
-1. powermt display dev=all > luns.out
-
-2. 以独占模式启动二节点的crs，让其不访问asm
- crsctl start crs -excl -nocrs 
-
-3. 在grid用户下使用sysasm进行asm实例的启动，并且对crsdg mount的过程进行trace
- sqlplus 
-spool mount.out
-set time on
-select spid, s.program from v$process p, v$session s where paddr = addr and 
-s.username = 'SYS' and s.program like '%sqlplus%';
-.
-From another xterm, start a truss on spid from above sql o/p-
-truss -aefldDE -o /tmp/mount_dskstr_orig.truss -p <spid>
-.
-back on the sqlplus session, 
-run 'alter diskgroup mount DG'
-
-4.  truss -aefldDE -o /tmp/kfod.truss kfod asm_diskstring=/dev/rdsk/* status=true disks=all op=disks
-
-
-</spid></code></pre>
-
-<p>通过上述的信息收集（因为客户的信息无法取出来，所以无法帖在这里），仔细分析后发现，确定是操作系统层面读取不了有问题的两个磁盘。</p>
-<p>分析powermt display dev=all仔细对比Logical device ID没发现两个节点间的异常。</p>
-<p>在解决无果后，只能求助于google和metalink，查阅了无数与RAC，OCSSd相关文档，都无法解决我们当前的问题。后来灵机一闪，这会不会是EMC的concurrent访问出现了问题呢？</p>
-<p>使用powerpath concurrent lock在google上进行搜索，翻了数十个文档后终于有所收获，原来EMC为了保证系统crash后对磁盘的访问，开发了一个二进制代码emcpowerreset ，这个代码会在底层对EMC的盘加一个锁，与我们的现象有点相似。原文引述如下：</p>
-<blockquote>
-<p>EMC has developed a binary called emcpowerreset for removing disk reservations, held by PowerPath devices</p>
-</blockquote>
-<p>这个锁不同于系统层面的磁盘锁，是存储多路径管理上的一个锁，这个锁在操作系统层面和当前的powerpath日志中看不出来，为了解决问题，所以决定对这个锁重设一下。</p>
-<pre><code>/usr/lpp/EMC/Symmetrix/bin/emcpowerreset fscsiX hdiskpowerX 
-</code></pre><p>比较幸运，在重设后，使用</p>
-<pre><code>kfod asm_diskstring=&apos;&apos;/dev/rdsk/*&apos; disks=all
-</code></pre><p>可以顺利的把原来访问不了的磁盘扫描出来了。现场气氛一下热烈起来，马上进行拉CRS，起库，一切顺利，后面就不表了</p>
-<p>但是有点奇怪的是，这个锁是在系统异常关闭或crash时才会被加上，询问系统管理员说是正常关闭的，所以有些奇怪。更奇怪的是，这个锁的存在，在系统层面与存储层都查不到相关的信息，网上解决是因为当前的powerpath版本过低，在高版本才会记录相关的信息。</p>
-<p>但是HDS也有类似的磁盘锁，如果HDS存在磁盘锁，在有问题的节点是不能做dd的，而我们的环境是可以dd和kfed出磁盘的内容的。EMC的实现机制有点想不明白。</p>
-<p>非常抱歉未能在存储层面上找到根因，但本文主要还是想讲讲分析类似的cssd不能启动的思路，按照这样的思路，基本上都能找到cssd不能启动的原因。</p>
+<h2 id="producer和consumer-组"><a href="#producer和consumer-组" class="headerlink" title="producer和consumer 组"></a>producer和consumer 组</h2><p>今天先来解释一个简单的概念，关于<br>parallel执行计划里的producer和consumer</p>
+<p>这两个概念主要出现在执行计划里，简单的说明一下这两个概念</p>
+<p>producer：就是产生行的一组进程，所以叫产生者<br>consumer：这个与上一个producer进程相对应，就是将producer产生的行进行计算消耗掉，所以叫消费者</p>
+<p>通过这个执行计划可以非常的清晰看到</p>
+<p><img src="http://odh3pyi7v.bkt.clouddn.com/parallel_1.png" alt=""></p>
+<p>在这个执行计划中，CUSTOMERS和SALES这两个表作为PX进程的producer，产生并读取数据，然后发送给上一层，上一层，就是PX RECEIVE这一步，其接收数据，接收后，将数据进行HASH JOIN的操作，所以这一步被称为consumer 进程，因为其需要的数据是从producer里获取的。</p>
+<p>第一个PX的slave进程是 (Q1,00)，这个进程是并行读取CUSTOMERS，其产生的数据行发送给 slave set 2 (Q1,02),同理，SALES这个表，也是并行读取，返回给（Q1,02）</p>
+<p>可以看到，两个producer的NAME是: TQ10001,而consumer的NAME是：TQ10002</p>
+<h2 id="PX-的数量"><a href="#PX-的数量" class="headerlink" title="PX 的数量"></a>PX 的数量</h2><p>经常有人会问，为什么我开了4个并行，在v$px_session里却能看到8个并行子进程？这里需要解释一下，并行子进程是在并行SQL执行中并行执行工作的各个会话。PX服务器进程可以在OS级别上轻松识别，例如在Linux上它们是oracle进程的ORA_P<em>*</em>，如果是4个并行，你将会在操作系统上能看到8个这样的进程。</p>
+<p>而4个并行的4是指要求的并行度，即degree of parallelism (DOP),为什么会看到8个呢？上面不是解释过，一个并行操作，有producer和consumer 组吗？即有两个slave集，每个slave集按系统要求是4个并行，所以一个并行操作，就需要2倍的slave集进程了。</p>
+<p>即4个producers 和 4 个 consumers，一般来说，producers和consumers总是成对出现的，但也有特殊的情况，如果语句非常基本，只需一组PX服务器即可以并行完成整个语句。 例如，从客户端选择count（*）只需要一个PX slave集。</p>
+<p>有时也会出现另一种情况，发出的是并行的SQL，但是却没有以并行的方式运行，这是因为当前系统的并行会话已经达到了px_max_servers的值，或者px_max_servers是设了32，但是当前系统已经用了28，还只剩下4，但你的并行是4，并且有两个slave集，实际要求是8个进程，所以这个时候已经超过了32的并发了，你发出的语句，就只能以非并行的方式运行。  </p>
+<p>PARALLEL MAX SERVERS的默认值是：<br>PARALLEL MAX SERVERS=10∗cpu count∗parallels threads per cpu</p>
+<h2 id="监控px的运行"><a href="#监控px的运行" class="headerlink" title="监控px的运行"></a>监控px的运行</h2><p>可以通过查询v$px_process来获取当前系统的并行情况</p>
+<p><img src="http://odh3pyi7v.bkt.clouddn.com/parallel_2.png" alt=""></p>
+<p>也可以通过 v$px_session来查看某一个并行会话的情况，当然，我们也可以通过sql_monitor来更直观的查看到并行会话的执行情况。</p>
+<p>就先写到这，后面将详细说说如何去并行进行优化。</p>
 
       
     </div>
@@ -561,7 +473,7 @@ run 'alter diskgroup mount DG'
       
         <div class="post-tags">
           
-            <a href="/tags/Oracle-Troubleshoting/" rel="tag"># Oracle,Troubleshoting</a>
+            <a href="/tags/oracle-troubleshooting/" rel="tag"># oracle,troubleshooting</a>
           
         </div>
       
@@ -570,8 +482,8 @@ run 'alter diskgroup mount DG'
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/03/01/ORA-600_kcbzwfcro_2/" rel="next" title="ORA-600 [kcbzwfcro_2]">
-                <i class="fa fa-chevron-left"></i> ORA-600 [kcbzwfcro_2]
+              <a href="/2017/06/01/数据库恢复之移花接木/" rel="next" title="数据库恢复之移花接木">
+                <i class="fa fa-chevron-left"></i> 数据库恢复之移花接木
               </a>
             
           </div>
@@ -579,10 +491,6 @@ run 'alter diskgroup mount DG'
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/03/17/你看清自己的目标了吗/" rel="prev" title="你看清自己的目标了吗?">
-                你看清自己的目标了吗? <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -611,8 +519,8 @@ run 'alter diskgroup mount DG'
           
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2017/03/11/CSSD不能启动的分析思路/"
-           data-title="CSSD不能启动的分析思路" data-url="http://tyoracle.com/2017/03/11/CSSD不能启动的分析思路/">
+      <div class="ds-thread" data-thread-key="2017/06/28/ORACLE的并行概念/"
+           data-title="ORACLE的并行概念" data-url="http://tyoracle.com/2017/06/28/ORACLE的并行概念/">
       </div>
     
   </div>
@@ -750,7 +658,7 @@ run 'alter diskgroup mount DG'
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分析"><span class="nav-number">2.</span> <span class="nav-text">分析</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#producer和consumer-组"><span class="nav-number">2.</span> <span class="nav-text">producer和consumer 组</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PX-的数量"><span class="nav-number">3.</span> <span class="nav-text">PX 的数量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#监控px的运行"><span class="nav-number">4.</span> <span class="nav-text">监控px的运行</span></a></li></ol></div>
             
 
           </div>

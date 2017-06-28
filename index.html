@@ -292,6 +292,175 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://tyoracle.com/2017/06/28/ORACLE的并行概念/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="TY">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/weixin.png">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="IT 职业生涯规划">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="IT 职业生涯规划" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2017/06/28/ORACLE的并行概念/" itemprop="url">
+                  ORACLE的并行概念
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-06-28T00:00:00+08:00">
+                2017-06-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/oracle-troubleshooting/" itemprop="url" rel="index">
+                    <span itemprop="name">oracle,troubleshooting</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/06/28/ORACLE的并行概念/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/06/28/ORACLE的并行概念/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <blockquote>
+<p>版本声明：本文为tyoracle.com原创，如需转发，无需经我同意，但必须要注明来自于tyoracle.com</p>
+</blockquote>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>最近在看一些关于parallel的相关ppt，计划写一定这方面的东西，这些都是比较基础的东西，但是需要概念清晰。并行执行是通过将任务分解成更小的子任务来加速操作的常用方法。</p>
+<p>那我们为什么需要使用并行呢？</p>
+<p>假设，我们需要计算停在一条马路上汽车有多少辆，我们可以一个人从头到尾，慢慢数，直至清点完，你也可以请你的一个朋友帮忙，让他从另一边数过来，直至你们两个在路中间相遇。假设你和你朋友的清算速度一样，这样就相当于节省了原来的一半时间，这就是并行的好处。</p>
+<p>在ORACLE里有什么操作可以使用并行：</p>
+<ul>
+<li>Access methods. For example, table scans, index full scans, and partitioned index range scans.</li>
+<li>Join methods. For example, nested loop, sort merge, hash, and star transformation.</li>
+<li>DDL statements. CREATE TABLE AS SELECT, CREATE INDEX, REBUILD INDEX, REBUILD INDEX PARTITION, and MOVE SPLIT COALESCE PARTITION</li>
+<li>DML statements. For example, INSERT AS SELECT, updates, deletes, and MERGE operations.</li>
+<li>其他杂项的操作. For example, GROUP BY, NOT IN, SELECT DISTINCT, UNION, UNION ALL, CUBE, and ROLLUP, as well as aggregate and table functions.</li>
+</ul>
+<p>通常并行大多数是在数据仓库环境中使用，因为数仓都是大数据，大的批处理。有时在OLTP环境中，使用适当的并行，如批处理，并行DDL，也能获得不错的效果。</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/06/28/ORACLE的并行概念/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
   <link itemprop="mainEntityOfPage" href="http://tyoracle.com/2017/06/01/数据库恢复之移花接木/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -403,55 +572,18 @@
 
       
         
-          
-            <blockquote>
+          <blockquote>
 <p>版本声明：本文为tyoracle.com原创，如需转发，无需经我同意，但必须要注明来自于tyoracle.com</p>
 </blockquote>
 <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>端午假期前最后一天，人人都期待着小长假的到来，所以心情轻松。晚上十点的时候，正准备冲凉休息，这时一个陌生的电话打了过来。对方以急促的语气告诉我，他是公司的项目经理，客户那边因为使用VMWARE的ESX 虚拟平台，其虚拟机存放的存储（LUN）满了，导致了数台虚拟机异常，而其中有一台是客户的生产数据库，数据较为关键。</p>
 <p>现在客户已经给存储扩容，看起来数据库是启动了，但是应用始终连不上，需要我远程帮忙看看。听到这，心想，既然数据库已经启动，应该不会有什么问题，便欣然接受，远程上去检查数据库的状态。</p>
-<p>在这里先交待一下客户环境：<br>客户使用的是VMWARE ESX虚拟化环境，这套系统是采用linux HA高可用结构；两节点共享磁盘VMDK200GB（位于LUN11上）因为底层存储爆满，而导致IO写入丢失，使部分目录损坏。</p>
-<p>数据库层面先说几个奇怪的地方，当前数据库运行在二节点：<br>Thu Mar 09 15:54:32 2017<br>Shutting down archive processes<br>Archiving is disabled<br>Archive process shutdown avoided: 0 active<br>Thread 1 closed at log sequence 161<br>Successful close of redo thread 1<br>Completed: ALTER DATABASE CLOSE NORMAL</p>
-<blockquote>
-<p>注意log sequence 161 在3月9日时，已经在使用了。从那以后，数据库就切换到一节点上运行，所以二节点上的alert.log 一直没有日志</p>
-</blockquote>
-<p>Sat May 27 22:01:46 2017<br>ALTER DATABASE OPEN<br>Thread 1 opened at log sequence 161<br>  Current log# 2 seq# 161 mem# 0: /oradata/ecology/redo02a.log<br>  Current log# 2 seq# 161 mem# 1: /oradata/ecology/redo02b.log<br>Successful open of redo thread 1<br>MTTR advisory is disabled because FAST_START_MTTR_TARGET is not set<br>SMON: enabling cache recovery   </p>
-<blockquote>
-<p>奇怪的是，在5.27日数据库打开时，却继续打开3.9日的redo log </p>
-<p>然后日志里报出异常：   </p>
-</blockquote>
-<p><code><pre><br>Successfully allocated 7 recovery slaves<br>Using 20 overflow buffers per recovery slave<br>Thread 1 checkpoint: logseq 161, block 11707, scn 96010099<br>    on-disk rba: logseq 161, block 24434, scn 96024340<br>  start recovery at logseq 161, block 24434, scn 96024340<br>Logfile reuse: expected 161 found 563</pre></code></p>
-<p><em>*</em> 2017-05-28 00:28:16.503<br>Started resilvering redo thread 1 seq 161 blocks 24434-24475</p>
-<p><em>*</em> 2017-05-28 00:28:16.504<br>Completed resilvering redo thread 1 seq 161<br>Reuse of Online Log [Thr=1,Seq=161] detected!<br>Incident 107252 created, dump file: /oracle/app/oracle/diag/rdbms/ecology/ecology/incident/incdir_107252/ecology_ora_31494_i107252.trc<br>ORA-00600: internal error code, arguments: [kcratr_scan_rc], [4], [1], [161], [24476], [], [], [], [], [], [], []<br></p>
-<p>在这种状态下，数据库居然可以open，数据库说其需要161这个redolog，但是打开当前的redolog发现序号已经变成了563了，这种状态按道理，数据库不应该能被打开，因为redolog信息与控制文件记录不一致了。数据库启动时需要使用161这个redolog，很大程度是因为使用了不正确的控制文件进行启动。</p>
-<p>这样打开了必然会导致数据库底层信息紊乱，果然后台报了大量的ORA-00600,7445的核心错误，在此列举几个，在别的地方可没有机会一次看到这么多600 ：-）</p>
-<p><code><pre><br>ORA-00600: 内部错误代码, 参数: [2662], [0], [17376781], [0], [48090977], [4236865], [], [], [], [], [], []<br>ORA-00600: internal error code, arguments: [kcfrbd_3], [2], [95672], [1], [79360], [79360], [], [], [], [], [], []<br>ORA-00600: 内部错误代码, 参数: [kkpo_rcinfo_defstg:objnotfound], [31866], [], [], [], [], [], [], [], [], [], []<br>ORA-00600: 内部错误代码, 参数: [kdsgrp1], [], [], [], [], [], [], [], [], [], [], []<br>ORA-00600: 内部错误代码, 参数: [6002], [0], [0], [2], [125], [], [], [], [], [], [], []<br>ORA-00600: 内部错误代码, 参数: [ktecgsc:kcbz_objdchk], [0], [0], [1], [], [], [], [], [], [], [], []<br>ORA-00600: internal error code, arguments: [kewrose_1], [600], [ORA-00600: internal error code, arguments: [kdsgrp1], [], [], [], [], [], [], [], [], [], [], []<br>ORA-00600: 内部错误代码, 参数: [13013], [5001], [74], [4236437], [83], [4236437], [17], [], [], [], [], []<br>ORA-00600: 内部错误代码, 参数: [4097], [10], [28], [58026], [], [], [], [], [], [], [], []<br>ORA-00600: 内部错误代码, 参数: [kdifind:kcbz_objdchk], [0], [0], [1], [], [], [], [], [], [], [], []<br>ORA-00600: 内部错误代码, 参数: [ktspfpblk:kcbz_objdchk], [64], [63], [67], [], [], [], [], [], [], [], []<br>ORA-00600: internal error code, arguments: [kcratr_scan_rc], [4], [1], [161], [24476], [], [], [], [], [], [], []</pre></code></p>
-<p>ORA-07445: 出现异常错误: 核心转储 [kkdlavc()+191] [SIGSEGV] [ADDR:0x0] [PC:0x1A7B43B] [Address not mapped to object] []<br>ORA-07445: 出现异常错误: 核心转储 [pfrins()+216] [SIGSEGV] [ADDR:0x0] [PC:0x37A816C] [Address not mapped to object] []<br></p>
-<p>上述的报错大意是，出现大量的数据逻辑坏块，块检查时，出现各种ORA-600错误，进行exp和expdp也直接报错退出，执行RMAN直接将库宕机，这个应该是因为控制文件损坏所致的。因为RMAN需要读取控制文件的相关信息才能启动。 同时也理解了，因为控制文件的异常，而导致了数据库在open时，还一直需要使用3.9日的redolog.<br><img src="http://odh3pyi7v.bkt.clouddn.com/rman_error1.jpg" alt=""></p>
-<p>数据库宕机后，马上对所有的数据文件进行了DBV的检查，幸好数据文件不多，只有9个，数据量也不大，一百多G的分配空间。DBV没有任何的坏块，包括system表空间，这是因为dbv是检查不出逻辑损坏的。使用fsck对存储挂载点进行修复，修复完后连控制文件都不见了，符合猜想，幸好数据文件FSCK后都还在，并且DBV没有坏块。</p>
-<p>客户只有故障当天中午的全备，归档目录下的所有归档日志丢失。如果从备份恢复，只能恢复到中午的27日中午，从中午到晚上的数据必然会丢失。因为是小长假前的工作日，客户大部分的工作在27日下午进行，下班后，数据库才没什么数据变化，晚上的数据没有，客户可以接受，但丢失下午的数据，客户是不能接受的。</p>
-<h1 id="尝试恢复"><a href="#尝试恢复" class="headerlink" title="尝试恢复"></a>尝试恢复</h1><p>既然客户不允许丢数据，那只有华山一条路，想办法去修复前面那一堆的ORA-600了。在做之前，我们还是要养成一个良好的习惯，做这些异常恢复前，一定要保护好现场，否则自己就没有回退的余地了。所以我们先划出了一个新的目录，把数据库的数据文件与redo log都复制到新的目录，以防万一。</p>
-<p>首先尝试解决2662的问题，按照常规的方法，都说是scn的问题，但仔细想想，实际上是库用损坏的控制文件打开，其SCN使用的是seq 161的redolog，所以必然与当前的数据文件scn不一致。理解了这一点，重建控制文件应该就能解决。</p>
-<p>因为缺少了控制文件，所以无法使用alter database backup controlfile to trace来获得控制文件的内容，当然我们也可以从备份中恢复，但这次，我直接从alert.log里获取到相关的信息，直接编写脚本重建了。重建后open resetlog 报<br><code><pre><br>Sun May 28 02:35:32 2017<br>SMON: enabling cache recovery<br>Errors in file /oracle/app/oracle/diag/rdbms/ecology/ecology/trace/ecology_ora_8020.trc  (incident=189655):<br>ORA-00600: internal error code, arguments: [kdsgrp1], [], [], [], [], [], [], [], [], [], [], []</pre></code></p>
-<p></p>
-<p>kdsgrp1报错大概的意思是当数据库操作找不到预期行时，会抛出ora-600 [kdsgrp1]错误。 错误在内存中被命中，因此可能是仅内存错误或由磁盘损坏导致的错误。这种报错在我们这种场景下是正常的，可以想像，数据库发出一个IO，但是因为底层空间满了，这个IO无法写入，这个IO就会被丢弃，所以磁盘上的块出现不完整。</p>
-<p>检查这个trace,发现是与undo$相关，我们注意到这个报错是出现在打开数据库smon进行事务恢复时所出现的，当smon需要做事务恢复时，去读取undo$的信息，发现file 1  block 225上的数据不致，从而抛出了kdsgrp1,这个时候我们考虑禁用smon的事务恢复，并且将undo进行offline，使用以下的参数文件进行启动。</p>
-<p><img src="http://odh3pyi7v.bkt.clouddn.com/parameter.jpg" alt=""><br><img src="http://odh3pyi7v.bkt.clouddn.com/parameter2.jpg" alt=""></p>
-<p>上述的参数，主要作用是，禁止smon进行rollback,offline undo segment,允许控制文件与数据文件的scn不一至情况下启动数据库，允许跳过坏块.</p>
-<p>这样一折腾后，终于成功的把数据库打开了，心中那种激动啊，看起来成功在望啊<br><img src="http://odh3pyi7v.bkt.clouddn.com/open.jpg" alt=""></p>
-<p>但是很快随即一盆冷水淋过，大家发现没有，标红的用户只有三个对象啊，这怎么可能呢？另外还有一个应用用户也没有找到，余下的全是系统自带对象，我的天啊，数据库明明打开了，数据文件也online，数据到那里呢？想想，让我找个地方先静静………..</p>
-<p>想了好一阵子，发现参数里有个10231，这个参数是会跳过坏块的，正因为这个参数的作用，因为system的基表有坏块，把相关损坏的块都跳过了，从而把真正的用户对象全弄掉了，system表空间因为IO异常，数据块肯定埋着无数的地雷，不可能去掉10231这个参数，一个一个坏块去修复。</p>
-<p>那这样打开库有什么用呢？白白折腾了这么久，心中一阵沮丧。</p>
-<p>或者有些读者想到，能不能试试用终级杀器DUL呢？这种情况下，DUL能好用吗？</p>
-<p>我们也使用了DUL去尝试，但因为system表空间的user$和obj$等基表有问题，dul一样扫描不出用户的相关对象。也曾想过跳过system表空间，但没有了数据字典，就算抽出来数据，也只是一堆无意义的记录，对客户来说，没有什么意义。</p>
-<p>看起来真的没有办法，只能让客户丢失半天数据了？？</p>
-<h1 id="柳暗花明"><a href="#柳暗花明" class="headerlink" title="柳暗花明"></a>柳暗花明</h1><p>折腾了十几个小时，加上没有得到好的休息，脑袋都晕乎乎的，决定到楼下买杯咖啡透透气。外面，帝都正阳光灿烂，鸟语花香，正值假期，金融区这一块反而人丁稀少。园区里的园丁，正在辛勤地给树苗进行嫁接。望着这些勤劳的背影，忽然灵光闪动，能不能先将备份恢复出来，然后将恢复出来的system表空间移花接木到损坏的数据库呢？损坏的数据库不是只有system有问题吗？数据文件暂时不知道有没有问题，但至少解决了system表空间找不到用户数据的问题。</p>
-<p>说干就干，马上冲上楼，与系统工程师把新的环境搭建起来，把备份恢复到新环境，数据也推进至备份的时间点27日中午的十二点。然后把系统表空间复制到旧的环境，有点常识都知道，这样复制过来并不能直接使用的，还需要使用BBED修改system的头部SCN,使其与其他数据文件的相一致。在这里就不一一细述了，修改后，重建控制文件，非常幸运的又重新把库打开了。<br><img src="http://odh3pyi7v.bkt.clouddn.com/open2.jpg" alt=""></p>
-<p>看到上图终于出现了用户的数据，并且是12500个，与我们从备份恢复出来的对象数是一致的。当然虽然数据库成功打开了，但是后台还是一堆的报错，赶紧把用户的数据导出来，非常幸运的是，用户数据只有七张表导出报错，这七张表都是含有lob字段的，经客户确认，属于非关键表，可以允许丢一小部分数据，所以我们就使用了RMAN备份中的表代替。</p>
-<p>经过详细的数据比对，27日下午操作的数据都被挽救回来了，至此，经过将近二十个小时折腾，终于把数据库恢复到宕机前的数据状态，最大程度的挽救了数据，减少了数据的丢失。</p>
-<h1 id="故事让我们学到什么？"><a href="#故事让我们学到什么？" class="headerlink" title="故事让我们学到什么？"></a>故事让我们学到什么？</h1><p>对于将ORACLE生产环境运行在ESX虚拟化上，相信有非常多的客户是这样做的，并且有很多客户太过信任vmware的snapshot机制，认为对操作系统做好快照，做好虚拟机的整机备份就不会有问题了，但是如果发生类似于这个故事的场景，虚拟机的备份，肯定是会丢失数据的。如昨晚做了虚拟机的备份，但今天下午七点时，数据库挂了，就只能恢复到昨晚虚拟机备份的状态。</p>
-<p>对于这个故事，幸运的是客户使用的是数据库层面的备份，并且用户数据文件没有损坏，否则也同样会丢失数据，对于生产系统，强烈建议为其配置dataguard灾备环境，如果配置了DG，类似于这样的场景，就不会那么麻烦了，直接切换到dg环境即可。</p>
-
-          
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/06/01/数据库恢复之移花接木/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1024,18 +1156,16 @@ kcslf kcsgscn_ [700000000019B70, 700000000019BA0) = 00000003 5CC91234 00000000 0
             <blockquote>
 <p>版本声明：本文为tyoracle.com原创，如需转发，无需经我同意，但必须要注明来自于tyoracle.com</p>
 </blockquote>
-<p>#近况</p>
-<p>最近一直没有更新博客，已经几个月没有写东西了，年初定下来的目标，又再一次停了下来。人总会能为自己不去做某些事而找到各种各样的理由，这样可以从内心上说服自己，让自己不再承受内心的责备</p>
+<h1 id="近况"><a href="#近况" class="headerlink" title="近况"></a>近况</h1><p>最近一直没有更新博客，已经几个月没有写东西了，年初定下来的目标，又再一次停了下来。人总会能为自己不去做某些事而找到各种各样的理由，这样可以从内心上说服自己，让自己不再承受内心的责备</p>
 <p>我最近在做什么呢？学了很多的知识，但没几个记住，听了很多的道理，却没改变我的任何生活。因为，我只是在那里听着，看着，而从没有去践行，没有去做到。</p>
 <p>最近，因为某些机会，与印度人电话了几次，最后都是他在讲他的印度英语，而我在讲我的广式英语，借用广东人的一句就是：鸡同鸭讲。结果他最后也受不了，说要拉一个会讲英语的中国人加入会议才能继续讨论，内心深深受到打击。</p>
 <p>最近一直没有时间去更新的原因，一个是因为自己变懒了，一个是需要准备OCM的考试。终于在上周考完了。这个试本来应该在原厂的时候就考了（当时还不需要自己花钱呢）可是一拖再拖，因为公司的要求，拖到了今天才把他考完了。成绩需要两周后才能知道，在没有成绩前，不能有任何的幻想，所以在此先总结一下考试的一些信息，避免自己遗忘得太快。</p>
-<p>#OCM考试</p>
-<p>OCM考试现在都是很成熟的考试了，在网上能找到各类的资料，特别是培训学校出来的，能得到的东西都非常全，但是，他们给你的，并不就是你的，你还需要自己去看，去消化，去不断练习。这一次考试，给我最大的感觉就是时间会非常紧，无论你考前做过多少实验，但一到考试，总会有少许紧张，且题目的确较多，记忆力稍微差点，如命令行少个括号，或逗号，都会逼着你在这一题停下来，反复尝试，从而多花几分钟到十几分钟找原因，这样对于只有几十分钟的考试，后面的题就会变得没有时间去做。</p>
+<h1 id="OCM考试"><a href="#OCM考试" class="headerlink" title="OCM考试"></a>OCM考试</h1><p>OCM考试现在都是很成熟的考试了，在网上能找到各类的资料，特别是培训学校出来的，能得到的东西都非常全，但是，他们给你的，并不就是你的，你还需要自己去看，去消化，去不断练习。这一次考试，给我最大的感觉就是时间会非常紧，无论你考前做过多少实验，但一到考试，总会有少许紧张，且题目的确较多，记忆力稍微差点，如命令行少个括号，或逗号，都会逼着你在这一题停下来，反复尝试，从而多花几分钟到十几分钟找原因，这样对于只有几十分钟的考试，后面的题就会变得没有时间去做。</p>
 <p>在这次考试，有三个场景我是刚刚够时间做完，dataguard的场景，因为开始创建时出现问题，卡了几分钟，创建service时，卡了几分钟，最后导致了fast failover差三分钟才能完成，所以很遗撼，DG这个场景我没有完成：-（</p>
 <p>所以给考试的同学建议，一定要多练习，在做练习时，给自己定一个考试时间，这样有压力，才会提高速度。另一个就是遇到卡壳的问题，一定不要坚持，三分钟想不出答案，五分钟做不出来，一定要跳到下一题，当你把所有题做完后，再回过头来慢慢思考这一题，这样能保证你，仅有一题丢分。</p>
 <p>对于查文档，除非你对文档的所在文档名和位置非常熟，否则你还是放弃这个想法吧，在那种场景下去查文档（文档内的查找非常慢），纯属浪费时间，不到万不得已，千万别去查文档。</p>
 <p>这样的考试下来，感觉OCM就是考记忆力，它覆盖的知识面的确非常广，对于实际问题的解决帮助却非常少，所以获取这个证书只是一个称号，不要把这个称号与能力挂钩，因为OCM不会考你log file sync为什么异常的高，数据库宕机了如何去分析…….</p>
-<p>#最近的学习<br>其实最近也一直在学习，学习什么呢？在《得到》上的各种专栏，听了很多的道理，但是却没有过好一生，这是最真实的写照。 在每天通勤的路上，我每天都听着各位大牛在讲述不同方面的道理，当时听着，很有感觉，有时也有很多想法，很想写下来，但晚上一回家，啥也想不起来了。</p>
+<h1 id="最近的学习"><a href="#最近的学习" class="headerlink" title="最近的学习"></a>最近的学习</h1><p>其实最近也一直在学习，学习什么呢？在《得到》上的各种专栏，听了很多的道理，但是却没有过好一生，这是最真实的写照。 在每天通勤的路上，我每天都听着各位大牛在讲述不同方面的道理，当时听着，很有感觉，有时也有很多想法，很想写下来，但晚上一回家，啥也想不起来了。</p>
 <p>这种学习状态一定要改变了，尝试每种专栏先听一次，听到有想法的专栏，先记下来，在晚上再听一次，然后再写写自己的想法，这样才能有所收获。将这些想法内化，然后行动，才是真正的获益。</p>
 
           
@@ -1993,145 +2123,11 @@ kcslf kcsgscn_ [700000000019B70, 700000000019BA0) = 00000003 5CC91234 00000000 0
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-Oracle " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://tyoracle.com/2017/02/18/sysaux转角遇上BUG/">
-
-  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <meta itemprop="name" content="TY">
-    <meta itemprop="description" content="">
-    <meta itemprop="image" content="/images/weixin.png">
-  </span>
-
-  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-    <meta itemprop="name" content="IT 职业生涯规划">
-    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
-      <img style="display:none;" itemprop="url image" alt="IT 职业生涯规划" src="">
-    </span>
-  </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/02/18/sysaux转角遇上BUG/" itemprop="url">
-                  sysaux转角遇上BUG
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-18T00:00:00+08:00">
-                2017-02-18
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/02/18/sysaux转角遇上BUG/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/02/18/sysaux转角遇上BUG/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h2 id="个人介绍"><a href="#个人介绍" class="headerlink" title="个人介绍"></a>个人介绍</h2><p>本人TY，从事ORACLE DBA十五年，从ORACLE 8I开始，一直奋战在一线，本着对技术的狂热，一直走到今天，积累了大量的经验与案例，期待静下心来，将这些案例与经验化成文字，与大家分享，共同进步。<br>本人致力于各类IT技术分享与帮助年轻人进行IT的职业生涯规划，<br>个人网站：tyoracle.com，欢迎关注</p>
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>周一上班的时候，按惯例巡检每一套库，这是做运维操作的一个好习惯。这样可以清楚了解到自己管的每套库的状态。忽然发现某套库的SYSAUX表空间的使用率已经达到98%了，我记得上周五下班前才给这个库增加过表空间，这个SYSAUX当前已超过60G了,这个数据库数据库不是太大，60G的sysaux有点异常。普通的运维，可能发现表空间没有了，简单的加上表空间解决问题就可以了。但做运维的，一定要注意细节，我们一定要学会问为什么，这样才能让自己有所进步，也可以避免自己掉进坑里。</p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2017/02/18/sysaux转角遇上BUG/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -2174,7 +2170,7 @@ kcslf kcsgscn_ [700000000019B70, 700000000019BA0) = 00000003 5CC91234 00000000 0
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">20</span>
+                <span class="site-state-item-count">21</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

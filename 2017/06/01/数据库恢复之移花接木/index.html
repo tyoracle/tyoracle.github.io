@@ -101,7 +101,7 @@
 <meta property="og:image" content="http://odh3pyi7v.bkt.clouddn.com/parameter2.jpg">
 <meta property="og:image" content="http://odh3pyi7v.bkt.clouddn.com/open.jpg">
 <meta property="og:image" content="http://odh3pyi7v.bkt.clouddn.com/open2.jpg">
-<meta property="og:updated_time" content="2017-06-04T15:12:43.575Z">
+<meta property="og:updated_time" content="2017-06-28T02:32:48.899Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="数据库恢复之移花接木">
 <meta name="twitter:description" content="版本声明：本文为tyoracle.com原创，如需转发，无需经我同意，但必须要注明来自于tyoracle.com
@@ -419,6 +419,7 @@
 </blockquote>
 <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>端午假期前最后一天，人人都期待着小长假的到来，所以心情轻松。晚上十点的时候，正准备冲凉休息，这时一个陌生的电话打了过来。对方以急促的语气告诉我，他是公司的项目经理，客户那边因为使用VMWARE的ESX 虚拟平台，其虚拟机存放的存储（LUN）满了，导致了数台虚拟机异常，而其中有一台是客户的生产数据库，数据较为关键。</p>
 <p>现在客户已经给存储扩容，看起来数据库是启动了，但是应用始终连不上，需要我远程帮忙看看。听到这，心想，既然数据库已经启动，应该不会有什么问题，便欣然接受，远程上去检查数据库的状态。</p>
+<a id="more"></a>
 <p>在这里先交待一下客户环境：<br>客户使用的是VMWARE ESX虚拟化环境，这套系统是采用linux HA高可用结构；两节点共享磁盘VMDK200GB（位于LUN11上）因为底层存储爆满，而导致IO写入丢失，使部分目录损坏。</p>
 <p>数据库层面先说几个奇怪的地方，当前数据库运行在二节点：<br>Thu Mar 09 15:54:32 2017<br>Shutting down archive processes<br>Archiving is disabled<br>Archive process shutdown avoided: 0 active<br>Thread 1 closed at log sequence 161<br>Successful close of redo thread 1<br>Completed: ALTER DATABASE CLOSE NORMAL</p>
 <blockquote>
@@ -502,6 +503,10 @@
 
           <div class="post-nav-prev post-nav-item">
             
+              <a href="/2017/06/28/ORACLE的并行概念/" rel="prev" title="ORACLE的并行概念">
+                ORACLE的并行概念 <i class="fa fa-chevron-right"></i>
+              </a>
+            
           </div>
         </div>
       
@@ -577,7 +582,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">20</span>
+                <span class="site-state-item-count">21</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
