@@ -1,0 +1,845 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  ﻿<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="IT 职业生涯规划" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="#OGG准实时同步到GP的思路
+
+作者：ORACLE ACS Tony.Yang                            2017.7.5
+
+##背景介绍
+
+随着数据规模的不断扩大，传统的RDBMS难以满足OLAP的需求，建设银行总行软件开发中心，想利用GREENPLUM的大数据处理能力，将ORACLE相关的表进行准实时同步，将数据加载到GP中进行处理。
+原来设计方案是使用OGG A">
+<meta property="og:type" content="website">
+<meta property="og:title" content="IT 职业生涯规划">
+<meta property="og:url" content="http://tyoracle.com/OGG准实时同步到GP的思路.html">
+<meta property="og:site_name" content="IT 职业生涯规划">
+<meta property="og:description" content="#OGG准实时同步到GP的思路
+
+作者：ORACLE ACS Tony.Yang                            2017.7.5
+
+##背景介绍
+
+随着数据规模的不断扩大，传统的RDBMS难以满足OLAP的需求，建设银行总行软件开发中心，想利用GREENPLUM的大数据处理能力，将ORACLE相关的表进行准实时同步，将数据加载到GP中进行处理。
+原来设计方案是使用OGG A">
+<meta property="og:image" content="http://ata2-img.cn-hangzhou.img-pub.aliyun-inc.com/c459c9263a61045d95405c8e275cc489.png">
+<meta property="og:updated_time" content="2017-07-06T07:21:55.945Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="IT 职业生涯规划">
+<meta name="twitter:description" content="#OGG准实时同步到GP的思路
+
+作者：ORACLE ACS Tony.Yang                            2017.7.5
+
+##背景介绍
+
+随着数据规模的不断扩大，传统的RDBMS难以满足OLAP的需求，建设银行总行软件开发中心，想利用GREENPLUM的大数据处理能力，将ORACLE相关的表进行准实时同步，将数据加载到GP中进行处理。
+原来设计方案是使用OGG A">
+<meta name="twitter:image" content="http://ata2-img.cn-hangzhou.img-pub.aliyun-inc.com/c459c9263a61045d95405c8e275cc489.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"always"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://tyoracle.com/OGG准实时同步到GP的思路.html"/>
+
+
+
+
+
+  <title>
+  
+
+  
+     | IT 职业生涯规划
+  
+</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', '83296706-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?7a57fee69b03840c9f7dd4d904a40d7b";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left  ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner">﻿<div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">IT 职业生涯规划</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle">时间的朋友</p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+  ﻿<header class="post-header">
+
+	<h2 class="post-title" itemprop="name headline"></h2>
+
+
+
+</header>
+
+    
+    
+      <p>#OGG准实时同步到GP的思路</p>
+<blockquote>
+<p>作者：ORACLE ACS Tony.Yang                            2017.7.5</p>
+</blockquote>
+<p>##背景介绍</p>
+<blockquote>
+<p>随着数据规模的不断扩大，传统的RDBMS难以满足OLAP的需求，建设银行总行软件开发中心，想利用GREENPLUM的大数据处理能力，将ORACLE相关的表进行准实时同步，将数据加载到GP中进行处理。</p>
+<p>原来设计方案是使用OGG Application Adapters做抽取转换，生成flat file（平面文件），但这样不能实现准实时更新，需要客户写shell脚本，每隔五分钟调起，利用GP的sql load功能，把平面文件的数据加载到GP相应的表中。这样的方法是最简单方便的，但对于数据实时性较高的场景，有可能力不从心。</p>
+<p>ORACLE原方并不原生支持GREENPLUM，其提供了两种同步GP的方式，一种是上面提到的直接写到平面文件，另一个是把OGG抽取到的信息，交付成JMS的格式,JMS即Java消息服务（Java Message Service）应用程序接口，是一个Java平台中关于面向消息中间件（MOM）的API，用于在两个应用程序之间，或分布式系统中发送消息，进行异步通信。但因JMS需要调用JAVA进行处理，需要客户做一些定制化的JAVA开发工作，一旦配置成功，可以实现ORACLE到GP的准实时同步。</p>
+<p>本文只是提供一个实现的思路，因需要做定制开发，还需要客户进一步将思路落地</p>
+</blockquote>
+<p>OGG（Oracle GoldenGate）是一个基于日志的结构化数据备份工具，一般用于Oracle数据库之间的主从备份以及Oracle数据库到其他数据库（DB2, MySQL等）的同步。下面是Oracle官方提供的一个OGG的整体架构图，从图中可以看出OGG的部署分为源端和目标端两部分组成，主要有Manager，Extract，Pump，Collector，Replicat这么一些组件。</p>
+<p><img src="http://ata2-img.cn-hangzhou.img-pub.aliyun-inc.com/c459c9263a61045d95405c8e275cc489.png" alt="OGG数据流程"></p>
+<ul>
+<li>Manager：在源端和目标端都会有且只有一个Manager进程存在，负责管理其他进程的启停和监控等；</li>
+<li>Extract：负责从源端数据库表或者事务日志中捕获数据，有初始加载和增量同步两种模式可以配置，初始加载模式是直接将源表数据同步到目标端，而增量同步就是分析源端数据库的日志，将变动的记录传到目标端，本文介绍的是增量同步的模式；</li>
+<li>Pump：Extract从源端抽取的数据会先写到本地磁盘的Trail文件，Pump进程会负责将Trail文件的数据投递到目标端；</li>
+<li>Collector：目标端负责接收来自源端的数据，生成Trail文件</li>
+<li>Replicat：负责读取目标端的Trail文件，转化为相应的DDL和DML语句作用到目标数据库，实现数据同步。</li>
+</ul>
+<p>我们要做的是，在处于Replicat的位置，利用Java Adapter分析Trail文件，将数据的变化记录写入JMS中，然后利用java handler，将JMS推送过来的数据插入到GP中。</p>
+<p>##需要准备的软件</p>
+<ol>
+<li>JDK 1.6 or later (JDK 1.7 recommended)</li>
+<li>Apache Maven 3.x</li>
+<li>OGG Java Adapter</li>
+</ol>
+<p>##原理<br>Maven是一个项目管理工具，它包含了一个项目对象模型 (Project Object Model)，一组标准集合，一个项目生命周期(Project Lifecycle)，一个依赖管理系统(Dependency Management System)，和用来运行定义在生命周期阶段(phase)中插件(plugin)目标(goal)的逻辑。当你使用Maven的时候，你用一个明确定义的项目对象模型来描述你的项目，然后Maven可以应用横切的逻辑，这些逻辑来自一组共享的（或者自定义的）插件。   </p>
+<p>Maven 有一个生命周期，当你运行 mvn install 的时候被调用。这条命令告诉 Maven 执行一系列的有序的步骤，直到到达你指定的生命周期。遍历生命周期旅途中的一个影响就是，Maven 运行了许多默认的插件目标，这些目标完成了像编译和创建一个 JAR 文件这样的工作。    </p>
+<p>此外，Maven能够很方便的帮你管理项目报告，生成站点，管理JAR文件，等等。  </p>
+<p>我们要利用Maven将JMS里的消息通过JAVA写入到GP里</p>
+<p>##安装步骤</p>
+<p>###0. 环境要求</p>
+<p>源端已安装好Oracle<br>源端已安装好OGG（建议版本Oracle GoldenGate V12.1.2.1）<br>目标端已安装好OGG Adapters（建议版本Oracle GoldenGate Application Adapters 12.1.2.1）<br>java 7<br>（下面将介绍Oracle/OGG相关安装和配置过程，Oracle的安装将不做介绍，另外需要注意的是：Oracle/OGG相关参数配置以熟悉Oracle/OGG的运维人员配置为准，本示例只是提供一个可运行的样本，Oracle所使用的版本为ORA11gR2）</p>
+<p>###1. 源端OGG安装</p>
+<p>下载OGG安装包解压后有如下目录：</p>
+<p>drwxr-xr-x install<br>drwxrwxr-x response<br>-rwxr-xr-x runInstaller<br>drwxr-xr-x stage   </p>
+<p>目前oracle一般采取response安装的方式，在response/oggcore.rsp中配置安装依赖，具体如下：</p>
+<p>oracle.install.responseFileVersion=/oracle/install/rspfmt_ogginstall_response_schema_v12_1_2</p>
+<p>需要目前与oracle版本对应<br>INSTALL_OPTION=ORA11g </p>
+<p>  goldegate主目录 ：<br>SOFTWARE_LOCATION=/home/oracle/u01/ggate</p>
+<p>初始不启动manager：<br>START_MANAGER=false</p>
+<p>manger端口：<br>MANAGER_PORT=7839</p>
+<p>对应oracle的主目录：<br>DATABASE_LOCATION=/home/oracle/u01/app/oracle/product/11.2.0/dbhome_1</p>
+<p>暂可不配置：<br>INVENTORY_LOCATION= </p>
+<p>分组（目前暂时将oracle和ogg用同一个账号ogg_test，实际可以给ogg单独账号）：<br>UNIX_GROUP_NAME=oinstall</p>
+<p>执行命令：  </p>
+<p>runInstaller -silent -responseFile {YOUR_OGG_INSTALL_FILE_PATH}/response/oggcore.rsp<br>本示例中，安装后OGG的目录在/home/oracle/u01/ggate，安装日志在/home/oracle/u01/ggate/cfgtoollogs/oui目录下，当silentInstall{时间}.log文件里出现如下提示，表明安装成功：</p>
+<p>The installation of Oracle GoldenGate Core was successful.<br>执行/home/oracle/u01/ggate/ggsci命令，并在提示符下键入命令：CREATE SUBDIRS，从而生成ogg需要的各种目录（dir打头的那些）。至此，源端OGG安装完成。</p>
+<h3 id="2-源端Oracle配置"><a href="#2-源端Oracle配置" class="headerlink" title="2. 源端Oracle配置"></a>2. 源端Oracle配置</h3><p>以dba分身进入sqlplus：sqlplus / as sysdba</p>
+<h1 id="创建独立的表空间"><a href="#创建独立的表空间" class="headerlink" title="创建独立的表空间"></a>创建独立的表空间</h1><pre><code>create tablespace ATMV datafile &apos;/home/oracle/u01/app/oracle/oradata/uprr/ATMV.dbf&apos; size 100m autoextend on next 50m maxsize unlimited;  
+</code></pre><h1 id="创建ogg-test用户，密码也为ogg-test"><a href="#创建ogg-test用户，密码也为ogg-test" class="headerlink" title="创建ogg_test用户，密码也为ogg_test"></a>创建ogg_test用户，密码也为ogg_test</h1><pre><code>create user ogg_test identified by ogg_test default tablespace ATMV;
+</code></pre><h1 id="给ogg-test赋予充分的权限"><a href="#给ogg-test赋予充分的权限" class="headerlink" title="给ogg_test赋予充分的权限"></a>给ogg_test赋予充分的权限</h1><pre><code>grant connect,resource,dba to ogg_test; 
+</code></pre><h1 id="检查附加日志情况"><a href="#检查附加日志情况" class="headerlink" title="检查附加日志情况"></a>检查附加日志情况</h1><pre><code>Select SUPPLEMENTAL_LOG_DATA_MIN, SUPPLEMENTAL_LOG_DATA_PK, SUPPLEMENTAL_LOG_DATA_UI, SUPPLEMENTAL_LOG_DATA_FK, SUPPLEMENTAL_LOG_DATA_ALL from v$database;
+</code></pre><h1 id="增加数据库附加日志及回退"><a href="#增加数据库附加日志及回退" class="headerlink" title="增加数据库附加日志及回退"></a>增加数据库附加日志及回退</h1><p><code><pre><br>    alter database add supplemental log data;<br>    alter database add supplemental log data (primary key, unique,foreign key) columns;</pre></code></p>
+<pre><code> # rollback
+alter database drop supplemental log data (primary key, unique,foreign key) columns;
+alter database drop supplemental log data;
+</code></pre><p></p>
+<h1 id="全字段模式，注意：在该模式下的delete操作也只有主键值"><a href="#全字段模式，注意：在该模式下的delete操作也只有主键值" class="headerlink" title="全字段模式，注意：在该模式下的delete操作也只有主键值"></a>全字段模式，注意：在该模式下的delete操作也只有主键值</h1><pre><code>ALTER DATABASE ADD SUPPLEMENTAL LOG DATA (ALL) COLUMNS;
+</code></pre><h1 id="开启数据库强制日志模式"><a href="#开启数据库强制日志模式" class="headerlink" title="开启数据库强制日志模式"></a>开启数据库强制日志模式</h1><p>alter database force logging;  </p>
+<h1 id="执行marker-setup-sql-脚本"><a href="#执行marker-setup-sql-脚本" class="headerlink" title="执行marker_setup.sql 脚本"></a>执行marker_setup.sql 脚本</h1><p>@marker_setup.sql  </p>
+<h1 id="执行-ddl-setup-sql"><a href="#执行-ddl-setup-sql" class="headerlink" title="执行@ddl_setup.sql"></a>执行@ddl_setup.sql</h1><p>@ddl_setup.sql  </p>
+<h1 id="执行role-setup-sql"><a href="#执行role-setup-sql" class="headerlink" title="执行role_setup.sql"></a>执行role_setup.sql</h1><p>@role_setup.sql  </p>
+<h1 id="给ogg用户赋权"><a href="#给ogg用户赋权" class="headerlink" title="给ogg用户赋权"></a>给ogg用户赋权</h1><p>grant GGS_GGSUSER_ROLE to ogg_test;  </p>
+<h1 id="执行-ddl-enable-sql，开启DDL-trigger"><a href="#执行-ddl-enable-sql，开启DDL-trigger" class="headerlink" title="执行@ddl_enable.sql，开启DDL trigger"></a>执行@ddl_enable.sql，开启DDL trigger</h1><p>@ddl_enable.sql  </p>
+<h1 id="执行优化脚本"><a href="#执行优化脚本" class="headerlink" title="执行优化脚本"></a>执行优化脚本</h1><p>@ddl_pin ogg_test  </p>
+<h1 id="安装sequence-support"><a href="#安装sequence-support" class="headerlink" title="安装sequence support"></a>安装sequence support</h1><p>@sequence.sql<br>#<br>alter table sys.seq$ add supplemental log data (primary key) columns;  </p>
+<p>###3. OGG源端mgr配置</p>
+<p>以下是通过ggsci对ogg进行配置</p>
+<p>配置mgredit params mgr</p>
+<p><code><pre><br>PORT 7839<br>DYNAMICPORTLIST  7840-7849<br>USERID ogg_test, PASSWORD ogg_test<br>PURGEOLDEXTRACTS ./dirdat/*, USECHECKPOINTS, MINKEEPDAYS 7<br>LAGREPORTHOURS 1<br>LAGINFOMINUTES 30<br>LAGCRITICALMINUTES 45<br>PURGEDDLHISTORY MINKEEPDAYS 3, MAXKEEPDAYS 7<br>PURGEMARKERHISTORY MINKEEPDAYS 3, MAXKEEPDAYS 7</pre></code></p>
+<p><br>启动mgr（运行日志在ggate/dirrpt中）</p>
+<p>start mgr</p>
+<p>查看mgr状态</p>
+<p>info mgr</p>
+<p>查看mgr配置</p>
+<p>view params mgr</p>
+<p>###4. OGG源端extract配置</p>
+<p>以下是通过ggsci对ogg进行配置</p>
+<p>配置extract（名字可任取，extract是组名）edit params extract</p>
+<p><code><pre><br>EXTRACT extract<br>SETENV (NLS_LANG=”AMERICAN_AMERICA.AL32UTF8”)<br>DBOPTIONS   ALLOWUNUSEDCOLUMN<br>USERID ogg_test, PASSWORD ogg_test<br>REPORTCOUNT EVERY 1 MINUTES, RATE<br>NUMFILES 5000<br>DISCARDFILE ./dirrpt/ext_test.dsc, APPEND, MEGABYTES 100<br>DISCARDROLLOVER AT 2:00<br>WARNLONGTRANS 2h, CHECKINTERVAL 3m<br>EXTTRAIL ./dirdat/st, MEGABYTES 200<br>DYNAMICRESOLUTION<br>TRANLOGOPTIONS CONVERTUCS2CLOBS<br>TRANLOGOPTIONS RAWDEVICEOFFSET 0<br>DDL &amp;<br>INCLUDE MAPPED OBJTYPE ‘table’ &amp;<br>INCLUDE MAPPED OBJTYPE ‘index’ &amp;<br>INCLUDE MAPPED OBJTYPE ‘SEQUENCE’ &amp;<br>EXCLUDE OPTYPE COMMENT<br>DDLOPTIONS  NOCROSSRENAME  REPORT<br>TABLE     OGG_TEST.<em>;<br>SEQUENCE  OGG_TEST.</em>;<br>GETUPDATEBEFORES<br></pre></code></p>
+<p>增加extract进程（ext后的名字要跟上面extract对应，本例中extract是组名）</p>
+<p>add ext extract,tranlog, begin now</p>
+<p>删除某废弃进程DP_TEST</p>
+<p>delete ext DP_TEST</p>
+<p>添加抽取进程，每个队列文件大小为200m</p>
+<p>add exttrail ./dirdat/st,ext extract, megabytes 200</p>
+<p>启动抽取进程（运行日志在ggate/dirrpt中）</p>
+<p>start extract extract</p>
+<p>至此，extract配置完成，数据库的一条变更可以在ggate/dirdat目录下的文件中看到</p>
+<h3 id="5-生成def文件"><a href="#5-生成def文件" class="headerlink" title="5. 生成def文件"></a>5. 生成def文件</h3><p>源端ggsci起来后执行如下命令，生成defgen文件,并且拷贝到目标端dirdef下<br><code><pre><br>edit params defgen</pre></code></p>
+<p>DEFSFILE ./dirdef/ogg_test.def<br>USERID ogg_test, PASSWORD ogg_test<br>table OGG_TEST.*;<br></p>
+<p>在shell中执行如下命令，生成ogg_test.def</p>
+<p>./defgen paramfile ./dirprm/defgen.prm</p>
+<p>###6. 目标端OGG安装和配置</p>
+<p>解压adapter包将源端中dirdef/ogg_test.def文件拷贝到adapter的dirdef下</p>
+<p>执行ggsci起来后执行如下命令，创建必须目录create subdirs</p>
+<p>编辑mgr配置edit params mgr<br><code><pre><br>PORT 7839<br>DYNAMICPORTLIST  7840-7849<br>PURGEOLDEXTRACTS ./dirdat/*, USECHECKPOINTS, MINKEEPDAYS 7<br>LAGREPORTHOURS 1<br>LAGINFOMINUTES 30<br>LAGCRITICALMINUTES 45<br>PURGEDDLHISTORY MINKEEPDAYS 3, MAXKEEPDAYS 7<br>PURGEMARKERHISTORY MINKEEPDAYS 3, MAXKEEPDAYS 7<br></pre></code></p>
+<p>启动mgrstart mgr<br>start mgr</p>
+<p>###7. 源端ogg pump配置  </p>
+<p>启动ggsci后执行如下操作：</p>
+<p>编辑pump配置<br><code><pre><br>edit params pump</pre></code></p>
+<blockquote>
+<p>EXTRACT pump<br>RMTHOST xx.xx.xx.xx, MGRPORT 7839, COMPRESS<br>PASSTHRU<br>NUMFILES 5000<br>RMTTRAIL ./dirdat/st<br>DYNAMICRESOLUTION<br>TABLE      OGG_TEST.*;</p>
+</blockquote>
+<p><br>添加投递进程，从某一个队列开始投<br>    add ext pump,exttrailsource ./dirdat/st</p>
+<p>备注：投递进程，每个队文件大小为200m</p>
+<pre><code>add rmttrail ./dirdat/st,ext pump,megabytes 200
+</code></pre><p>启动pump</p>
+<p>start pump</p>
+<p>启动后，结合上面adapter的配置，可以在目标端的dirdat目录下看到过来的trailfile</p>
+<p>至此，简单的数据同步链路已经打通，下一步，我们需要将trail file的内容转换成JMS，并且交付到GP里。</p>
+<h2 id="AP的配置"><a href="#AP的配置" class="headerlink" title="AP的配置"></a>AP的配置</h2><p>依赖环境：jdk1.7。 </p>
+<p>配置好JAVA_HOME, LD_LIBRARY_PATH，可以将环境变量配置到~/.bash_profile中，例如</p>
+<pre><code>export JAVA_HOME=/xxx/xxx/jrexx
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:$JAVA_HOME/lib/amd64:$JAVA_HOME/lib/amd64/server
+</code></pre><p>修改环境变量后，请重启adapter的mgr进程</p>
+<h3 id="配置Java-Data-Pump-Parameter-File"><a href="#配置Java-Data-Pump-Parameter-File" class="headerlink" title="配置Java Data Pump Parameter File"></a>配置Java Data Pump Parameter File</h3><p>创建一个JAVA的抽取进程，用来读取源库传输过来的trail file.</p>
+<p><code><pre><br>EXTRACT PGP<br>SETENV ( GGS_USEREXIT_CONF = “dirprm/pgp.props”)<br>CUSEREXIT libggjava_ue.so CUSEREXIT PASSTHRU<br>INCLUDEUPDATEBEFORES<br>GETUPDATEBEFORES<br>NOCOMPRESSUPDATES<br>SOURCEDEFS ./dirdef/source.def<br>TABLE OGG_TEST.*;<br></pre></code></p>
+<p>这个进程启动的时候，会检查dirprm/pgp.props这个文件的内容，所以在启动前，需要先配置好dirprm/pgp.props这个文件</p>
+<h3 id="JDBC访问Greenplum示例"><a href="#JDBC访问Greenplum示例" class="headerlink" title="JDBC访问Greenplum示例"></a>JDBC访问Greenplum示例</h3><p>在说明配置AP前，先给出一个JDBC访问 GP的示例，读懂这个示例有助于下一步配置AP的</p>
+<p>建立maven工程JDBCGreenplumDemo，在pom.xml配置文件添加必要的依赖：</p>
+<!--lang: java--> 
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;project xmlns=&quot;http://maven.apache.org/POM/4.0.0&quot;
+xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+xsi:schemaLocation=&quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd&quot;&gt;
+&lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+
+&lt;groupId&gt;JDBCGreenplumDemo&lt;/groupId&gt;
+&lt;artifactId&gt;JDBCGreenplumDemo&lt;/artifactId&gt;
+&lt;version&gt;1.0-SNAPSHOT&lt;/version&gt;
+
+&lt;dependencies&gt;
+
+&lt;dependency&gt;
+&lt;groupId&gt;postgresql&lt;/groupId&gt;
+&lt;artifactId&gt;postgresql&lt;/artifactId&gt;
+&lt;version&gt;9.2-1003.jdbc4&lt;/version&gt;
+&lt;/dependency&gt;
+
+&lt;/dependencies&gt;
+
+&lt;/project&gt;
+</code></pre><p>创建表和添加随机数据：<br><code><pre><br>    create table point with(appendonly=true, compresslevel=5) as<br>    select a as id, round(random()) as flag, random() as value<br>    from generate_series(1, 5000000) a;<br></pre></code></p>
+<p>UserService类：</p>
+<!--lang: java-->  
+<p><code><pre><br>package com.mangocool.greenplum.util;</pre></code></p>
+<p>import java.sql.*;    </p>
+<p>public class ConnectionUtils {</p>
+<pre><code>private static Connection conn = null;
+
+public static Connection getConn()
+{
+    if(conn == null)
+    {
+        try {
+            Class.forName(&quot;org.postgresql.Driver&quot;);
+            String url = &quot;jdbc:postgresql://192.168.20.145:5432/testdb&quot;;
+            conn = DriverManager.getConnection(url, &quot;gpadmin&quot;, &quot;gpadmin&quot;);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    return conn;
+}
+</code></pre><p>}<br></p>
+<p>ConnectionUtils类：<br><!--lang: java--><br><code><pre><br>package com.mangocool.greenplum.service;</pre></code></p>
+<p>import com.mangocool.greenplum.util.ConnectionUtils;</p>
+<p>import java.sql.Connection;<br>import java.sql.PreparedStatement;<br>import java.sql.ResultSet;<br>import java.sql.SQLException;<br>import java.util.ArrayList;<br>import java.util.HashMap;<br>import java.util.List;</p>
+<p>public class UserService {</p>
+<pre><code>private PreparedStatement pstat = null;
+private ResultSet rs = null;
+
+public List&lt;HashMap&lt;String, String&gt;&gt; getUserList()
+{
+    List&lt;HashMap&lt;String, String&gt;&gt; users = new ArrayList&lt;HashMap&lt;String, String&gt;&gt;();
+    HashMap&lt;String, String&gt; user = null;
+    String sql = &quot;select * from point limit 500000&quot;;
+    Connection conn = ConnectionUtils.getConn();
+    try {
+        pstat = conn.prepareStatement(sql);
+        long startTime = System.nanoTime();
+        rs = pstat.executeQuery();
+
+        while(rs.next())
+        {
+            user = new HashMap&lt;String, String&gt;();
+            user.put(&quot;id&quot;, rs.getString(1));
+            user.put(&quot;flag&quot;, rs.getString(2));
+            user.put(&quot;value&quot;, rs.getString(3));
+            users.add(user);
+        }
+        long endTime = System.nanoTime();
+        System.out.printf(&quot;耗时：%5.3fs&quot;, (endTime - startTime)/1000000000.0);
+        rs.close();
+        pstat.close();
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return users;
+}
+
+public static void main(String[] args) {
+    UserService userService = new UserService();
+    userService.getUserList();
+}
+</code></pre><p>}<br></p>
+<p>如果是用eclipse搭建工程的，需要添加postgresql的驱动包。</p>
+<p>下载地址：<a href="http://central.maven.org/maven2/postgresql/postgresql/9.1-901-1.jdbc4/postgresql-9.1-901-1.jdbc4.jar" target="_blank" rel="external">http://central.maven.org/maven2/postgresql/postgresql/9.1-901-1.jdbc4/postgresql-9.1-901-1.jdbc4.jar</a></p>
+<h3 id="Adapter-java-属性文件"><a href="#Adapter-java-属性文件" class="headerlink" title="Adapter java 属性文件"></a>Adapter java 属性文件</h3><p>这个文件包含了JAVA连接到GP的相关信息，作用是：</p>
+<ul>
+<li>建立GP与JDBC接口的通讯</li>
+<li>格式化交付的数据</li>
+</ul>
+<p>在这里对应的是dirprm/pgp.props这个文件  </p>
+<p><strong>使用以下的例子，里面的内容需要根据客户环境进行实际调试，此脚本只是根据官方文档给出建议，并不能在生产环境中直接使用。</strong></p>
+<p><code><pre><br>gg.log.level=debug<br>gg.handlerlist=hjdbc<br>gg.handler.hjdbc.type=com.goldengate.delivery.handler.jdbc.JDBCHandler<br>gg.handler.hjdbc.connectionURL=jdbc:postgresql://192.168.20.145:5432/testdb<br>gg.handler.hjdbc.schema=HANAuser<br>gg.handler.hjdbc.driverClass=com.sap.db.jdbc.Driver<br>gg.handler.hjdbc.userName=gpadmin<br>gg.handler.hjdbc.password=gpadmin<br>gg.handler.hjdbc.mode=tx</pre></code></p>
+<p>goldengate.userexit.nochkpt=TRUE<br>goldengate.userexit.timestamp=utc<br>goldengate.log.logname=cuserexit<br>goldengate.log.level=INFO<br>goldengate.log.tofile=true<br>goldengate.userexit.writers=javawriter<br>javawriter.stats.full=TRUE<br>javawriter.stats.display=TRUE<br>gg.classpath=ggjava/jdbc/postgresql-9.1-901-1.jdbc4.jar:<br>javawriter.stats.full=TRUE<br>javawriter.stats.display=TRUE<br>javawriter.bootoptions=-Xmx256m -Xms256m -Djava.class.path=ggjava/ggjava.jar</p>
+<p></p>
+<p>如果上述文件没有配置错误，应该可以顺利的启动前面配置的PGP进程</p>
+<p>ggsci&gt; start pgp</p>
+<p>如果不能启动，需要调整相关的参数，参考：<br>[ Oracle® GoldenGate Application Adapters ]<br>Administering Oracle GoldenGate Adapters<br>12c (12.1.2.1.1)<br>E61853-01</p>
+
+    
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="OGG准实时同步到GP的思路.html"
+           data-title="" data-url="http://tyoracle.com/OGG准实时同步到GP的思路.html">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview sidebar-panel sidebar-panel-active">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/weixin.png"
+               alt="TY" />
+          <p class="site-author-name" itemprop="name">TY</p>
+          <p class="site-description motion-element" itemprop="description">IT职业生涯规划与技术分享</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">23</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/tyoracle.com" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-link"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  ##<a href="http://www.ce-service.com.cn/blog/" title="中亦安图技术博客" target="_blank">中亦安图技术博客</a>
+                  <a href="http://creativecommons.org/licenses//4.0" class="cc-opacity" target="_blank">中亦安图技术博客</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  ##<a href="https://oracleblog.org/" title="天堂向左 DBA向右" target="_blank">天堂向左 DBA向右</a>
+                  <a href="http://creativecommons.org/licenses//4.0" class="cc-opacity" target="_blank">天堂向左 DBA向右</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        ﻿<div class="copyright" >
+  
+  &copy;  Thu Jul 28 2016 08:00:00 GMT+0800 (中国标准时间) - 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">TY</span>
+</div>
+
+
+<div class="powered-by">
+  由Tony Yang强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="tyoracle.com">
+    IT 职业生涯规划  
+  </a>
+</div>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+本站总访问量 <span id="busuanzi_value_site_pv"></span> &nbsp&nbsp&nbsp
+您是第 <span id="busuanzi_value_site_uv"></span> 个来到的小伙伴
+
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"tyoracle"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

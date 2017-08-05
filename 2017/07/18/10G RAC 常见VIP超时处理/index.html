@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="oracle,troubleshooting," />
 
 
 
@@ -86,22 +86,25 @@
 
 
 
-<meta name="description" content="感想当时光飞逝，进入2017年已经三天了，感觉还是停留在2016里，恍如昨日。时间总是在过去了，才会让人感觉到飞快，拥有的时候，才不知如何使用，白白浪费在刷微信，浏览无聊的网页上。
-在朋友圈，这几天不断的刷着2016的成绩与2017的计划，这种期望是好的，但是又有多少人在年底的时候能完成自己年初定下的计划，并且完成的呢？
-在新一年的开始，的确需要对过去进行回顾，对未来进行规划，但是任何的一切，不会">
+<meta name="description" content="版本声明：本文为tyoracle.com原创，如需转发，无需经我同意，但必须要注明来自于tyoracle.com
+
+前言今天在客户那，遇到一套AIX环境下的10.2.0.4 RAC因为网卡闪断，而致VIP报错切换到另一个节点，使本机的service,listener等全部offline的问题，所以在此收集一下，各种情况下的VIP超时的处理方法，供日后问题查找与分析。
+分析因为客户没法把日志发给我">
 <meta property="og:type" content="article">
-<meta property="og:title" content="2017_new_begining">
-<meta property="og:url" content="http://tyoracle.com/2017/01/03/2017_new_begining/index.html">
+<meta property="og:title" content="10G RAC 常见VIP超时处理">
+<meta property="og:url" content="http://tyoracle.com/2017/07/18/10G RAC 常见VIP超时处理/index.html">
 <meta property="og:site_name" content="IT 职业生涯规划">
-<meta property="og:description" content="感想当时光飞逝，进入2017年已经三天了，感觉还是停留在2016里，恍如昨日。时间总是在过去了，才会让人感觉到飞快，拥有的时候，才不知如何使用，白白浪费在刷微信，浏览无聊的网页上。
-在朋友圈，这几天不断的刷着2016的成绩与2017的计划，这种期望是好的，但是又有多少人在年底的时候能完成自己年初定下的计划，并且完成的呢？
-在新一年的开始，的确需要对过去进行回顾，对未来进行规划，但是任何的一切，不会">
-<meta property="og:updated_time" content="2017-02-03T09:31:16.410Z">
+<meta property="og:description" content="版本声明：本文为tyoracle.com原创，如需转发，无需经我同意，但必须要注明来自于tyoracle.com
+
+前言今天在客户那，遇到一套AIX环境下的10.2.0.4 RAC因为网卡闪断，而致VIP报错切换到另一个节点，使本机的service,listener等全部offline的问题，所以在此收集一下，各种情况下的VIP超时的处理方法，供日后问题查找与分析。
+分析因为客户没法把日志发给我">
+<meta property="og:updated_time" content="2017-07-18T03:34:59.058Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="2017_new_begining">
-<meta name="twitter:description" content="感想当时光飞逝，进入2017年已经三天了，感觉还是停留在2016里，恍如昨日。时间总是在过去了，才会让人感觉到飞快，拥有的时候，才不知如何使用，白白浪费在刷微信，浏览无聊的网页上。
-在朋友圈，这几天不断的刷着2016的成绩与2017的计划，这种期望是好的，但是又有多少人在年底的时候能完成自己年初定下的计划，并且完成的呢？
-在新一年的开始，的确需要对过去进行回顾，对未来进行规划，但是任何的一切，不会">
+<meta name="twitter:title" content="10G RAC 常见VIP超时处理">
+<meta name="twitter:description" content="版本声明：本文为tyoracle.com原创，如需转发，无需经我同意，但必须要注明来自于tyoracle.com
+
+前言今天在客户那，遇到一套AIX环境下的10.2.0.4 RAC因为网卡闪断，而致VIP报错切换到另一个节点，使本机的service,listener等全部offline的问题，所以在此收集一下，各种情况下的VIP超时的处理方法，供日后问题查找与分析。
+分析因为客户没法把日志发给我">
 
 
 
@@ -129,13 +132,13 @@
 
 
 
-  <link rel="canonical" href="http://tyoracle.com/2017/01/03/2017_new_begining/"/>
+  <link rel="canonical" href="http://tyoracle.com/2017/07/18/10G RAC 常见VIP超时处理/"/>
 
 
 
 
 
-  <title> 2017_new_begining | IT 职业生涯规划 </title>
+  <title> 10G RAC 常见VIP超时处理 | IT 职业生涯规划 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -296,8 +299,8 @@
   
   
 
-  <article class="post post-type-person " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://tyoracle.com/2017/01/03/2017_new_begining/">
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://tyoracle.com/2017/07/18/10G RAC 常见VIP超时处理/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="TY">
@@ -321,7 +324,7 @@
             
             
               
-                2017_new_begining
+                10G RAC 常见VIP超时处理
               
             
           </h1>
@@ -336,8 +339,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-03T00:00:00+08:00">
-                2017-01-03
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-07-18T00:00:00+08:00">
+                2017-07-18
               </time>
             
 
@@ -347,6 +350,28 @@
           </span>
 
           
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/oracle-troubleshooting/" itemprop="url" rel="index">
+                    <span itemprop="name">oracle,troubleshooting</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
 
           
             
@@ -355,8 +380,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2017/01/03/2017_new_begining/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/01/03/2017_new_begining/" itemprop="commentCount"></span>
+                <a href="/2017/07/18/10G RAC 常见VIP超时处理/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/07/18/10G RAC 常见VIP超时处理/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -386,18 +411,145 @@
       
 
       
-        <h2 id="感想"><a href="#感想" class="headerlink" title="感想"></a>感想</h2><p>当时光飞逝，进入2017年已经三天了，感觉还是停留在2016里，恍如昨日。时间总是在过去了，才会让人感觉到飞快，拥有的时候，才不知如何使用，白白浪费在刷微信，浏览无聊的网页上。</p>
-<p>在朋友圈，这几天不断的刷着2016的成绩与2017的计划，这种期望是好的，但是又有多少人在年底的时候能完成自己年初定下的计划，并且完成的呢？</p>
-<p>在新一年的开始，的确需要对过去进行回顾，对未来进行规划，但是任何的一切，不会因为新的一年而改变，如未读的书依然在书柜里，未背的单词，还是不会，未跑的里程，还是需要用汗水去浇灌。如果你今年还是定下了要读多少本书，背多少单词，做多少事，只不过是把往年的计划重复。对你来说，2017并没有什么特别。</p>
-<p>我们是需要将每一年活出精彩，还是重复过着每一年的生活呢？这需要我们每个人深入地思考。</p>
-<p>在新年伊始，回顾与展望，的确让人有一种庄严的仪式感。这样可以让人有一种新生的感觉。那我也不能免俗，让自己在2017年写下新一年的初步计划。</p>
-<p>2016年里发生了很多的事情，世界的，中国的，身边的，但那是外部的环境，你不能改变，那只能适应。2016年是一个知识变现的年，在这一年里，看到很多技术牛人，将知识通过网络变现，知识开始以各种不同的付费形式出现。而我也参与其中，成为付费学习的一份子。在2017，需要将这些付费学习的知识，整理成文字，内化在自己的思维里，才不枉付出时间与金钱进行学习。</p>
-<p>财富自由，生涯规划，人生升级，这些概念，需要无时无刻的提醒自己去不断地思考，反省与努力。</p>
-<p>2017年，需要更关注时间的消耗，时间是不可再生资源，你的时间花在了这些地方，就没有时间进行学习。时间放在那，成长就在那。希望是一个人前进的动力，虽然前路并不可知，但是认准了方向，只需去做就行了，做了，至少你往前移动了一点，能看清前方的路也多一点，所以怀着希望，认准方向，就拼命去努力，不要浪费时间在那里胡思乱想。</p>
-<p>再多的计划都是空谈，实干出真知，简单地说，继续一百天的计划，一百天跑步，一百篇博客更新，一百天持续英语朗读，每天坚持碎片化学习付费订阅，学习冥想。</p>
-<p>其实最好的执行方式，取于一张A4纸自制一个2017的日历，每坚持一天，就在上面打个圆圈，对，这是我准备去做的。</p>
-<p>愿你我在2017年活出与2016年不一样的自我，而不是重复过去一年的自己。</p>
+        <blockquote>
+<p>版本声明：本文为tyoracle.com原创，如需转发，无需经我同意，但必须要注明来自于tyoracle.com</p>
+</blockquote>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天在客户那，遇到一套AIX环境下的10.2.0.4 RAC因为网卡闪断，而致VIP报错切换到另一个节点，使本机的service,listener等全部offline的问题，所以在此收集一下，各种情况下的VIP超时的处理方法，供日后问题查找与分析。</p>
+<h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><p>因为客户没法把日志发给我，只能从网上找到类似的日志</p>
+<pre><code>1:# errpt
+IDENTIFIER TIMESTAMP  T C RESOURCE_NAME  DESCRIPTION
+F3931284   0416005812 I H ent2   ETHERNET NETWORK RECOVERY MODE
+173C787F   0416005712 I S topsvcsPossible malfunction on local adapter
+EC0BCCD4   0416005712 T H ent2   ETHERNET DOWN
+</code></pre><p>VIP: (在2012-04-16 00:57:43检测到问题，Interface en2 checked failed)，看到超时了2.434S</p>
+<pre><code>2012-04-16 00:57:43.437: [RACG][1] [127770][1][ora.racdb2.vip]: /oracle/product/10g/crs/bin/racgvip[9]: /etc/lsattr:  not found
+/oracle/product/10g/crs/bin/racgvip[37]: /etc/lsattr:  not found
+Interface en2 checked failed (host=racdb2)
+Invalid parameters, or failed to bring up VIP (host=racdb2)
+2012-04-16 00:57:43.437: [RACG][1] [127770][1][ora.racdb2.vip]: clsrcexecut: env ORACLE_CONFIG_HOME=/oracle/product/10g/crs
+2012-04-16 00:57:43.437: [RACG][1] [127770][1][ora.racdb2.vip]: clsrcexecut: cmd = /oracle/product/10g/crs/bin/racgeut -e _USR_ORA_DEBUG=0 54 /oracle/product/10g/crs/bin/racgvip check racdb2
+2012-04-16 00:57:43.437: [RACG][1] [127770][1][ora.racdb2.vip]: clsrcexecut: rc = 1, time = 2.309s
+2012-04-16 00:57:43.437: [RACG][1] [127770][1][ora.racdb2.vip]: end for resource = ora.racdb2.vip, action = check, status = 1, time = 2.434s
+</code></pre><p>crsd 日志报错</p>
+<pre><code>2012-04-16 00:57:43.437: [ CRSAPP][11321]32CheckResource error for ora.node02.vip error code = 1
+2012-04-16 00:57:43.437: [ CRSRES][11321]32In stateChanged, ora.node02.vip target is ONLINE
+2012-04-16 00:57:43.437: [ CRSRES][11321]32ora.node02.vip on node02 went OFFLINE unexpectedly
+</code></pre><p>如果问题会经常出现，建议设置以下的trace进行问题根因定位</p>
+<pre><code>VIP tracing is set by using the following commands:
 
+#crsctl debug log res &quot;ora.node01.vip:5&quot;
+#crsctl debug log res &quot;ora.node02.vip:5&quot;
+</code></pre><p>取消trace可以用</p>
+<pre><code>#crsctl debug log res &quot;ora.node01.vip:0&quot;
+#crsctl debug log res &quot;ora.node02.vip:0&quot;
+</code></pre><h2 id="原因定位"><a href="#原因定位" class="headerlink" title="原因定位"></a>原因定位</h2><p>通过分析trace,发现原来是在AIX下的racgvip里存在这样一段脚本</p>
+<pre><code># timeout of ping in number of loops (1 sec)
+PING_TIMEOUT=&quot; -c 1 -w 1&quot;
+</code></pre><p>其意思是</p>
+<pre><code>-S hostname/IP addr
+Uses the IP address as the source address in outgoing ping packets.
+
+-c Count
+Specifies the number of echo requests, as indicated by the Count
+variable, to be sent (and received).
+
+-w timeout
+This option works only with the -c option. It causes ping to wait
+for a maximum of &apos;timeout&apos; seconds for a reply (after sending the
+last packet).
+</code></pre><p>所以，上述的命令可以理解成，如果从公网IP 去ping 网关，返回时间超1秒即认为会报错</p>
+<p>ping -S 192.168.220.36 -c 1 -w 1 192.168.220.33<br>==&gt;192.168.220.36 是公网IP, 192.168.220.33 是网关.</p>
+<p>正因为racgvip里有这个网络检查机制，在上述的情境中，因为AIX的网卡闪断，导致了RAC里的日志报超时2.434S，所以超出了racgvip里的检查阀值，必然会导致VIP超时，从而出现offline unexpectedly并漂移到另外的节点。</p>
+<p>改善方法：</p>
+<p>-1. 修改racgvip，将超时时间设大一点，至5秒（根据实际情况确定）<br> <code><pre></pre></code></p>
+<pre><code>    1. Stop all node applications.
+% srvctl stop nodeapps -n &lt;hostname&gt;
+
+2. Backup then Modify the racgvip script .
+
+Change:
+# timeout of ping in number of loops (1 sec)
+PING_TIMEOUT=&quot; -c 1 -w 1&quot;
+
+To:
+# timeout of ping in number of loops (5 sec)
+PING_TIMEOUT=&quot; -c 1 -w 5&quot;
+
+3. Start the node applications and other necessary resources.
+% srvctl start nodeapps -n &lt;hostname&gt;
+</code></pre><p></p>
+<p>2、使用load balance模式的双网卡绑定  </p>
+<p>只有使用load balance模式的双网卡绑定才可以，如果使用主备模式的绑定是不可以的，在实际情况遇到过，因为主备模式是会在主网卡失效后，重试3次，每次间隔1秒才会切换到备网卡，所以这个时候也会遇到超时3秒的情况。但使用load balance模式需要交换机支持。</p>
+<h2 id="另一个AIX下的VIP案例"><a href="#另一个AIX下的VIP案例" class="headerlink" title="另一个AIX下的VIP案例"></a>另一个AIX下的VIP案例</h2><p>适用于10.2.0.1–11.1的AIX下的RAC版本</p>
+<pre><code>srvctl start nodeapps -n racnode2
+racnode2:ora.racnode2.vip:Interface eth0 checked failed (host=racnode2.us.oracle.com)
+racnode2:ora.racnode2.vip:Invalid parameters, or failed to bring up VIP (host=racnode2.us.oracle.com)
+CRS-1006: No more members to consider
+CRS-0215: Could not start resource &apos;ora.racnode2.vip&apos;
+</code></pre><p>这是因为公网网卡用的是 LHEA (IBM Logical Host Ethernet Adapter):</p>
+<pre><code># /usr/bin/entstat -d en0
+-------------------------------------------------------------
+ETHERNET STATISTICS (en0) :
+Device Type: Host Ethernet Adapter (l-hea)
+...
+
+Or, the adapter type is null in entstat -d output:
+
+
+# /usr/bin/entstat -d en3 
+-------------------------------------------------------------
+ETHERNET STATISTICS (en3) :
+Device Type:
+...
+</code></pre><p>这是因为LHEA使用的entstat模式不同，其命中了Bug 8725020 - VIP WONT RUN (LHEA) ADAPTER 5.3 TL9</p>
+<p>修复的方法可以修改racgvip的脚本</p>
+<pre><code>1. Backup the racgvip script
+2. Edit this line in the script using vi:
+
+$ENTSTAT -d $_IF | $GREP -iEq &apos;.*lan.*state.*:.*operational.*|.*link.*status.*:.*up.*|.*port.*operational.*state.*:.*up.*&apos;
+
+and replace it with this:
+
+$ENTSTAT -d $_IF | $GREP -iEq &apos;.*lan.*state.*:.*operational.*|.*link.*status.*:.*up.*|.*port.*operational.*state.*:.*up.*|.*driver.*flags.*:.*up.*&apos;
+</code></pre><p>重启整个RAC生效。</p>
+<h2 id="HPUNIX下的VIP案例"><a href="#HPUNIX下的VIP案例" class="headerlink" title="HPUNIX下的VIP案例"></a>HPUNIX下的VIP案例</h2><pre><code>crsd.log  shows:
+
+
+2009-01-22 08:43:14.664: [ COMMCRS][44]Authorization failed, network error 
+2009-01-22 08:43:14.670: [ OCRSRV][44]th_select_answer: Failure in answer. clsc ret [3] 
+2009-01-22 08:43:14.675: [ CRSAPP][152290] CheckResource error for ora.node1.vip error code = 139 
+2009-01-22 08:43:14.682: [ CRSRES][152290] In stateChanged, ora.node1.vip target is ONLINE 
+2009-01-22 08:43:14.701: [ CRSRES][152290] ora.node1.vip on node1 went OFFLINE unexpectedly
+</code></pre><p>奇怪的是在ora.node1.vip.log没有任何的相关记录，但是在 <crs_home>/racg/racgmain目录下产生了一个core file</crs_home></p>
+<pre><code>node1:/u01/oracle/app/oracle/product/10.2.0/crs/lognode1/racg/racgmain# ls -ltr 
+-rw------- 1 root sys 7488128 Jan 22 08:43 core 
+
+node1:/u01/oracle/app/oracle/product/10.2.0/crs/log/node1/racg/racgmain# file core 
+core: ELF-64 core file - IA64 from &apos;racgmain&apos; - received SIGSEGV 
+</code></pre><p>这个报错与 Bug 6783336  ，  Bug 7165018 相似，并且他们的 Base  Bug 是6955290，</p>
+<p>解决：</p>
+<pre><code>You must shutdown Clusterware on the node implementing the workaround
+root&gt; crsctl stop crs
+
+Change the mode of executable which uses shared library from &quot;delay binding&quot; to &quot;immediate binding&quot; using this command:
+
+$ chatr -B immediate &lt;executable&gt; 
+
+So we need to do &quot;chatr -B immediate&quot; on following executables from both CRS Home and RDBMS Home:
+crs_relocate.bin 
+crs_start.bin 
+crs_stop.bin 
+crsd.bin 
+evmd.bin 
+racgons.bin 
+racgeut 
+racgevtf 
+racgmain 
+
+When finished start Clusterware and repeat the steps on the next node
+
+Whenever you apply a patch or patchset to your installation repeat the above workaround
+</code></pre>
       
     </div>
 
@@ -418,13 +570,19 @@
 
     <footer class="post-footer">
       
+        <div class="post-tags">
+          
+            <a href="/tags/oracle-troubleshooting/" rel="tag"># oracle,troubleshooting</a>
+          
+        </div>
+      
 
       
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/10/09/PMON_unable_to_acquire_latch的问题分析/" rel="next" title="PMON unable to acquire latch的问题分析">
-                <i class="fa fa-chevron-left"></i> PMON unable to acquire latch的问题分析
+              <a href="/2017/06/29/MYSQL并行恢复/" rel="next" title="MYSQL并行恢复">
+                <i class="fa fa-chevron-left"></i> MYSQL并行恢复
               </a>
             
           </div>
@@ -432,10 +590,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/02/06/该奋斗了/" rel="prev" title="该奋斗了">
-                该奋斗了 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -464,8 +618,8 @@
           
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2017/01/03/2017_new_begining/"
-           data-title="2017_new_begining" data-url="http://tyoracle.com/2017/01/03/2017_new_begining/">
+      <div class="ds-thread" data-thread-key="2017/07/18/10G RAC 常见VIP超时处理/"
+           data-title="10G RAC 常见VIP超时处理" data-url="http://tyoracle.com/2017/07/18/10G RAC 常见VIP超时处理/">
       </div>
     
   </div>
@@ -603,7 +757,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#感想"><span class="nav-number">1.</span> <span class="nav-text">感想</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分析"><span class="nav-number">2.</span> <span class="nav-text">分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#原因定位"><span class="nav-number">3.</span> <span class="nav-text">原因定位</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#另一个AIX下的VIP案例"><span class="nav-number">4.</span> <span class="nav-text">另一个AIX下的VIP案例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HPUNIX下的VIP案例"><span class="nav-number">5.</span> <span class="nav-text">HPUNIX下的VIP案例</span></a></li></ol></div>
             
 
           </div>

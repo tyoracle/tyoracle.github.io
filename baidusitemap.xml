@@ -4,6 +4,47 @@
 
     
   <url>
+    <loc>http://tyoracle.com/2017/07/18/10G%20RAC%20%E5%B8%B8%E8%A7%81VIP%E8%B6%85%E6%97%B6%E5%A4%84%E7%90%86/</loc>
+    <lastmod>2017-07-18T03:34:59.058Z</lastmod>
+    <data>
+        <display>
+        <title>10G RAC 常见VIP超时处理</title>
+        <pubTime>2017-07-17T16:00:00.000Z</pubTime>
+        
+        <tag>oracle,troubleshooting</tag>
+         
+         
+           
+             
+              <breadCrumb title="oracle,troubleshooting" url="http://tyoracle.com/categories/oracle-troubleshooting/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+    
+  <url>
+    <loc>http://tyoracle.com/2017/06/29/MYSQL%E5%B9%B6%E8%A1%8C%E6%81%A2%E5%A4%8D/</loc>
+    <lastmod>2017-07-02T11:01:50.479Z</lastmod>
+    <data>
+        <display>
+        <title>MYSQL并行恢复</title>
+        <pubTime>2017-06-28T16:00:00.000Z</pubTime>
+        
+        <tag>mysql,recover</tag>
+         
+         
+           
+             
+              <breadCrumb title="mysql,recover" url="http://tyoracle.com/categories/mysql-recover/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>http://tyoracle.com/2017/06/28/ORACLE%E7%9A%84%E5%B9%B6%E8%A1%8C%E6%A6%82%E5%BF%B5/</loc>
     <lastmod>2017-06-28T07:47:00.376Z</lastmod>
     <data>
